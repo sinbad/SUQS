@@ -1,0 +1,31 @@
+{
+	"FileVersion" : 3,
+	"Version" : 1,
+	"VersionName" : "1.0",
+	"FriendlyName" : "Steve's Unreal Quest System (SUQS)",
+	"Description" : "Data-driven quest system for UE4",
+	"Category" : "Code Utilities",
+	"CreatedBy" : "Steve Streeting",
+	"CreatedByURL" : "https://www.stevestreeting.com",
+	"DocsURL" : "",
+	"MarketplaceURL" : "",
+	"SupportURL" : "https://github.com/sinbad/SUQS",
+	"EnabledByDefault" : true,
+	"CanContainContent" : false,
+	"IsBetaVersion" : true,
+	"Installed" : false,
+	"Modules" :
+	[
+		{
+			"Name" : "SUQS",
+			"Type" : "Runtime",
+			"LoadingPhase" : "Default"
+		},
+		{
+			"Name": "SUQSEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		}
+		
+	]	
+}
