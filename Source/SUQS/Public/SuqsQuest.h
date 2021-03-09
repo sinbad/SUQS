@@ -27,9 +27,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	int TargetNumber = 1;
 
-	/// An optional time limit for the task
+	/// An optional time limit for the task. Once a task is started, it will be auto-failed if this time limit expires
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	float TimeLimit = 0;
+
+	/// Whether this task starts off hidden. If all tasks in an objective are hidden, the objective is also hidden
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
+	bool bHidden = false;
+	
 
 };
 
@@ -79,6 +84,11 @@ public:
 /// Quests can depend on other quests before being activated.
 /// Quests must be uniquely named (the Name property inherited from FTableRowBase). If you use more than one
 /// quest table asset then there must be no name clashes between them.
+/// Quest data is static; progress through the quest is tracked with USuqsStatus. This means quests / objectives / tasks cannot be
+/// added at runtime. However, you can choose when to make Quests available to the player, and objectives / tasks can
+/// be hidden in USuqsStatus, and activated later, which is the same as being dynamic, except you have to pre-define the
+/// variants in your data. This is deliberate, it means all your quest data is visible statically which makes it easier to
+/// avoid bugs introduced by code dynamically altering quests arbitrarily.
 USTRUCT(BlueprintType)
 struct SUQS_API FSuqsQuest : public FTableRowBase
 {

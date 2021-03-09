@@ -3,6 +3,27 @@
 #include "SuqsStatusStructs.generated.h"
 
 
+/// Summarises the state of a quest / objective / task
+/// Note that there isn't an "Inactive" entry. Quests which are not available yet
+/// just won't be included at all in quest state
+UENUM(BlueprintType)
+enum class ESuqsSummaryState : uint8
+{
+	/// Unavailable (quest only), will not be shown to the player
+	Unavailable = 0,
+	/// No progress has been made on any task yet
+	NotStarted = 2,
+	/// At least one element of progress has been made
+    InProgress = 4,
+	/// All mandatory elements have been completed
+    Completed = 6,
+	/// This item has been failed and cannot be progressed without being explicitly reset
+    Failed = 20,
+	/// This item (objective/task) is hidden. It is essentially ignored even if mandatory. Can be used
+	/// to have "dynamic" objectives / tasks
+	Hidden = 40,
+};
+
 /// Status of a single task, held by FSuqsObjectiveStatus
 USTRUCT(BlueprintType)
 struct SUQS_API FSuqsTaskStatus
@@ -18,9 +39,9 @@ public:
 	/// Current time elapsed, if task has a time limit
 	UPROPERTY(BlueprintReadOnly, Category="Task Status")
 	float ElapsedTime;
-	/// Whether this task has been completed (shorthand to comparing to task definition)
+	/// Whether this task has been started, completed, failed
 	UPROPERTY(BlueprintReadOnly, Category="Task Status")
-	bool bCompleted;
+	ESuqsSummaryState bState = ESuqsSummaryState::NotStarted;
 };
 
 /// Status of a single objective, held by FSuqsQuestStatus
@@ -35,9 +56,9 @@ public:
 	/// The identifier of the objective this status refers to
 	UPROPERTY(BlueprintReadOnly, Category="Objective Status")
 	FName Identifier;
-	/// Whether this objective has been completed
+	/// Whether this objective has been started, completed, failed (quick access to looking at tasks)
 	UPROPERTY(BlueprintReadOnly, Category="Objective Status")
-	bool bCompleted;
+	ESuqsSummaryState bState = ESuqsSummaryState::NotStarted;
 
 	/// List of detailed task status
 	UPROPERTY(BlueprintReadOnly, Category="Objective Status")
@@ -54,12 +75,12 @@ struct SUQS_API FSuqsQuestStatus
 {
 	GENERATED_BODY()
 public:
-	/// The identifier of the quest this status refers to
+	/// The name of the quest this status refers to
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
-	FName Identifier;
-	/// Whether this quest has been completed
+	FName Name;
+	/// Whether this objective has been started, completed, failed (quick access to looking at tasks)
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
-	bool bCompleted;
+	ESuqsSummaryState bState = ESuqsSummaryState::NotStarted;
 
 	/// List of detailed objective status, in case you want to see which optional ones were completed
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
