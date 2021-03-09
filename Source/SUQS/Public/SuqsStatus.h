@@ -30,6 +30,14 @@ protected:
 	UPROPERTY(SaveGame)
 	TArray<FSuqsQuestStatus> Quests;
 
+	const FSuqsQuestStatus* FindQuestStatus(const FName& QuestName) const;
+	FSuqsQuestStatus* FindQuestStatus(const FName& QuestName);
+	FSuqsTaskStatus* FindTaskStatus(const FName& QuestName, const FName& TaskID, FSuqsObjectiveStatus** OutObjective);
+	FSuqsTaskStatus* FindTaskStatus(FSuqsQuestStatus& Q, const FName& TaskID, FSuqsObjectiveStatus** OutObjective);
+	
+	void FailTask(FSuqsQuestStatus& Q, FSuqsObjectiveStatus& O, FSuqsTaskStatus& T);
+	void TaskStateChanged(ESuqsSummaryState PrevState, FSuqsQuestStatus& Quest, FSuqsObjectiveStatus& Objective, FSuqsTaskStatus& Task);
+	
 public:
 
 	/// Get the overall status of a named quest

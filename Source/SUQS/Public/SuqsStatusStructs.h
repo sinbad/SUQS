@@ -36,9 +36,12 @@ public:
 	/// Current number (vs target number of quest)
 	UPROPERTY(BlueprintReadOnly, Category="Task Status")
 	int Number;
-	/// Current time elapsed, if task has a time limit
+	/// Whether the task has a time limit
 	UPROPERTY(BlueprintReadOnly, Category="Task Status")
-	float ElapsedTime;
+	bool bTimeLimit = false;
+	/// Current time remaining, if task has a time limit
+	UPROPERTY(BlueprintReadOnly, Category="Task Status")
+	float TimeRemaining = 0;
 	/// Whether this task has been started, completed, failed
 	UPROPERTY(BlueprintReadOnly, Category="Task Status")
 	ESuqsSummaryState bState = ESuqsSummaryState::NotStarted;

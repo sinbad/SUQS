@@ -77,6 +77,10 @@ public:
 	/// List of actual tasks that must be performed to complete this objective. 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	TArray<FSuqsTask> Tasks;
+
+	/// Attempt to get a task by its identifier
+	const FSuqsTask* FindTask(const FName& Identifier);
+	
 };
 
 /// A top-level quest. Made up of objectives which represent the multi-stage nature of a quest. Objectives are usually
@@ -131,4 +135,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	TArray<FSuqsObjective> Objectives;
 
+	/// Attempt to get an objective by its identifier
+	const FSuqsObjective* FindObjective(const FName& Identifier);
 };
