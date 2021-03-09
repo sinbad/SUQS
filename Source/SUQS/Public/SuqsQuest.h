@@ -15,20 +15,20 @@ struct SUQS_API FSuqsTask
 {
 	GENERATED_BODY()
 public:
-	/// Unique identifier of the task
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	/// Unique identifier of the task. Must be unique within the *quest* (not just within objective)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	FName Identifier;
 
 	/// The player-visible text of the task
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	FText Title;
 
 	/// The number of times this task needs to be completed to be checked off
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	int TargetNumber = 1;
 
 	/// An optional time limit for the task
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	float TimeLimit = 0;
 
 };
@@ -41,7 +41,7 @@ struct SUQS_API FSuqsObjective
 {
 	GENERATED_BODY()
 public:
-	/// Identifier for this objective
+	/// Identifier for this objective. Must be unique within the quest it belongs to.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	FName Identifier;
 
@@ -50,12 +50,12 @@ public:
 	FText Title;
 
 	/// Additional description to append to the quest description when this quest is active (and uncompleted)
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	FText DescriptionWhenActive;
 	
 	/// Additional description to append to the quest description when this quest is completed
 	/// Unlike quests, if this is blank it won't use the active description
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	FText DescriptionWhenCompleted;
 
 	/// Whether this objective is mandatory to complete the quest.
@@ -70,23 +70,21 @@ public:
 	bool bSequentialTasks = false;
 
 	/// List of actual tasks that must be performed to complete this objective. 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	TArray<FSuqsTask> Tasks;
 };
 
 /// A top-level quest. Made up of objectives which represent the multi-stage nature of a quest. Objectives are usually
 /// sequential, and can themselves contain multiple tasks which can be sequential or completed in any order.
 /// Quests can depend on other quests before being activated.
+/// Quests must be uniquely named (the Name property inherited from FTableRowBase). If you use more than one
+/// quest table asset then there must be no name clashes between them.
 USTRUCT(BlueprintType)
 struct SUQS_API FSuqsQuest : public FTableRowBase
 {
 	GENERATED_BODY()
 
 public:
-
-	/// Unique identifier for the quest
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
-	FName Identifier;
 
 	/// Whether this quest is intended for the player to see, or whether it's just an internal state tracker
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
