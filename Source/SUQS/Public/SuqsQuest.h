@@ -87,7 +87,7 @@ public:
 	TArray<FSuqsTask> Tasks;
 
 	/// Attempt to get a task by its identifier
-	const FSuqsTask* FindTask(const FName& Identifier);
+	const FSuqsTask* FindTask(const FName& Identifier) const;
 	
 };
 
@@ -108,6 +108,10 @@ struct SUQS_API FSuqsQuest : public FTableRowBase
 
 public:
 
+	/// The unique Identifier of the quest
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	FName Identifier;
+
 	/// Whether this quest is intended for the player to see, or whether it's just an internal state tracker
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	bool bPlayerVisible = true;
@@ -127,9 +131,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	FText DescriptionWhenCompleted;
 
-	/// Whether this quest should be automatically activated when its prerequisites are fulfilled (default false)
+	/// Whether this quest should be automatically accepted when its prerequisites are fulfilled (default false)
+	/// When false, this quest can only be accepted by calling USuqsPlayState::AcceptQuest
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
-	bool AutoActivate = false;
+	bool AutoAccept = false;
 
 	/// List of quest identifiers which must be completed in order for this quest to be enabled
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
@@ -140,5 +145,5 @@ public:
 	TArray<FSuqsObjective> Objectives;
 
 	/// Attempt to get an objective by its identifier
-	const FSuqsObjective* FindObjective(const FName& Identifier);
+	const FSuqsObjective* FindObjective(const FName& Identifier) const;
 };

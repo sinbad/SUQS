@@ -2,12 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "SuqsQuest.h"
+#include "SuqsQuestState.h"
 #include "Engine/DataTable.h"
 #include "UObject/Object.h"
-#include "SuqsStatusStructs.h"
 #include "SuqsPlayState.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogSuqsState, Verbose, Verbose);
+DECLARE_LOG_CATEGORY_EXTERN(LogSuqsPlayState, Verbose, Verbose);
 
 /**
  * Holder for all the state relating to quests and their objectives/tasks for a single player.
@@ -26,41 +26,40 @@ protected:
 	/// Unified quest defs, combined from all entries in QuestDataTables
 	UPROPERTY()
 	TMap<FName, FSuqsQuest> QuestDefinitions;
-	/// Status of quests. Only contains entries for available quests, unavailable quests won't even be in this list.
-	UPROPERTY(SaveGame)
-	TArray<FSuqsQuestState> Quests;
-
-	const FSuqsQuestState* FindQuestStatus(const FName& QuestName) const;
-	FSuqsQuestState* FindQuestStatus(const FName& QuestName);
-	FSuqsTaskState* FindTaskStatus(const FName& QuestName, const FName& TaskID, FSuqsObjectiveState** OutObjective);
-	FSuqsTaskState* FindTaskStatus(FSuqsQuestState& Q, const FName& TaskID, FSuqsObjectiveState** OutObjective);
 	
-	void FailTask(FSuqsQuestState& Q, FSuqsObjectiveState& O, FSuqsTaskState& T);
-	void TaskStateChanged(ESuqsItemStatus PrevState, FSuqsQuestState& Quest, FSuqsObjectiveState& Objective, FSuqsTaskState& Task);
+	UPROPERTY()
+	TMap<FName, USuqsQuestState*> QuestState;
+
+	USuqsQuestState* FindQuestStatus(const FName& QuestName);
+	const USuqsQuestState* FindQuestStatus(const FName& QuestName) const;
+	USuqsTaskState* FindTaskStatus(const FName& QuestName, const FName& TaskID);
+
+	void EnsureStateBuilt();
+	void EnsureQuestDefinitionsBuilt();
 	
 public:
 
 	/// Get the overall status of a named quest
 	UFUNCTION(BlueprintCallable)
-	ESuqsItemStatus GetQuestState(const FName& Name) const;
+	ESuqsQuestStatus GetQuestState(const FName& Name) const;
 	
-	/// Return whether the named quest is or has been available to the player (may also be completed / failed)
+	/// Return whether the named quest is or has been accepted for the player (may also be completed / failed)
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestAvailable(const FName& Name) const { return GetQuestState(Name) != ESuqsItemStatus::Unavailable; }
+    bool IsQuestAccepted(const FName& Name) const { return GetQuestState(Name) != ESuqsQuestStatus::Unavailable; }
 
 	/// Return whether the named quest is completed
 	UFUNCTION(BlueprintCallable)
-	bool IsQuestCompleted(const FName& Name) const { return GetQuestState(Name) == ESuqsItemStatus::Completed; }
+	bool IsQuestCompleted(const FName& Name) const { return GetQuestState(Name) == ESuqsQuestStatus::Completed; }
 
 	/// Return whether the named quest has failed
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestFailed(const FName& Name) const { return GetQuestState(Name) == ESuqsItemStatus::Completed; }
+    bool IsQuestFailed(const FName& Name) const { return GetQuestState(Name) == ESuqsQuestStatus::Completed; }
 
-	/// Make a quest available for the player
+	/// Accept a quest and track its state
 	/// Note: you don't need to do this for quests which are set to auto-activate based on the completion of other quests.
 	/// However you will want to do it for events that you activate other ways, e.g. entering areas, talking to characters
 	UFUNCTION(BlueprintCallable)
-	void ActivateQuest(const FName& Name);
+	void AcceptQuest(const FName& Name);
 
 	/// Manually fail a quest. You should prefer using FailTask() instead if you need to explain which specific part
 	/// of a quest failed. Otherwise, this will mark all uncompleted tasks /objectives as failed.
@@ -111,6 +110,4 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override;
 	// FTickableGameObject end
-
-	virtual void PostLoad() override;
 };

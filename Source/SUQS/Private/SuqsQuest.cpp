@@ -1,6 +1,6 @@
 #include "SuqsQuest.h"
 
-const FSuqsTask* FSuqsObjective::FindTask(const FName& Id)
+const FSuqsTask* FSuqsObjective::FindTask(const FName& Id) const
 {
 	for (auto& Task : Tasks)
 	{
@@ -11,7 +11,7 @@ const FSuqsTask* FSuqsObjective::FindTask(const FName& Id)
 	
 }
 
-const FSuqsObjective* FSuqsQuest::FindObjective(const FName& Id)
+const FSuqsObjective* FSuqsQuest::FindObjective(const FName& Id) const
 {
 	for (auto& Obj : Objectives)
 	{
