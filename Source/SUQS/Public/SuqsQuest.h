@@ -74,6 +74,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	bool bSequentialTasks = false;
 
+	/// Whether all mandatory tasks in this objective must be completed for the objective to be complete (default true)
+	/// If you set this to false, completing ONE of the mandatory tasks completes the objective (non-mandatory tasks do
+	/// not complete the objective)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
+	bool bAllMandatoryTasksRequired = true;
+	
+
 	/// List of actual tasks that must be performed to complete this objective. 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	TArray<FSuqsTask> Tasks;
