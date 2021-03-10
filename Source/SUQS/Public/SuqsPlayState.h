@@ -5,7 +5,7 @@
 #include "Engine/DataTable.h"
 #include "UObject/Object.h"
 #include "SuqsStatusStructs.h"
-#include "SuqsStatus.generated.h"
+#include "SuqsPlayState.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSuqsState, Verbose, Verbose);
 
@@ -14,7 +14,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSuqsState, Verbose, Verbose);
  * Add this somewhere that's useful to you, e.g. your PlayerState or GameInstance.
  */
 UCLASS(BlueprintType)
-class SUQS_API USuqsStatus : public UObject, public FTickableGameObject
+class SUQS_API USuqsPlayState : public UObject, public FTickableGameObject
 {
 	GENERATED_BODY()
 public:
@@ -28,33 +28,33 @@ protected:
 	TMap<FName, FSuqsQuest> QuestDefinitions;
 	/// Status of quests. Only contains entries for available quests, unavailable quests won't even be in this list.
 	UPROPERTY(SaveGame)
-	TArray<FSuqsQuestStatus> Quests;
+	TArray<FSuqsQuestState> Quests;
 
-	const FSuqsQuestStatus* FindQuestStatus(const FName& QuestName) const;
-	FSuqsQuestStatus* FindQuestStatus(const FName& QuestName);
-	FSuqsTaskStatus* FindTaskStatus(const FName& QuestName, const FName& TaskID, FSuqsObjectiveStatus** OutObjective);
-	FSuqsTaskStatus* FindTaskStatus(FSuqsQuestStatus& Q, const FName& TaskID, FSuqsObjectiveStatus** OutObjective);
+	const FSuqsQuestState* FindQuestStatus(const FName& QuestName) const;
+	FSuqsQuestState* FindQuestStatus(const FName& QuestName);
+	FSuqsTaskState* FindTaskStatus(const FName& QuestName, const FName& TaskID, FSuqsObjectiveState** OutObjective);
+	FSuqsTaskState* FindTaskStatus(FSuqsQuestState& Q, const FName& TaskID, FSuqsObjectiveState** OutObjective);
 	
-	void FailTask(FSuqsQuestStatus& Q, FSuqsObjectiveStatus& O, FSuqsTaskStatus& T);
-	void TaskStateChanged(ESuqsSummaryState PrevState, FSuqsQuestStatus& Quest, FSuqsObjectiveStatus& Objective, FSuqsTaskStatus& Task);
+	void FailTask(FSuqsQuestState& Q, FSuqsObjectiveState& O, FSuqsTaskState& T);
+	void TaskStateChanged(ESuqsItemStatus PrevState, FSuqsQuestState& Quest, FSuqsObjectiveState& Objective, FSuqsTaskState& Task);
 	
 public:
 
 	/// Get the overall status of a named quest
 	UFUNCTION(BlueprintCallable)
-	ESuqsSummaryState GetQuestState(const FName& Name) const;
+	ESuqsItemStatus GetQuestState(const FName& Name) const;
 	
 	/// Return whether the named quest is or has been available to the player (may also be completed / failed)
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestAvailable(const FName& Name) const { return GetQuestState(Name) != ESuqsSummaryState::Unavailable; }
+    bool IsQuestAvailable(const FName& Name) const { return GetQuestState(Name) != ESuqsItemStatus::Unavailable; }
 
 	/// Return whether the named quest is completed
 	UFUNCTION(BlueprintCallable)
-	bool IsQuestCompleted(const FName& Name) const { return GetQuestState(Name) == ESuqsSummaryState::Completed; }
+	bool IsQuestCompleted(const FName& Name) const { return GetQuestState(Name) == ESuqsItemStatus::Completed; }
 
 	/// Return whether the named quest has failed
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestFailed(const FName& Name) const { return GetQuestState(Name) == ESuqsSummaryState::Completed; }
+    bool IsQuestFailed(const FName& Name) const { return GetQuestState(Name) == ESuqsItemStatus::Completed; }
 
 	/// Make a quest available for the player
 	/// Note: you don't need to do this for quests which are set to auto-activate based on the completion of other quests.

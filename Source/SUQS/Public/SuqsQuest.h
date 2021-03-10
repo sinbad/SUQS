@@ -127,9 +127,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	FText DescriptionWhenCompleted;
 
-	/// Whether this quest should be automatically enabled when its prerequisites are fulfilled (deafult false)
+	/// Whether this quest should be automatically activated when its prerequisites are fulfilled (default false)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
-	bool AutoEnable = false;
+	bool AutoActivate = false;
 
 	/// List of quest identifiers which must be completed in order for this quest to be enabled
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")

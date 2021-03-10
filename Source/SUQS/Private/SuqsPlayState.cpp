@@ -1,9 +1,9 @@
-#include "SuqsStatus.h"
+#include "SuqsPlayState.h"
 
 
 DEFINE_LOG_CATEGORY(LogSuqsState)
 
-ESuqsSummaryState USuqsStatus::GetQuestState(const FName& Name) const
+ESuqsItemStatus USuqsPlayState::GetQuestState(const FName& Name) const
 {
 	// Could make a lookup for this, but we'd need to post-load call to re-populate it, leave for now
 	const auto Status = FindQuestStatus(Name);
@@ -11,28 +11,28 @@ ESuqsSummaryState USuqsStatus::GetQuestState(const FName& Name) const
 	if (Status)
 		return Status->bState;
 	else
-		return ESuqsSummaryState::Unavailable;
+		return ESuqsItemStatus::Unavailable;
 	
 }
 
 
-FSuqsQuestStatus* USuqsStatus::FindQuestStatus(const FName& QuestName)
+FSuqsQuestState* USuqsPlayState::FindQuestStatus(const FName& QuestName)
 {
-	return Quests.FindByPredicate([QuestName](const FSuqsQuestStatus& Status)
+	return Quests.FindByPredicate([QuestName](const FSuqsQuestState& Status)
     {
         return Status.Name == QuestName;
     });
 }
 
-const FSuqsQuestStatus* USuqsStatus::FindQuestStatus(const FName& QuestName) const
+const FSuqsQuestState* USuqsPlayState::FindQuestStatus(const FName& QuestName) const
 {
-	return Quests.FindByPredicate([QuestName](const FSuqsQuestStatus& Status)
+	return Quests.FindByPredicate([QuestName](const FSuqsQuestState& Status)
     {
         return Status.Name == QuestName;
     });
 }
 
-FSuqsTaskStatus* USuqsStatus::FindTaskStatus(const FName& QuestName, const FName& TaskID, FSuqsObjectiveStatus** OutObjective)
+FSuqsTaskState* USuqsPlayState::FindTaskStatus(const FName& QuestName, const FName& TaskID, FSuqsObjectiveState** OutObjective)
 {
 	if (auto Q = FindQuestStatus(QuestName))
 		return FindTaskStatus(*Q, TaskID, OutObjective);
@@ -40,7 +40,7 @@ FSuqsTaskStatus* USuqsStatus::FindTaskStatus(const FName& QuestName, const FName
 	return nullptr;
 }
 
-FSuqsTaskStatus* USuqsStatus::FindTaskStatus(FSuqsQuestStatus& Q, const FName& TaskID, FSuqsObjectiveStatus** OutObjective)
+FSuqsTaskState* USuqsPlayState::FindTaskStatus(FSuqsQuestState& Q, const FName& TaskID, FSuqsObjectiveState** OutObjective)
 {
 	// Task IDs are unique by quest 
 	for (auto& Objective : Q.Objectives)
@@ -58,22 +58,22 @@ FSuqsTaskStatus* USuqsStatus::FindTaskStatus(FSuqsQuestStatus& Q, const FName& T
 	return nullptr;
 }
 
-void USuqsStatus::ActivateQuest(const FName& Name)
+void USuqsPlayState::ActivateQuest(const FName& Name)
 {
 	// TODO
 }
 
-void USuqsStatus::FailQuest(const FName& Name)
+void USuqsPlayState::FailQuest(const FName& Name)
 {
 	// TODO
 }
 
-void USuqsStatus::FailTask(const FName& QuestName, const FName& TaskIdentifier)
+void USuqsPlayState::FailTask(const FName& QuestName, const FName& TaskIdentifier)
 {
-	FSuqsQuestStatus* Q = FindQuestStatus(QuestName);
+	FSuqsQuestState* Q = FindQuestStatus(QuestName);
 	if (Q)
 	{
-		FSuqsObjectiveStatus* Obj;
+		FSuqsObjectiveState* Obj;
 		auto T = FindTaskStatus(*Q, TaskIdentifier, &Obj);
 		if (T)
 		{
@@ -82,15 +82,15 @@ void USuqsStatus::FailTask(const FName& QuestName, const FName& TaskIdentifier)
 	}
 }
 
-void USuqsStatus::FailTask(FSuqsQuestStatus& Q, FSuqsObjectiveStatus& O, FSuqsTaskStatus& T)
+void USuqsPlayState::FailTask(FSuqsQuestState& Q, FSuqsObjectiveState& O, FSuqsTaskState& T)
 {
 	const auto OldState = T.bState;
-	T.bState = ESuqsSummaryState::Failed;
+	T.bState = ESuqsItemStatus::Failed;
 	TaskStateChanged(OldState, Q, O, T);
 }
 
-void USuqsStatus::TaskStateChanged(ESuqsSummaryState PrevState, FSuqsQuestStatus& Quest,
-	FSuqsObjectiveStatus& Objective, FSuqsTaskStatus& Task)
+void USuqsPlayState::TaskStateChanged(ESuqsItemStatus PrevState, FSuqsQuestState& Quest,
+	FSuqsObjectiveState& Objective, FSuqsTaskState& Task)
 {
 	// Get definitions of quest / objective
 	// Don't assume the indexing is the same, it should be buuuuut it might have changed
@@ -104,24 +104,24 @@ void USuqsStatus::TaskStateChanged(ESuqsSummaryState PrevState, FSuqsQuestStatus
 }
 
 
-void USuqsStatus::CompleteTask(const FName& QuestName, const FName& TaskIdentifier)
+void USuqsPlayState::CompleteTask(const FName& QuestName, const FName& TaskIdentifier)
 {
 	// TODO
 }
 
-void USuqsStatus::ProgressTask(const FName& QuestName, const FName& TaskIdentifier, int Delta)
+void USuqsPlayState::ProgressTask(const FName& QuestName, const FName& TaskIdentifier, int Delta)
 {
 	// TODO
 }
 
 
-void USuqsStatus::SetTaskHidden(const FName& QuestName, const FName& TaskIdentifier, bool bHidden)
+void USuqsPlayState::SetTaskHidden(const FName& QuestName, const FName& TaskIdentifier, bool bHidden)
 {
 	// TODO
 }
 
 // FTickableGameObject start
-void USuqsStatus::Tick(float DeltaTime)
+void USuqsPlayState::Tick(float DeltaTime)
 {
 	for (auto& Quest : Quests)
 	{
@@ -143,13 +143,13 @@ void USuqsStatus::Tick(float DeltaTime)
 	}
 }
 
-TStatId USuqsStatus::GetStatId() const
+TStatId USuqsPlayState::GetStatId() const
 {
 	RETURN_QUICK_DECLARE_CYCLE_STAT(USuqsStatus, STATGROUP_Tickables);
 }
 // FTickableGameObject end
 
-void USuqsStatus::PostLoad()
+void USuqsPlayState::PostLoad()
 {
 	Super::PostLoad();
 
