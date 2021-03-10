@@ -9,6 +9,17 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSuqsPlayState, Verbose, Verbose);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskCompleted, USuqsTaskState*, Task);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskFailed, USuqsTaskState*, Task);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveCompleted, USuqsObjectiveState*, Objective);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveFailed, USuqsObjectiveState*, Objective);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestCompleted, USuqsQuestState*, Task);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestFailed, USuqsQuestState*, Task);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestUpdated, USuqsQuestState*, Quest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActiveQuestChanged, USuqsQuestState*, Quest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, Quest);
+
 /**
  * Holder for all the state relating to quests and their objectives/tasks for a single player.
  * Add this somewhere that's useful to you, e.g. your PlayerState or GameInstance.
@@ -38,6 +49,34 @@ protected:
 	void EnsureQuestDefinitionsBuilt();
 	
 public:
+
+	/// Fired when a task is completed
+	UPROPERTY(BlueprintAssignable)
+	FOnTaskCompleted OnTaskCompleted;
+	/// Fired when a task has failed
+	UPROPERTY(BlueprintAssignable)
+	FOnTaskFailed OnTaskFailed;
+	/// Fired when a objective is completed
+	UPROPERTY(BlueprintAssignable)
+	FOnObjectiveCompleted OnObjectiveCompleted;
+	/// Fired when a objective has failed
+	UPROPERTY(BlueprintAssignable)
+	FOnObjectiveFailed OnObjectiveFailed;
+	/// Fired when a quest is completed
+	UPROPERTY(BlueprintAssignable)
+	FOnQuestCompleted OnQuestCompleted;
+	/// Fired when a quest has failed
+	UPROPERTY(BlueprintAssignable)
+	FOnQuestFailed OnQuestFailed;
+	/// Fired when a quest or its objectives / tasks has changed in any way
+	UPROPERTY(BlueprintAssignable)
+	FOnQuestUpdated OnQuestUpdated;
+	/// Fired when a different quest has been made the active quest
+	UPROPERTY(BlueprintAssignable)
+	FOnActiveQuestChanged OnActiveQuestChanged;
+	/// Fired when a quest has been accepted for the first time
+	UPROPERTY(BlueprintAssignable)
+	FOnQuestAccepted OnQuestAccepted;
 
 	/// Get the overall status of a named quest
 	UFUNCTION(BlueprintCallable)
@@ -94,20 +133,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ProgressTask(const FName& QuestName, const FName& TaskIdentifier, int Delta);
 
-	/**
-	 * Set whether a task is hidden. Tasks start life hidden or not according to the quest definition, this changes that.
-	 * Hidden tasks are ignored as if they don't exist and changing this will cause the objective/task status to be re-evaluated.
-	 * For sequential objectives / tasks this could cause some jumping around as things appear/disappear, allowing
-	 * some branching / dynamism within quests.
-	 * @param QuestName The name of the quest
-	 * @param TaskIdentifier The identifier of the task within the quest
-	 * @param bHidden Whether the task is hidden. If all tasks in an objective are hidden, the objective is hidden too.
-	 */
-	UFUNCTION(BlueprintCallable)
-	void SetTaskHidden(const FName& QuestName, const FName& TaskIdentifier, bool bHidden);
 
+	void RaiseQuestUpdated(USuqsQuestState* Quest);
+	void RaiseTaskFailed(USuqsTaskState* Task);
+	void RaiseTaskCompleted(USuqsTaskState* Task);
+	void RaiseObjectiveCompleted(USuqsObjectiveState* Objective);
+	void RaiseObjectiveFailed(USuqsObjectiveState* Objective);
+
+
+	
 	// FTickableGameObject begin
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override;
 	// FTickableGameObject end
+
 };

@@ -1,6 +1,4 @@
 #include "SuqsPlayState.h"
-
-
 #include "SuqsObjectiveState.h"
 #include "SuqsQuestState.h"
 #include "SuqsTaskState.h"
@@ -101,18 +99,48 @@ void USuqsPlayState::FailTask(const FName& QuestName, const FName& TaskIdentifie
 
 void USuqsPlayState::CompleteTask(const FName& QuestName, const FName& TaskIdentifier)
 {
-	// TODO
+	auto T = FindTaskStatus(QuestName, TaskIdentifier);
+	if (T)
+	{
+		T->Complete();
+	}
 }
 
 void USuqsPlayState::ProgressTask(const FName& QuestName, const FName& TaskIdentifier, int Delta)
 {
-	// TODO
+	auto T = FindTaskStatus(QuestName, TaskIdentifier);
+	if (T)
+	{
+		T->Progress(Delta);
+	}
 }
 
 
-void USuqsPlayState::SetTaskHidden(const FName& QuestName, const FName& TaskIdentifier, bool bHidden)
+void USuqsPlayState::RaiseQuestUpdated(USuqsQuestState* Quest)
 {
-	// TODO
+	// might be worth queuing these up and raising combined, since one change can
+	// trigger this from e.g. task, objective and quest all changing as a cascade
+	OnQuestUpdated.Broadcast(Quest);
+}
+
+void USuqsPlayState::RaiseTaskCompleted(USuqsTaskState* Task)
+{
+	OnTaskCompleted.Broadcast(Task);
+}
+void USuqsPlayState::RaiseTaskFailed(USuqsTaskState* Task)
+{
+	OnTaskFailed.Broadcast(Task);
+}
+
+
+void USuqsPlayState::RaiseObjectiveCompleted(USuqsObjectiveState* Objective)
+{
+	OnObjectiveCompleted.Broadcast(Objective);
+}
+
+void USuqsPlayState::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
+{
+	OnObjectiveFailed.Broadcast(Objective);
 }
 
 // FTickableGameObject start

@@ -13,7 +13,7 @@ void USuqsQuestState::Initialise(FSuqsQuest* Def, USuqsPlayState* Root)
 	// Quest definitions are static data so it's OK to keep this (it's owned by parent)
 	QuestDefinition = Def;
 	PlayState = Root;
-	bStatus = ESuqsQuestStatus::NotStarted;
+	Status = ESuqsQuestStatus::NotStarted;
 	FastTaskLookup.Empty();
 
 	for (const auto& ObjDef : Def->Objectives)
@@ -44,4 +44,11 @@ void USuqsQuestState::Tick(float DeltaTime)
 USuqsTaskState* USuqsQuestState::FindTask(const FName& Identifier) const
 {
 	return FastTaskLookup.FindChecked(Identifier);
+}
+
+void USuqsQuestState::NotifyObjectiveStatusChanged()
+{
+	// TODO propagate state
+	// If not completed or failed, figure out what objective should be active now
+	// Re-scan objectives to see what we should do now
 }

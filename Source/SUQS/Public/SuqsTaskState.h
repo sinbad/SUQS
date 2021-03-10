@@ -30,18 +30,20 @@ class SUQS_API USuqsTaskState : public UObject
 
 	friend class USuqsObjectiveState;
 protected:
-	/// Current number (vs target number of quest)
-	UPROPERTY(BlueprintReadOnly, Category="Task Status")
+	/// Current number (vs target number)
+	UPROPERTY(BlueprintReadOnly, Category="Task State")
 	int Number;
-	/// Whether the task has a time limit
-	UPROPERTY(BlueprintReadOnly, Category="Task Status")
-	bool bTimeLimit = false;
 	/// Current time remaining, if task has a time limit
-	UPROPERTY(BlueprintReadOnly, Category="Task Status")
+	UPROPERTY(BlueprintReadOnly, Category="Task State")
 	float TimeRemaining = 0;
 	/// Whether this task has been started, completed, failed
-	UPROPERTY(BlueprintReadOnly, Category="Task Status")
-	ESuqsTaskStatus bStatus = ESuqsTaskStatus::NotStarted;
+	UPROPERTY(BlueprintReadOnly, Category="Task State")
+	ESuqsTaskStatus Status = ESuqsTaskStatus::NotStarted;
+	/// Whether we suggest that this task is hidden from the player right now
+	/// This is the case for mandatory, sequential, incomplete tasks beyond the first one
+	UPROPERTY(BlueprintReadOnly, Category="Task State")
+	bool SuggestHide;
+
 
 	const FSuqsTask* TaskDefinition;
 	TWeakObjectPtr<USuqsObjectiveState> ParentObjective;
@@ -50,13 +52,38 @@ protected:
 	
 	void Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsPlayState* Root);
 	void Tick(float DeltaTime);
+	void ChangeStatus(ESuqsTaskStatus NewStatus);
 public:
-	const FName& GetIdentifier() const { return TaskDefinition->Identifier; }
+	// expose BP properties for C++ 
+	
+	/// Current number (vs target number of quest)
 	int GetNumber() const { return Number; }
-	bool GetTimeLimit() const { return bTimeLimit; }
+	/// Current time remaining, if task has a time limit
 	float GetTimeRemaining() const { return TimeRemaining; }
-	ESuqsTaskStatus GetStatus() const {  return bStatus; }
+	ESuqsTaskStatus GetStatus() const {  return Status; }
 
+	UFUNCTION(BlueprintCallable)
+    const FName& GetIdentifier() const { return TaskDefinition->Identifier; }
+	UFUNCTION(BlueprintCallable)
+	bool IsMandatory() { return TaskDefinition->bMandatory; }
+	UFUNCTION(BlueprintCallable)
+	bool IsTimeLimited() const { return TaskDefinition->TimeLimit > 0; }
+	UFUNCTION(BlueprintCallable)
+	const FText& GetTitle() { return TaskDefinition->Title; }
+	/// The target number of things to be achieved
+	UFUNCTION(BlueprintCallable)
+	int GetTargetNumber() { return TaskDefinition->TargetNumber; }
+
+	UFUNCTION(BlueprintCallable)
+	USuqsObjectiveState* GetParentObjective() const { return ParentObjective.Get(); }
+
+	/// Fail this task
+	UFUNCTION(BlueprintCallable)
 	void Fail();
-
+	/// Complete this task (setting number to target number automatically)
+	UFUNCTION(BlueprintCallable)
+	void Complete();
+	/// Advance the number associated with progress on this quest. If it reaches the target number or more, it will automatically complete
+	UFUNCTION(BlueprintCallable)
+	void Progress(int Delta);
 };

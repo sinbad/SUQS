@@ -41,7 +41,7 @@ protected:
 
 	/// Whether this objective has been started, completed, failed (quick access to looking at tasks)
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
-	ESuqsQuestStatus bStatus = ESuqsQuestStatus::NotStarted;
+	ESuqsQuestStatus Status = ESuqsQuestStatus::NotStarted;
 
 	/// List of detailed objective status
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
@@ -58,10 +58,15 @@ protected:
 	void Tick(float DeltaTime);
 	
 public:
-	const FName& GetIdentifier() const { return QuestDefinition->Identifier; }
-	ESuqsQuestStatus GetStatus() const { return bStatus; }
+	ESuqsQuestStatus GetStatus() const { return Status; }
 	const TArray<USuqsObjectiveState*>& GetObjectives() const { return Objectives; }
 
+	UFUNCTION(BlueprintCallable)
+    const FName& GetIdentifier() const { return QuestDefinition->Identifier; }
+	
 	/// Find a task with the given identifier in this quest
 	USuqsTaskState* FindTask(const FName& Identifier) const;
+
+	void NotifyObjectiveStatusChanged();
+	
 };

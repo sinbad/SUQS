@@ -36,7 +36,7 @@ class SUQS_API USuqsObjectiveState : public UObject
 protected:
 	/// Whether this objective has been started, completed, failed (quick access to looking at tasks)
 	UPROPERTY(BlueprintReadOnly, Category="Objective Status")
-	ESuqsObjectiveStatus bStatus = ESuqsObjectiveStatus::NotStarted;
+	ESuqsObjectiveStatus Status = ESuqsObjectiveStatus::NotStarted;
 
 	/// List of detailed task status
 	UPROPERTY(BlueprintReadOnly, Category="Objective Status")
@@ -46,12 +46,26 @@ protected:
 	TWeakObjectPtr<USuqsQuestState> ParentQuest;
 	TWeakObjectPtr<USuqsPlayState> PlayState;
 
+	int MandatoryTasksNeededToComplete;
+
 	
 	void Initialise(const FSuqsObjective* ObjDef, USuqsQuestState* QuestState, USuqsPlayState* Root);
 	void Tick(float DeltaTime);
-	
+	// Private fail/complete since users should only ever call task fail/complete
+	void Fail();
+	void Complete();
+	void ChangeStatus(ESuqsObjectiveStatus NewStatus);
+
 public:
-	const FName& GetIdentifier() const { return ObjectiveDefinition->Identifier; }
-	ESuqsObjectiveStatus GetStatus() const { return bStatus; }
+	// C++ access
+	
+	ESuqsObjectiveStatus GetStatus() const { return Status; }
 	const TArray<USuqsTaskState*>& GetTasks() { return Tasks; }
+
+	UFUNCTION(BlueprintCallable)
+    const FName& GetIdentifier() const { return ObjectiveDefinition->Identifier; }
+	UFUNCTION(BlueprintCallable)
+    USuqsQuestState* GetParentQuest() const { return ParentQuest.Get(); }
+	
+	void NotifyTaskStatusChanged();
 };
