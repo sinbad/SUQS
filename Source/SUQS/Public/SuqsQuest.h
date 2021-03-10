@@ -37,11 +37,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	float TimeLimit = 0;
 
-	/// Whether this task starts off hidden. If all tasks in an objective are hidden, the objective is also hidden
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
-	bool bHidden = false;
-	
-
 };
 
 /// A sub-objective of a quest. These objectives are usually performed in order but may be non-sequential
@@ -79,8 +74,14 @@ public:
 	/// not complete the objective)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	bool bAllMandatoryTasksRequired = true;
-	
 
+	/// Quest branch which this objective appears on. To support branching quests, if an objective is assigned
+	/// to a branch, that objective is only active if that quest branch is active. No branches
+	/// are active by default so you have to activate quest branches to activate these objectives.
+	/// Objectives are always still sequential but essentially depend on the previous active objective (taking into account branches)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
+	FName Branch;
+	
 	/// List of actual tasks that must be performed to complete this objective. 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	TArray<FSuqsTask> Tasks;
