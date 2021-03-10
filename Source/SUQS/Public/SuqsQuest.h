@@ -23,6 +23,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	FText Title;
 
+	/// Whether this task is mandatory to complete the objective
+	/// NOTE: Non-mandatory objectives are always available even in sequential task lists (they are out of sequence)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
+	bool bMandatory = true;
+
+
 	/// The number of times this task needs to be completed to be checked off
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	int TargetNumber = 1;
@@ -63,14 +69,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	FText DescriptionWhenCompleted;
 
-	/// Whether this objective is mandatory to complete the quest.
-	/// NOTE: you shouldn't really have an optional objective in a sequential objective list! Use SubTasks to structure things
-	/// if you need a mixture.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
-	bool bMandatory = true;
-
-	/// Whether the tasks in this objective need to be completed sequentially. Default is false, since usually your
-	/// objectives are sequential and your tasks are parallel (that's largely the point of the division)
+	/// Whether the tasks in this objective need to be completed sequentially. Default is false, since 
+	/// objectives are sequential and your tasks are often parallel, but you can change this.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	bool bSequentialTasks = false;
 
@@ -127,11 +127,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	TArray<FName> PrerequiteQuests;
 
-	/// Whether the objectives must be completed in order (default true)
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
-	bool bSequentialObjectives = true;
-
-	/// List of objectives involved in the quest. At least one must be mandatory.
+	/// List of objectives involved in the quest. They are all sequential, and mandatory, but may be hidden to provide some branching
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	TArray<FSuqsObjective> Objectives;
 
