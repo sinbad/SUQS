@@ -42,7 +42,7 @@ protected:
 	/// Whether we suggest that this task is hidden from the player right now
 	/// This is the case for mandatory, sequential, incomplete tasks beyond the first one
 	UPROPERTY(BlueprintReadOnly, Category="Task State")
-	bool SuggestHide;
+	bool bSuggestHide;
 
 
 	const FSuqsTask* TaskDefinition;

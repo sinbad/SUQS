@@ -13,7 +13,12 @@ void USuqsTaskState::Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* O
 
 void USuqsTaskState::Tick(float DeltaTime)
 {
-	if (IsTimeLimited() && TimeRemaining > 0)
+	// Don't reduce time when task is hidden (e.g. not the next in sequence)
+	// Also not when also completed / failed
+	if (!bSuggestHide &&
+		IsIncomplete() && 
+		IsTimeLimited() &&
+		TimeRemaining > 0)
 	{
 		TimeRemaining -= DeltaTime;
 		if (TimeRemaining <= 0)

@@ -59,7 +59,7 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 	int IncompleteMandatoryTasks = 0;
 	for (auto& Task : Tasks)
 	{
-		Task->SuggestHide = false;
+		Task->bSuggestHide = false;
 		if (Task->IsMandatory())
 		{
 			switch(Task->Status)
@@ -75,7 +75,7 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 				if (ObjectiveDefinition->bSequentialTasks && IncompleteMandatoryTasks > 0)
 				{
 					// If tasks are sequential, and this is an incomplete task after the first, suggest hiding it
-					Task->SuggestHide = true;
+					Task->bSuggestHide = true;
 				}
 				++IncompleteMandatoryTasks;
 				break;
