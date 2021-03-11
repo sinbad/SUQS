@@ -85,30 +85,30 @@ public:
 
 	/// Get the overall status of a named quest
 	UFUNCTION(BlueprintCallable)
-	ESuqsQuestStatus GetQuestState(const FName& QuestID) const;
+	ESuqsQuestStatus GetQuestState(FName QuestID) const;
 	
 	/// Return whether the quest is or has been accepted for the player (may also be completed / failed)
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestAccepted(const FName& QuestID) const { return GetQuestState(QuestID) != ESuqsQuestStatus::Unavailable; }
+    bool IsQuestAccepted(FName QuestID) const { return GetQuestState(QuestID) != ESuqsQuestStatus::Unavailable; }
 
 	/// Return whether the quest is completed
 	UFUNCTION(BlueprintCallable)
-	bool IsQuestCompleted(const FName& QuestID) const { return GetQuestState(QuestID) == ESuqsQuestStatus::Completed; }
+	bool IsQuestCompleted(FName QuestID) const { return GetQuestState(QuestID) == ESuqsQuestStatus::Completed; }
 
 	/// Return whether the quest has failed
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestFailed(const FName& QuestID) const { return GetQuestState(QuestID) == ESuqsQuestStatus::Completed; }
+    bool IsQuestFailed(FName QuestID) const { return GetQuestState(QuestID) == ESuqsQuestStatus::Completed; }
 
 	/// Accept a quest and track its state
 	/// Note: you don't need to do this for quests which are set to auto-activate based on the completion of other quests.
 	/// However you will want to do it for events that you activate other ways, e.g. entering areas, talking to characters
 	UFUNCTION(BlueprintCallable)
-	void AcceptQuest(const FName& QuestID);
+	void AcceptQuest(FName QuestID);
 
 	/// Manually fail a quest. You should prefer using FailTask() instead if you need to explain which specific part
 	/// of a quest failed. Otherwise, this will mark all current tasks /objectives as failed.
 	UFUNCTION(BlueprintCallable)
-    void FailQuest(const FName& QuestID);
+    void FailQuest(FName QuestID);
 
 	/**
 	 * Mark a task as failed. If this is a mandatory task, it will fail the objective the task is attached to.
@@ -117,7 +117,7 @@ public:
 	 * @param TaskIdentifier The identifier of the task within the quest
 	 */
 	UFUNCTION(BlueprintCallable)
-    void FailTask(const FName& QuestID, const FName& TaskIdentifier);
+    void FailTask(FName QuestID, FName TaskIdentifier);
 
 	/**
 	 * Fully complete a task. If this is the last mandatory task in an objective, also completes the objective, and
@@ -126,7 +126,7 @@ public:
 	 * @param TaskIdentifier The identifier of the task within the quest
 	 */
 	UFUNCTION(BlueprintCallable)
-	void CompleteTask(const FName& QuestID, const FName& TaskIdentifier);
+	void CompleteTask(FName QuestID, FName TaskIdentifier);
 
 	/**
 	 * Increment task progress. Increases the number value on a task, clamping it to the min/max numbers in the quest
@@ -136,7 +136,7 @@ public:
 	 * @param Delta The change to make to the number on the task
 	 */
 	UFUNCTION(BlueprintCallable)
-	void ProgressTask(const FName& QuestID, const FName& TaskIdentifier, int Delta);
+	void ProgressTask(FName QuestID, FName TaskIdentifier, int Delta);
 
 
 	void RaiseQuestUpdated(USuqsQuestState* Quest);

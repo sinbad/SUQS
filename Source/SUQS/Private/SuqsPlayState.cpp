@@ -43,7 +43,7 @@ void USuqsPlayState::EnsureQuestDefinitionsBuilt()
 	}
 }
 
-ESuqsQuestStatus USuqsPlayState::GetQuestState(const FName& QuestID) const
+ESuqsQuestStatus USuqsPlayState::GetQuestState(FName QuestID) const
 {
 	// Could make a lookup for this, but we'd need to post-load call to re-populate it, leave for now
 	const auto Status = FindQuestStatus(QuestID);
@@ -86,20 +86,20 @@ USuqsTaskState* USuqsPlayState::FindTaskStatus(const FName& QuestID, const FName
 	return nullptr;
 }
 
-void USuqsPlayState::AcceptQuest(const FName& QuestID)
+void USuqsPlayState::AcceptQuest(FName QuestID)
 {
 	// TODO
 	//OnQuestAccepted.Broadcast(Quest);
 }
 
-void USuqsPlayState::FailQuest(const FName& QuestID)
+void USuqsPlayState::FailQuest(FName QuestID)
 {
 	auto Q = FindQuestStatus(QuestID);
 	if (Q)
 		Q->Fail();
 }
 
-void USuqsPlayState::FailTask(const FName& QuestID, const FName& TaskIdentifier)
+void USuqsPlayState::FailTask(FName QuestID, FName TaskIdentifier)
 {
 	auto T = FindTaskStatus(QuestID, TaskIdentifier);
 	if (T)
@@ -109,7 +109,7 @@ void USuqsPlayState::FailTask(const FName& QuestID, const FName& TaskIdentifier)
 }
 
 
-void USuqsPlayState::CompleteTask(const FName& QuestID, const FName& TaskIdentifier)
+void USuqsPlayState::CompleteTask(FName QuestID, FName TaskIdentifier)
 {
 	auto T = FindTaskStatus(QuestID, TaskIdentifier);
 	if (T)
@@ -118,7 +118,7 @@ void USuqsPlayState::CompleteTask(const FName& QuestID, const FName& TaskIdentif
 	}
 }
 
-void USuqsPlayState::ProgressTask(const FName& QuestID, const FName& TaskIdentifier, int Delta)
+void USuqsPlayState::ProgressTask(FName QuestID, FName TaskIdentifier, int Delta)
 {
 	auto T = FindTaskStatus(QuestID, TaskIdentifier);
 	if (T)
