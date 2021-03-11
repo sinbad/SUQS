@@ -129,6 +129,11 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 		// No incomplete objectives, and no failures
 		ChangeStatus(ESuqsQuestStatus::Completed);
 	}
+	else
+	{
+		// Just in case we go backwards (e.g. reset)
+		ChangeStatus(ESuqsQuestStatus::Incomplete);
+	}
 	
 
 }
