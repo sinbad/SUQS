@@ -50,8 +50,6 @@ protected:
 	void Initialise(const FSuqsObjective* ObjDef, USuqsQuestState* QuestState, USuqsPlayState* Root);
 	void Tick(float DeltaTime);
 	// Private fail/complete since users should only ever call task fail/complete
-	void Fail();
-	void Complete();
 	void ChangeStatus(ESuqsObjectiveStatus NewStatus);
 
 public:
@@ -77,6 +75,10 @@ public:
 	/// Reset the progress on this objective back to the initial state
 	UFUNCTION(BlueprintCallable)
     void Reset();
+	/// Manually fail this objective. Normally you should fail a specific task, but if you call this then it will mark
+	/// the current task(s) failed. Does nothing if there are no outstanding tasks
+	UFUNCTION(BlueprintCallable)
+    void FailOustandingTasks();
     
 	
 	void NotifyTaskStatusChanged();

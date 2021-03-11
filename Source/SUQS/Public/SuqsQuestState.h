@@ -103,6 +103,11 @@ public:
 	UFUNCTION(BlueprintCallable)
     void ResetBranch(FName Branch);
 
+	/// Manually fail this quest. Normally you should fail a specific task, but if you call this then it will mark
+	/// the current task(s) failed and then fail this quest. Does nothing if the quest doesn't have outstanding tasks
+	UFUNCTION(BlueprintCallable)
+    void Fail();
+
 	void NotifyObjectiveStatusChanged();
 
 	/// Find a task with the given identifier in this quest

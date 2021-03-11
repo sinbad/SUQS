@@ -42,7 +42,7 @@ protected:
 	/// Whether we suggest that this task is hidden from the player right now
 	/// This is the case for mandatory, sequential, incomplete tasks beyond the first one
 	UPROPERTY(BlueprintReadOnly, Category="Task State")
-	bool bSuggestHide;
+	bool bHidden;
 
 
 	const FSuqsTask* TaskDefinition;
@@ -61,6 +61,8 @@ public:
 	/// Current time remaining, if task has a time limit
 	float GetTimeRemaining() const { return TimeRemaining; }
 	ESuqsTaskStatus GetStatus() const {  return Status; }
+	/// Return whether this task should be hidden, e.g. because tasks are sequential in this objective
+	bool GetHidden() const { return bHidden; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FName& GetIdentifier() const { return TaskDefinition->Identifier; }

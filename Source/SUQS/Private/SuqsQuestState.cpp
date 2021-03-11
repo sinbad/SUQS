@@ -116,6 +116,15 @@ void USuqsQuestState::ResetBranch(FName Branch)
 	
 }
 
+void USuqsQuestState::Fail()
+{
+	auto Obj = GetCurrentObjective();
+	if (Obj)
+	{
+		Obj->FailOustandingTasks();
+	}
+}
+
 void USuqsQuestState::NotifyObjectiveStatusChanged()
 {
 	// Re-scan the objectives from top to bottom (this allows ANY change to have been made, including backtracking)

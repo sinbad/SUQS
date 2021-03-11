@@ -60,6 +60,17 @@ void USuqsObjectiveState::Reset()
 	}
 }
 
+void USuqsObjectiveState::FailOustandingTasks()
+{
+	for (auto Task : Tasks)
+	{
+		if (Task->IsIncomplete() && !Task->bHidden)
+		{
+			Task->Fail();
+		}
+	}
+}
+
 void USuqsObjectiveState::NotifyTaskStatusChanged()
 {
 	// Re-scan our tasks and decide what this means for our own state
@@ -68,7 +79,7 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 	int IncompleteMandatoryTasks = 0;
 	for (auto& Task : Tasks)
 	{
-		Task->bSuggestHide = false;
+		Task->bHidden = false;
 		if (Task->IsMandatory())
 		{
 			switch(Task->Status)
@@ -84,7 +95,7 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 				if (ObjectiveDefinition->bSequentialTasks && IncompleteMandatoryTasks > 0)
 				{
 					// If tasks are sequential, and this is an incomplete task after the first, suggest hiding it
-					Task->bSuggestHide = true;
+					Task->bHidden = true;
 				}
 				++IncompleteMandatoryTasks;
 				break;
@@ -95,11 +106,11 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 	}
 	
 	if (MandatoryTasksFailed > 0)
-		Fail();
+		ChangeStatus(ESuqsObjectiveStatus::Failed);
 
 	if (MandatoryTasksComplete >= MandatoryTasksNeededToComplete)
 	{
-		Complete();
+		ChangeStatus(ESuqsObjectiveStatus::Completed);
 	}
 	else
 	{
@@ -108,16 +119,6 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 
 }
 
-
-void USuqsObjectiveState::Fail()
-{
-	ChangeStatus(ESuqsObjectiveStatus::Failed);
-}
-
-void USuqsObjectiveState::Complete()
-{
-	ChangeStatus(ESuqsObjectiveStatus::Completed);
-}
 
 void USuqsObjectiveState::ChangeStatus(ESuqsObjectiveStatus NewStatus)
 {

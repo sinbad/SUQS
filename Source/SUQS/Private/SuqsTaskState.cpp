@@ -17,7 +17,7 @@ void USuqsTaskState::Tick(float DeltaTime)
 {
 	// Don't reduce time when task is hidden (e.g. not the next in sequence)
 	// Also not when also completed / failed
-	if (!bSuggestHide &&
+	if (!bHidden &&
 		IsIncomplete() && 
 		IsTimeLimited() &&
 		TimeRemaining > 0)
