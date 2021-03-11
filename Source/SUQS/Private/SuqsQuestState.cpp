@@ -93,6 +93,28 @@ USuqsObjectiveState* USuqsQuestState::GetCurrentObjective() const
 	return nullptr;
 }
 
+void USuqsQuestState::Reset()
+{
+	for (auto Obj : Objectives)
+	{
+		// This will trigger notifications on change
+		Obj->Reset();
+	}
+}
+
+void USuqsQuestState::ResetBranch(FName Branch)
+{
+	for (auto Obj : Objectives)
+	{
+		if (Obj->GetBranch() == Branch)
+		{
+			// This will trigger notifications on change
+			Obj->Reset();
+		}
+	}
+	
+}
+
 void USuqsQuestState::NotifyObjectiveStatusChanged()
 {
 	// Re-scan the objectives from top to bottom (this allows ANY change to have been made, including backtracking)

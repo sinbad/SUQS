@@ -51,6 +51,15 @@ const FText& USuqsObjectiveState::GetDescription() const
 	}
 }
 
+void USuqsObjectiveState::Reset()
+{
+	for (auto Task : Tasks)
+	{
+		// This will cause notifications
+		Task->Reset();
+	}
+}
+
 void USuqsObjectiveState::NotifyTaskStatusChanged()
 {
 	// Re-scan our tasks and decide what this means for our own state

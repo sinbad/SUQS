@@ -9,6 +9,8 @@ void USuqsTaskState::Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* O
 	TaskDefinition = TaskDef;
 	ParentObjective = ObjState;
 	PlayState = Root;
+
+	Reset();
 }
 
 void USuqsTaskState::Tick(float DeltaTime)
@@ -71,4 +73,11 @@ void USuqsTaskState::Progress(int Delta)
 	Number = std::min(std::max(0, Number), TaskDefinition->TargetNumber);
 	if (Number == TaskDefinition->TargetNumber)
 		Complete();
+}
+
+void USuqsTaskState::Reset()
+{
+	Number = 0;
+	TimeRemaining = TaskDefinition->TimeLimit;
+	ChangeStatus(ESuqsTaskStatus::NotStarted);
 }

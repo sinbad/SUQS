@@ -90,5 +90,8 @@ public:
 	/// Return whether a task is neither complete nor failed 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     bool IsIncomplete() const { return Status != ESuqsTaskStatus::Completed && Status != ESuqsTaskStatus::Failed; }
-	
+
+	/// Reset the progress on this task back to the initial state
+	UFUNCTION(BlueprintCallable)
+    void Reset();
 };

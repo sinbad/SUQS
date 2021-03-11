@@ -82,9 +82,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FText& GetDescription() const;
 	
-	/// Find a task with the given identifier in this quest
-	USuqsTaskState* FindTask(const FName& Identifier) const;
-
 	/// Set an objective branch to be active in this quest. Objectives associated with this branch will then be allowed
 	/// to activate.
 	UFUNCTION(BlueprintCallable)
@@ -98,5 +95,17 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsObjectiveState* GetCurrentObjective() const;
 
+	/// Reset all the progress on this quest back to the initial state
+	UFUNCTION(BlueprintCallable)
+	void Reset();
+
+	/// Reset all the progress on objectives associated with the named quest branch
+	UFUNCTION(BlueprintCallable)
+    void ResetBranch(FName Branch);
+
 	void NotifyObjectiveStatusChanged();
+
+	/// Find a task with the given identifier in this quest
+	USuqsTaskState* FindTask(const FName& Identifier) const;
+
 };

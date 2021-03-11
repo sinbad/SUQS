@@ -74,6 +74,9 @@ public:
 	/// Return whether an objective is neither complete nor failed 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsIncomplete() const { return Status != ESuqsObjectiveStatus::Completed && Status != ESuqsObjectiveStatus::Failed; }
+	/// Reset the progress on this objective back to the initial state
+	UFUNCTION(BlueprintCallable)
+    void Reset();
     
 	
 	void NotifyTaskStatusChanged();
