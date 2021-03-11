@@ -56,14 +56,23 @@ ESuqsQuestStatus USuqsPlayState::GetQuestState(const FName& Name) const
 }
 
 
-USuqsQuestState* USuqsPlayState::FindQuestStatus(const FName& QuestName)
+USuqsQuestState* USuqsPlayState::FindQuestStatus(const FName& QuestID)
 {
-	return QuestState.FindChecked(QuestName);
+	auto PQ = ActiveQuests.Find(QuestID);
+	if (PQ)
+		return *PQ;
+	PQ = QuestArchive.Find(QuestID);
+	if (PQ)
+		return *PQ;
+
+	UE_LOG(LogSuqsPlayState, Error, TEXT("Requested non-existent quest %s"), *QuestID.ToString());
+	return nullptr;
+	
 }
 
-const USuqsQuestState* USuqsPlayState::FindQuestStatus(const FName& QuestName) const
+const USuqsQuestState* USuqsPlayState::FindQuestStatus(const FName& QuestID) const
 {
-	return QuestState.FindChecked(QuestName);
+	return const_cast<USuqsPlayState*>(this)->FindQuestStatus(QuestID);
 }
 
 USuqsTaskState* USuqsPlayState::FindTaskStatus(const FName& QuestName, const FName& TaskID)
@@ -162,7 +171,7 @@ void USuqsPlayState::RaiseQuestFailed(USuqsQuestState* Quest)
 // FTickableGameObject start
 void USuqsPlayState::Tick(float DeltaTime)
 {
-	for (auto& QuestPair : QuestState)
+	for (auto& QuestPair : ActiveQuests)
 	{
 		QuestPair.Value->Tick(DeltaTime);
 	}

@@ -37,13 +37,18 @@ protected:
 	/// Unified quest defs, combined from all entries in QuestDataTables
 	UPROPERTY()
 	TMap<FName, FSuqsQuest> QuestDefinitions;
-	
-	UPROPERTY()
-	TMap<FName, USuqsQuestState*> QuestState;
 
-	USuqsQuestState* FindQuestStatus(const FName& QuestName);
-	const USuqsQuestState* FindQuestStatus(const FName& QuestName) const;
-	USuqsTaskState* FindTaskStatus(const FName& QuestName, const FName& TaskID);
+	/// Map of active quests
+	UPROPERTY()
+	TMap<FName, USuqsQuestState*> ActiveQuests;
+
+	/// Archive of completed / failed quests
+	UPROPERTY()
+	TMap<FName, USuqsQuestState*> QuestArchive;
+
+	USuqsQuestState* FindQuestStatus(const FName& QuestID);
+	const USuqsQuestState* FindQuestStatus(const FName& QuestID) const;
+	USuqsTaskState* FindTaskStatus(const FName& QuestID, const FName& TaskID);
 
 	void EnsureStateBuilt();
 	void EnsureQuestDefinitionsBuilt();
