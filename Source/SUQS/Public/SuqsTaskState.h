@@ -62,19 +62,19 @@ public:
 	float GetTimeRemaining() const { return TimeRemaining; }
 	ESuqsTaskStatus GetStatus() const {  return Status; }
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FName& GetIdentifier() const { return TaskDefinition->Identifier; }
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsMandatory() { return TaskDefinition->bMandatory; }
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsTimeLimited() const { return TaskDefinition->TimeLimit > 0; }
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const FText& GetTitle() { return TaskDefinition->Title; }
 	/// The target number of things to be achieved
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetTargetNumber() { return TaskDefinition->TargetNumber; }
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsObjectiveState* GetParentObjective() const { return ParentObjective.Get(); }
 
 	/// Fail this task
@@ -86,4 +86,9 @@ public:
 	/// Advance the number associated with progress on this quest. If it reaches the target number or more, it will automatically complete
 	UFUNCTION(BlueprintCallable)
 	void Progress(int Delta);
+
+	/// Return whether a task is neither complete nor failed 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool IsIncomplete() const { return Status != ESuqsTaskStatus::Completed && Status != ESuqsTaskStatus::Failed; }
+	
 };

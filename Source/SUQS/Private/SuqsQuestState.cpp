@@ -1,6 +1,7 @@
 #include "SuqsQuestState.h"
 
 #include "SuqsObjectiveState.h"
+#include "SuqsPlayState.h"
 #include "SuqsTaskState.h"
 
 void USuqsQuestState::Initialise(FSuqsQuest* Def, USuqsPlayState* Root)
@@ -13,8 +14,9 @@ void USuqsQuestState::Initialise(FSuqsQuest* Def, USuqsPlayState* Root)
 	// Quest definitions are static data so it's OK to keep this (it's owned by parent)
 	QuestDefinition = Def;
 	PlayState = Root;
-	Status = ESuqsQuestStatus::NotStarted;
+	Status = ESuqsQuestStatus::Incomplete;
 	FastTaskLookup.Empty();
+	ActiveBranches.Empty();
 
 	for (const auto& ObjDef : Def->Objectives)
 	{
@@ -28,7 +30,7 @@ void USuqsQuestState::Initialise(FSuqsQuest* Def, USuqsPlayState* Root)
 		}
 	}
 	
-	
+	NotifyObjectiveStatusChanged();
 }
 
 void USuqsQuestState::Tick(float DeltaTime)
@@ -61,12 +63,92 @@ void USuqsQuestState::SetBranchActive(FName Branch, bool bActive)
 
 bool USuqsQuestState::IsBranchActive(FName Branch)
 {
+	// No branch is always active
+	if (Branch.IsNone())
+		return true;
+	
 	return ActiveBranches.Contains(Branch);
+}
+
+
+const FText& USuqsQuestState::GetDescription() const
+{
+	switch (Status)
+	{
+	case ESuqsQuestStatus::Incomplete:
+	case ESuqsQuestStatus::Failed: 
+	case ESuqsQuestStatus::Unavailable: 
+	default:
+		return QuestDefinition->DescriptionWhenActive;
+	case ESuqsQuestStatus::Completed:
+		return QuestDefinition->DescriptionWhenCompleted.IsEmpty() ? QuestDefinition->DescriptionWhenActive : QuestDefinition->DescriptionWhenCompleted;
+	}
+}
+
+USuqsObjectiveState* USuqsQuestState::GetCurrentObjective() const
+{
+	if (CurrentObjectiveIndex >= 0 && CurrentObjectiveIndex < Objectives.Num())
+		return Objectives[CurrentObjectiveIndex];
+
+	return nullptr;
 }
 
 void USuqsQuestState::NotifyObjectiveStatusChanged()
 {
-	// TODO propagate state
-	// If not completed or failed, figure out what objective should be active now
-	// Re-scan objectives to see what we should do now
+	// Re-scan the objectives from top to bottom (this allows ANY change to have been made, including backtracking)
+	// The next active objective is the next incomplete one in sequence which is on an active branch
+	// If there is no next objective, then the quest is complete.
+	CurrentObjectiveIndex = -1;
+	bool ObjectivesFailed = false;
+
+	for (int i = 0; i < Objectives.Num(); ++i)
+	{
+		auto Obj = Objectives[i];
+		// The first objective that's on an active branch and incomplete is the current objective
+		if (IsBranchActive(Obj->GetBranch()) &&
+			Obj->IsIncomplete())
+		{
+			CurrentObjectiveIndex = i;
+			// Call this anyway, may not change but that's OK
+			ChangeStatus(ESuqsQuestStatus::Incomplete);
+			// first incomplete unfiltered objective is the next one 
+			break;
+		}
+		else
+		{
+			if (Obj->GetStatus() == ESuqsObjectiveStatus::Failed)
+				ObjectivesFailed = true;
+		}
+	}
+
+	// If any unfiltered objectives failed, we lose
+	if (ObjectivesFailed)
+		ChangeStatus(ESuqsQuestStatus::Failed);
+	else if (CurrentObjectiveIndex == -1)
+	{
+		// No incomplete objectives, and no failures
+		ChangeStatus(ESuqsQuestStatus::Completed);
+	}
+	
+
+}
+void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
+{
+	if (Status != NewStatus)
+	{
+		Status = NewStatus;
+
+		switch(NewStatus)
+		{
+		case ESuqsQuestStatus::Completed: 
+			PlayState->RaiseQuestCompleted(this);
+			break;
+		case ESuqsObjectiveStatus::Failed:
+			PlayState->RaiseQuestFailed(this);
+			break;
+		default: break;
+		}
+
+		PlayState->RaiseQuestUpdated(this);
+	}
 }

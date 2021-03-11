@@ -16,15 +16,14 @@ class USuqsTaskState;
 UENUM(BlueprintType)
 enum class ESuqsQuestStatus : uint8
 {
-	/// No progress has been made
-	NotStarted = 0,
-    /// At least one element of progress has been made
-    InProgress = 4,
+    /// Quest is accepted and in progress
+    Incomplete = 0,
     /// All mandatory elements have been completed
     Completed = 8,
     /// This quest has been failed and cannot be progressed without being explicitly reset
     Failed = 20,
 	/// Quest is not available because it's never been accepted
+	/// This is never used on USuqsQuestState itself, just returned as a status when querying quests
 	Unavailable = 30
 };
 
@@ -41,7 +40,7 @@ protected:
 
 	/// Whether this objective has been started, completed, failed (quick access to looking at tasks)
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
-	ESuqsQuestStatus Status = ESuqsQuestStatus::NotStarted;
+	ESuqsQuestStatus Status = ESuqsQuestStatus::Incomplete;
 
 	/// List of detailed objective status
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
@@ -50,6 +49,11 @@ protected:
 	/// List of active branches, which affects which objectives will be considered
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
 	TArray<FName> ActiveBranches;
+
+	/// The index of the current objective. -1 if quest completed
+	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
+	int CurrentObjectiveIndex = -1;
+
 
 	UPROPERTY()
 	TMap<FName, USuqsTaskState*> FastTaskLookup;
@@ -60,14 +64,23 @@ protected:
 
 	void Initialise(FSuqsQuest* Def, USuqsPlayState* Root);
 	void Tick(float DeltaTime);
+	void ChangeStatus(ESuqsQuestStatus NewStatus);
 	
 public:
 	ESuqsQuestStatus GetStatus() const { return Status; }
 	const TArray<USuqsObjectiveState*>& GetObjectives() const { return Objectives; }
 	const TArray<FName>& GetActiveBranches() const { return ActiveBranches; }
 
-	UFUNCTION(BlueprintCallable)
+	/// Get the unique quest identifier
+	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FName& GetIdentifier() const { return QuestDefinition->Identifier; }
+	/// Get the quest title
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    const FText& GetTitle() const { return QuestDefinition->Title; }
+	/// Get the current description for this quest (just the top-level description)
+	/// For any additional objective description, see GetCurrentObjective()->GetDescription();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    const FText& GetDescription() const;
 	
 	/// Find a task with the given identifier in this quest
 	USuqsTaskState* FindTask(const FName& Identifier) const;
@@ -81,6 +94,9 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsBranchActive(FName Branch);
 
+	/// Get the current objective on this quest. Will return null if quest is complete.
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	USuqsObjectiveState* GetCurrentObjective() const;
+
 	void NotifyObjectiveStatusChanged();
-	
 };

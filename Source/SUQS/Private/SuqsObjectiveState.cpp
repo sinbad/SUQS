@@ -35,6 +35,22 @@ void USuqsObjectiveState::Tick(float DeltaTime)
 	
 }
 
+
+const FText& USuqsObjectiveState::GetDescription() const
+{
+	switch (Status)
+	{
+	case ESuqsObjectiveStatus::NotStarted:
+	case ESuqsObjectiveStatus::InProgress:
+	case ESuqsObjectiveStatus::Failed:
+	default:
+		return ObjectiveDefinition->DescriptionWhenActive;
+	case ESuqsObjectiveStatus::Completed:
+		// Don't replace with active def when blank, blank is OK
+		return ObjectiveDefinition->DescriptionWhenCompleted;
+	}
+}
+
 void USuqsObjectiveState::NotifyTaskStatusChanged()
 {
 	// Re-scan our tasks and decide what this means for our own state

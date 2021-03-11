@@ -19,9 +19,7 @@ enum class ESuqsObjectiveStatus : uint8
     /// All mandatory elements have been completed
     Completed = 8,
     /// This item has been failed and cannot be progressed without being explicitly reset
-    Failed = 20,
-	/// This objective is being skipped because it is on an inactive branch
-	Skipped = 30
+    Failed = 20
 };
 
 /**
@@ -62,10 +60,21 @@ public:
 	ESuqsObjectiveStatus GetStatus() const { return Status; }
 	const TArray<USuqsTaskState*>& GetTasks() { return Tasks; }
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FName& GetIdentifier() const { return ObjectiveDefinition->Identifier; }
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    const FText& GetTitle() const { return ObjectiveDefinition->Title; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
     USuqsQuestState* GetParentQuest() const { return ParentQuest.Get(); }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	const FName& GetBranch() const { return ObjectiveDefinition->Branch; }
+	/// Get the additional description to be added to quest description for this objective, if any
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    const FText& GetDescription() const;
+	/// Return whether an objective is neither complete nor failed 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsIncomplete() const { return Status != ESuqsObjectiveStatus::Completed && Status != ESuqsObjectiveStatus::Failed; }
+    
 	
 	void NotifyTaskStatusChanged();
 };

@@ -139,6 +139,8 @@ public:
 	void RaiseTaskCompleted(USuqsTaskState* Task);
 	void RaiseObjectiveCompleted(USuqsObjectiveState* Objective);
 	void RaiseObjectiveFailed(USuqsObjectiveState* Objective);
+	void RaiseQuestCompleted(USuqsQuestState* Quest);
+	void RaiseQuestFailed(USuqsQuestState* Quest);
 
 
 	

@@ -80,6 +80,7 @@ USuqsTaskState* USuqsPlayState::FindTaskStatus(const FName& QuestName, const FNa
 void USuqsPlayState::AcceptQuest(const FName& Name)
 {
 	// TODO
+	//OnQuestAccepted.Broadcast(Quest);
 }
 
 void USuqsPlayState::FailQuest(const FName& Name)
@@ -141,6 +142,17 @@ void USuqsPlayState::RaiseObjectiveCompleted(USuqsObjectiveState* Objective)
 void USuqsPlayState::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
 {
 	OnObjectiveFailed.Broadcast(Objective);
+}
+
+
+void USuqsPlayState::RaiseQuestCompleted(USuqsQuestState* Quest)
+{
+	OnQuestCompleted.Broadcast(Quest);
+}
+
+void USuqsPlayState::RaiseQuestFailed(USuqsQuestState* Quest)
+{
+	OnQuestFailed.Broadcast(Quest);
 }
 
 // FTickableGameObject start
