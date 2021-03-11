@@ -46,6 +46,24 @@ USuqsTaskState* USuqsQuestState::FindTask(const FName& Identifier) const
 	return FastTaskLookup.FindChecked(Identifier);
 }
 
+
+void USuqsQuestState::SetBranchActive(FName Branch, bool bActive)
+{
+	int Changes;
+	if (bActive)
+		Changes = ActiveBranches.AddUnique(Branch);
+	else
+		Changes = ActiveBranches.Remove(Branch);
+
+	if (Changes > 0)
+		NotifyObjectiveStatusChanged();
+}
+
+bool USuqsQuestState::IsBranchActive(FName Branch)
+{
+	return ActiveBranches.Contains(Branch);
+}
+
 void USuqsQuestState::NotifyObjectiveStatusChanged()
 {
 	// TODO propagate state

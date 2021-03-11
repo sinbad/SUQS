@@ -39,9 +39,9 @@ public:
 
 };
 
-/// A sub-objective of a quest. These objectives are usually performed in order but may be non-sequential
-/// They can also be mandatory or optional. They comprise multiple tasks, which are the actual things the player must
-/// complete.
+/// A sub-objective of a quest. These objectives are always sequential, but branching can be supported by association with quest branches
+/// Objectives are mandatory if associated with no branch, or if the branch they are associated with is active in the quest.
+/// They are made up of multiple tasks, which are the actual things the player must complete, and derive their status from them.
 USTRUCT(BlueprintType)
 struct SUQS_API FSuqsObjective
 {

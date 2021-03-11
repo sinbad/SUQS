@@ -47,6 +47,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
 	TArray<USuqsObjectiveState*> Objectives;
 
+	/// List of active branches, which affects which objectives will be considered
+	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
+	TArray<FName> ActiveBranches;
+
 	UPROPERTY()
 	TMap<FName, USuqsTaskState*> FastTaskLookup;
 
@@ -60,12 +64,22 @@ protected:
 public:
 	ESuqsQuestStatus GetStatus() const { return Status; }
 	const TArray<USuqsObjectiveState*>& GetObjectives() const { return Objectives; }
+	const TArray<FName>& GetActiveBranches() const { return ActiveBranches; }
 
 	UFUNCTION(BlueprintCallable)
     const FName& GetIdentifier() const { return QuestDefinition->Identifier; }
 	
 	/// Find a task with the given identifier in this quest
 	USuqsTaskState* FindTask(const FName& Identifier) const;
+
+	/// Set an objective branch to be active in this quest. Objectives associated with this branch will then be allowed
+	/// to activate.
+	UFUNCTION(BlueprintCallable)
+	void SetBranchActive(FName Branch, bool bActive);
+
+	/// Return whether an objective branch is active or not
+	UFUNCTION(BlueprintCallable)
+    bool IsBranchActive(FName Branch);
 
 	void NotifyObjectiveStatusChanged();
 	
