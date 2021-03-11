@@ -35,11 +35,12 @@ void USuqsQuestState::Initialise(FSuqsQuest* Def, USuqsPlayState* Root)
 
 void USuqsQuestState::Tick(float DeltaTime)
 {
-	for (auto& Objective : Objectives)
+	// only tick the current objective
+	auto Obj = GetCurrentObjective();
+	if (Obj)
 	{
-		Objective->Tick(DeltaTime);
-	}
-	
+		Obj->Tick(DeltaTime);
+	}	
 }
 
 
