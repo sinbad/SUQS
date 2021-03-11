@@ -43,16 +43,22 @@ void USuqsPlayState::EnsureQuestDefinitionsBuilt()
 	}
 }
 
-ESuqsQuestStatus USuqsPlayState::GetQuestState(FName QuestID) const
+ESuqsQuestStatus USuqsPlayState::GetQuestStatus(FName QuestID) const
 {
 	// Could make a lookup for this, but we'd need to post-load call to re-populate it, leave for now
-	const auto Status = FindQuestStatus(QuestID);
+	const auto State = FindQuestStatus(QuestID);
 
-	if (Status)
-		return Status->GetStatus();
+	if (State)
+		return State->GetStatus();
 	else
 		return ESuqsQuestStatus::Unavailable;
 	
+}
+
+USuqsQuestState* USuqsPlayState::GetQuest(FName QuestID)
+{
+	auto Status = FindQuestStatus(QuestID);
+	return Status;
 }
 
 
@@ -86,10 +92,45 @@ USuqsTaskState* USuqsPlayState::FindTaskStatus(const FName& QuestID, const FName
 	return nullptr;
 }
 
-void USuqsPlayState::AcceptQuest(FName QuestID)
+
+void USuqsPlayState::GetAcceptedQuestIdentifiers(TArray<FName>& AcceptedQuestIDsOut) const
 {
-	// TODO
-	//OnQuestAccepted.Broadcast(Quest);
+	ActiveQuests.GenerateKeyArray(AcceptedQuestIDsOut);
+}
+
+void USuqsPlayState::GetArchivedQuestIdentifiers(TArray<FName>& ArchivedQuestIDsOut) const
+{
+	QuestArchive.GenerateKeyArray(ArchivedQuestIDsOut);
+}
+
+
+void USuqsPlayState::GetAcceptedQuests(TArray<USuqsQuestState*>& AcceptedQuestsOut) const
+{
+	ActiveQuests.GenerateValueArray(AcceptedQuestsOut);
+}
+
+void USuqsPlayState::GetArchivedQuests(TArray<USuqsQuestState*>& ArchivedQuestsOut) const
+{
+	QuestArchive.GenerateValueArray(ArchivedQuestsOut);
+}
+
+bool USuqsPlayState::AcceptQuest(FName QuestID, bool bResetIfComplete, bool bResetIfInProgress)
+{
+	auto QDef = QuestDefinitions.Find(QuestID);
+	if (QDef)
+	{
+		// Check that we don't already have this quest
+		// TODO
+		return true;
+		
+		//OnQuestAccepted.Broadcast(Quest);
+	}
+	else
+	{
+		UE_LOG(LogSuqsPlayState, Error , TEXT("Attempted to accept a non-existent quest %s"), *QuestID.ToString());
+		return false;
+	}
+	
 }
 
 void USuqsPlayState::FailQuest(FName QuestID)

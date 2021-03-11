@@ -85,25 +85,51 @@ public:
 
 	/// Get the overall status of a named quest
 	UFUNCTION(BlueprintCallable)
-	ESuqsQuestStatus GetQuestState(FName QuestID) const;
-	
+	ESuqsQuestStatus GetQuestStatus(FName QuestID) const;
+
 	/// Return whether the quest is or has been accepted for the player (may also be completed / failed)
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestAccepted(FName QuestID) const { return GetQuestState(QuestID) != ESuqsQuestStatus::Unavailable; }
+    bool IsQuestAccepted(FName QuestID) const { return GetQuestStatus(QuestID) != ESuqsQuestStatus::Unavailable; }
 
 	/// Return whether the quest is completed
 	UFUNCTION(BlueprintCallable)
-	bool IsQuestCompleted(FName QuestID) const { return GetQuestState(QuestID) == ESuqsQuestStatus::Completed; }
+	bool IsQuestCompleted(FName QuestID) const { return GetQuestStatus(QuestID) == ESuqsQuestStatus::Completed; }
 
 	/// Return whether the quest has failed
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestFailed(FName QuestID) const { return GetQuestState(QuestID) == ESuqsQuestStatus::Completed; }
+    bool IsQuestFailed(FName QuestID) const { return GetQuestStatus(QuestID) == ESuqsQuestStatus::Completed; }
 
-	/// Accept a quest and track its state
-	/// Note: you don't need to do this for quests which are set to auto-activate based on the completion of other quests.
-	/// However you will want to do it for events that you activate other ways, e.g. entering areas, talking to characters
+	/// Get a list of the IDs of accepted quests
 	UFUNCTION(BlueprintCallable)
-	void AcceptQuest(FName QuestID);
+	void GetAcceptedQuestIdentifiers(TArray<FName>& AcceptedQuestIDsOut) const;
+
+	/// Get a list of the IDs of archived quests (those that were completed or failed)
+	UFUNCTION(BlueprintCallable)
+    void GetArchivedQuestIdentifiers(TArray<FName>& ArchivedQuestIDsOut) const;
+
+	/// Get the state of a quest
+	UFUNCTION(BlueprintCallable)
+    USuqsQuestState* GetQuest(FName QuestID);
+
+	/// Get a list of the currently accepted quests
+	UFUNCTION(BlueprintCallable)
+    void GetAcceptedQuests(TArray<USuqsQuestState*>& AcceptedQuestsOut) const;
+
+	/// Get a list of the archived quests (those that were completed or failed)
+	UFUNCTION(BlueprintCallable)
+    void GetArchivedQuests(TArray<USuqsQuestState*>& ArchivedQuestsOut) const;
+
+	/**
+	 * Accept a quest and track its state (if possible)
+	 * Note: you don't need to do this for quests which are set to auto-accept based on the completion of other quests.
+	 * However you will want to do it for events that you activate other ways, e.g. entering areas, talking to characters
+	 * @param QuestID The identifier of the quest
+	 * @param bResetIfComplete If this quest has been previously completed (inc failed), whether to reset it. Ignore if false
+	 * @param bResetIfInProgress If this quest is already in progress, whether to reset it. If not, ignore
+	 * @returns Whether the quest was successfully accepted
+	 */
+	UFUNCTION(BlueprintCallable)
+	bool AcceptQuest(FName QuestID, bool bResetIfComplete = false, bool bResetIfInProgress = false);
 
 	/// Manually fail a quest. You should prefer using FailTask() instead if you need to explain which specific part
 	/// of a quest failed. Otherwise, this will mark all current tasks /objectives as failed.
