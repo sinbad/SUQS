@@ -148,11 +148,15 @@ void USuqsPlayState::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
 void USuqsPlayState::RaiseQuestCompleted(USuqsQuestState* Quest)
 {
 	OnQuestCompleted.Broadcast(Quest);
+
+	// TODO: trigger the acceptance of quests which depend on this completion
 }
 
 void USuqsPlayState::RaiseQuestFailed(USuqsQuestState* Quest)
 {
 	OnQuestFailed.Broadcast(Quest);
+
+	// TODO: trigger the acceptance of quests which depend on this failure
 }
 
 // FTickableGameObject start

@@ -136,9 +136,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	bool AutoAccept = false;
 
-	/// List of quest identifiers which must be completed in order for this quest to be enabled
+	/// List of quest identifiers which must be completed successfully in order for this quest to be accepted
+	/// Only does something when AutoAccept is enabled. This allows you to activate quest chains based on completion.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	TArray<FName> PrerequiteQuests;
+
+	/// List of quest identifiers which must have failed in order for this quest to be accepted
+	/// Only does something when AutoAccept is enabled. This allows you to activate quest chains based on failure.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	TArray<FName> PrerequiteQuestFailures;	
 
 	/// List of objectives involved in the quest. They are all sequential, and mandatory, but may be hidden to provide some branching
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
