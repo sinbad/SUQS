@@ -21,8 +21,8 @@ void USuqsPlayState::EnsureQuestDefinitionsBuilt()
 		{
 			Table->ForeachRow<FSuqsQuest>("", [this, Table](const FName& Key, const FSuqsQuest& Quest)
             {
-                if (QuestDefinitions.Contains(Key))
-                	UE_LOG(LogSuqsPlayState, Error, TEXT("Quest name '%s' has been used more than once! Duplicate entry was in %s"), *Key.ToString(), *Table->GetName());
+                if (QuestDefinitions.Contains(Quest.Identifier))
+                	UE_LOG(LogSuqsPlayState, Error, TEXT("Quest ID '%s' has been used more than once! Duplicate entry was in %s"), *Quest.Identifier.ToString(), *Table->GetName());
 
                 // Check task IDs are unique
                 TSet<FName> TaskIDSet;
@@ -37,7 +37,7 @@ void USuqsPlayState::EnsureQuestDefinitionsBuilt()
                     }
                 }
 				
-                QuestDefinitions.Add(Key, Quest);
+                QuestDefinitions.Add(Quest.Identifier, Quest);
             });
 		}
 	}
