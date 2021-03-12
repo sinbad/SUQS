@@ -14,8 +14,8 @@ const FString SimpleMainQuestJson = R"RAWJSON([
 		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"MainQuest1DescActive\", \"This is the main quest\")",
 		"DescriptionWhenCompleted": "NSLOCTEXT(\"[TestQuests]\", \"MainQuest1DescComplete\", \"You did the main quest!\")",
 		"AutoAccept": false,
-		"PrerequiteQuests": [],
-		"PrerequiteQuestFailures": [],
+		"PrerequisiteQuests": [],
+		"PrerequisiteQuestFailures": [],
 		"Objectives": [
 			{
 				"Identifier": "O1",
@@ -110,8 +110,8 @@ const FString SimpleMainQuestJson = R"RAWJSON([
 		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"MainQuest1DescActive\", \"Second quest in the main quest\")",
 		"DescriptionWhenCompleted": "NSLOCTEXT(\"[TestQuests]\", \"MainQuest1DescComplete\", \"You did the secon part of the main quest!\")",
 		"AutoAccept": true,
-		"PrerequiteQuests": ["Q_Main1"],
-		"PrerequiteQuestFailures": [],
+		"PrerequisiteQuests": ["Q_Main1"],
+		"PrerequisiteQuestFailures": [],
 		"Objectives": [
 			{
 				"Identifier": "O1",
@@ -145,8 +145,8 @@ const FString SimpleSideQuestJson = R"RAWJSON([
 		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SideQuest1DescActive\", \"This is one of those side quests you really play the game for\")",
 		"DescriptionWhenCompleted": "",
 		"AutoAccept": false,
-		"PrerequiteQuests": [],
-		"PrerequiteQuestFailures": [],
+		"PrerequisiteQuests": [],
+		"PrerequisiteQuestFailures": [],
 		"Objectives": [
 			{
 				"Identifier": "O1",
