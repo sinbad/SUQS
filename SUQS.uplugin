@@ -22,9 +22,9 @@
 			"LoadingPhase" : "Default"
 		},
 		{
-			"Name": "SUQSEditor",
-			"Type": "Editor",
-			"LoadingPhase": "PostEngineInit"
+			"Name": "SUQSTest",
+			"Type": "DeveloperTool",
+			"LoadingPhase": "Default"
 		}
 		
 	]	

@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class SUQSEditor : ModuleRules
+public class SUQSTest : ModuleRules
 {
-	public SUQSEditor(ReadOnlyTargetRules Target) : base(Target)
+	public SUQSTest(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -14,7 +14,7 @@ public class SUQSEditor : ModuleRules
                 "Core",
                 "CoreUObject",
                 "Engine",
-                "UnrealEd"
+                "SUQS"
             }
         );
         
