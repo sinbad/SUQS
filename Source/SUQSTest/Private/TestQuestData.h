@@ -202,7 +202,7 @@ const FString SimpleSideQuestJson = R"RAWJSON([
 						"bMandatory": true,
 						"TargetNumber": 1,
 						"TimeLimit": 0
-					}
+					},
 					{
 						"Identifier": "T_InsultDerek",
 						"Title": "NSLOCTEXT(\"[TestQuests]\", \"InsultDerek\", \"Call Derek's Lineage Into Question\")",
