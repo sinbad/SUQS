@@ -138,7 +138,6 @@ void USuqsObjectiveState::ChangeStatus(ESuqsObjectiveStatus NewStatus)
 		}
 
 		ParentQuest->NotifyObjectiveStatusChanged();
-		PlayState->RaiseQuestUpdated(GetParentQuest());
 		
 	}
 }

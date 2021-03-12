@@ -183,9 +183,10 @@ void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
 		case ESuqsObjectiveStatus::Failed:
 			PlayState->RaiseQuestFailed(this);
 			break;
+		case ESuqsQuestStatus::Incomplete:
+			PlayState->RaiseQuestReset(this);
+			break;
 		default: break;
 		}
-
-		PlayState->RaiseQuestUpdated(this);
 	}
 }

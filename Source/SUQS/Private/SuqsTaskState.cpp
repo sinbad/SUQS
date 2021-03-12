@@ -23,6 +23,8 @@ void USuqsTaskState::Tick(float DeltaTime)
 		TimeRemaining > 0)
 	{
 		TimeRemaining -= DeltaTime;
+		
+		PlayState->RaiseTaskUpdated(this);
 		if (TimeRemaining <= 0)
 		{
 			TimeRemaining = 0;
@@ -38,6 +40,7 @@ void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus)
 	{
 		Status = NewStatus;
 
+		PlayState->RaiseTaskUpdated(this);
 		switch(NewStatus)
 		{
 		case ESuqsTaskStatus::Completed: 
@@ -49,9 +52,7 @@ void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus)
 		default: break;
 		}
 
-		ParentObjective->NotifyTaskStatusChanged();
-		PlayState->RaiseQuestUpdated(this->GetParentObjective()->GetParentQuest());
-		
+		ParentObjective->NotifyTaskStatusChanged();		
 	}
 }
 
@@ -71,6 +72,9 @@ void USuqsTaskState::Progress(int Delta)
 {
 	Number += Delta;
 	Number = std::min(std::max(0, Number), TaskDefinition->TargetNumber);
+
+	PlayState->RaiseTaskUpdated(this);
+
 	if (Number == TaskDefinition->TargetNumber)
 		Complete();
 }

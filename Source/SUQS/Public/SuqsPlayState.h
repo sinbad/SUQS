@@ -9,6 +9,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSuqsPlayState, Verbose, Verbose);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskUpdated, USuqsTaskState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskCompleted, USuqsTaskState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskFailed, USuqsTaskState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveCompleted, USuqsObjectiveState*, Objective);
@@ -16,7 +17,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveFailed, USuqsObjectiveSt
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestCompleted, USuqsQuestState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestFailed, USuqsQuestState*, Task);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestUpdated, USuqsQuestState*, Quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActiveQuestChanged, USuqsQuestState*, Quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, Quest);
 
@@ -46,8 +46,8 @@ protected:
 	UPROPERTY()
 	TMap<FName, USuqsQuestState*> QuestArchive;
 
-	USuqsQuestState* FindQuestStatus(const FName& QuestID);
-	const USuqsQuestState* FindQuestStatus(const FName& QuestID) const;
+	USuqsQuestState* FindQuestState(const FName& QuestID);
+	const USuqsQuestState* FindQuestState(const FName& QuestID) const;
 	USuqsTaskState* FindTaskStatus(const FName& QuestID, const FName& TaskID);
 
 	void EnsureStateBuilt();
@@ -73,9 +73,9 @@ public:
 	/// Fired when a quest has failed
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestFailed OnQuestFailed;
-	/// Fired when a quest or its objectives / tasks has changed in any way
+	/// Fired when something on the detail of a task has changed (progress, time etc)
 	UPROPERTY(BlueprintAssignable)
-	FOnQuestUpdated OnQuestUpdated;
+	FOnTaskUpdated OnTaskUpdated;
 	/// Fired when a different quest has been made the active quest
 	UPROPERTY(BlueprintAssignable)
 	FOnActiveQuestChanged OnActiveQuestChanged;
@@ -124,12 +124,17 @@ public:
 	 * Note: you don't need to do this for quests which are set to auto-accept based on the completion of other quests.
 	 * However you will want to do it for events that you activate other ways, e.g. entering areas, talking to characters
 	 * @param QuestID The identifier of the quest
-	 * @param bResetIfComplete If this quest has been previously completed (inc failed), whether to reset it. Ignore if false
-	 * @param bResetIfInProgress If this quest is already in progress, whether to reset it. If not, ignore
+	 * @param bResetIfFailed If this quest has failed, whether to reset it (default true)
+	 * @param bResetIfComplete If this quest has been previously completed, whether to reset it. Default false (do nothing)
+	 * @param bResetIfInProgress If this quest is already in progress, whether to reset it. If not, do nothing
 	 * @returns Whether the quest was successfully accepted
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool AcceptQuest(FName QuestID, bool bResetIfComplete = false, bool bResetIfInProgress = false);
+	bool AcceptQuest(FName QuestID, bool bResetIfFailed = true, bool bResetIfComplete = false, bool bResetIfInProgress = false);
+
+	/// Reset all progress on a quest. Works whether a quest is in progress, complete or failed
+	UFUNCTION(BlueprintCallable)
+    void ResetQuest(FName QuestID);
 
 	/// Manually fail a quest. You should prefer using FailTask() instead if you need to explain which specific part
 	/// of a quest failed. Otherwise, this will mark all current tasks /objectives as failed.
@@ -165,13 +170,14 @@ public:
 	void ProgressTask(FName QuestID, FName TaskIdentifier, int Delta);
 
 
-	void RaiseQuestUpdated(USuqsQuestState* Quest);
+	void RaiseTaskUpdated(USuqsTaskState* Task);
 	void RaiseTaskFailed(USuqsTaskState* Task);
 	void RaiseTaskCompleted(USuqsTaskState* Task);
 	void RaiseObjectiveCompleted(USuqsObjectiveState* Objective);
 	void RaiseObjectiveFailed(USuqsObjectiveState* Objective);
 	void RaiseQuestCompleted(USuqsQuestState* Quest);
 	void RaiseQuestFailed(USuqsQuestState* Quest);
+	void RaiseQuestReset(USuqsQuestState* Quest);
 
 
 	

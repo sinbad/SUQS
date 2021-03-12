@@ -46,7 +46,7 @@ void USuqsPlayState::EnsureQuestDefinitionsBuilt()
 ESuqsQuestStatus USuqsPlayState::GetQuestStatus(FName QuestID) const
 {
 	// Could make a lookup for this, but we'd need to post-load call to re-populate it, leave for now
-	const auto State = FindQuestStatus(QuestID);
+	const auto State = FindQuestState(QuestID);
 
 	if (State)
 		return State->GetStatus();
@@ -57,12 +57,12 @@ ESuqsQuestStatus USuqsPlayState::GetQuestStatus(FName QuestID) const
 
 USuqsQuestState* USuqsPlayState::GetQuest(FName QuestID)
 {
-	auto Status = FindQuestStatus(QuestID);
+	auto Status = FindQuestState(QuestID);
 	return Status;
 }
 
 
-USuqsQuestState* USuqsPlayState::FindQuestStatus(const FName& QuestID)
+USuqsQuestState* USuqsPlayState::FindQuestState(const FName& QuestID)
 {
 	auto PQ = ActiveQuests.Find(QuestID);
 	if (PQ)
@@ -76,14 +76,14 @@ USuqsQuestState* USuqsPlayState::FindQuestStatus(const FName& QuestID)
 	
 }
 
-const USuqsQuestState* USuqsPlayState::FindQuestStatus(const FName& QuestID) const
+const USuqsQuestState* USuqsPlayState::FindQuestState(const FName& QuestID) const
 {
-	return const_cast<USuqsPlayState*>(this)->FindQuestStatus(QuestID);
+	return const_cast<USuqsPlayState*>(this)->FindQuestState(QuestID);
 }
 
 USuqsTaskState* USuqsPlayState::FindTaskStatus(const FName& QuestID, const FName& TaskID)
 {
-	auto Q = FindQuestStatus(QuestID);
+	auto Q = FindQuestState(QuestID);
 	if (Q)
 	{
 		return Q->FindTask(TaskID);
@@ -114,16 +114,50 @@ void USuqsPlayState::GetArchivedQuests(TArray<USuqsQuestState*>& ArchivedQuestsO
 	QuestArchive.GenerateValueArray(ArchivedQuestsOut);
 }
 
-bool USuqsPlayState::AcceptQuest(FName QuestID, bool bResetIfComplete, bool bResetIfInProgress)
+bool USuqsPlayState::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bResetIfComplete, bool bResetIfInProgress)
 {
 	auto QDef = QuestDefinitions.Find(QuestID);
 	if (QDef)
 	{
 		// Check that we don't already have this quest
-		// TODO
+		auto Quest = FindQuestState(QuestID);
+		if (Quest)
+		{
+			bool bReset;
+			switch(Quest->Status)
+			{
+			case ESuqsQuestStatus::Incomplete:
+				bReset = bResetIfInProgress;
+				break;
+			case ESuqsQuestStatus::Completed: 
+				bReset = bResetIfComplete;
+				break;
+			case ESuqsQuestStatus::Failed: 
+				bReset = bResetIfFailed;
+				break;
+			default:
+				bReset = true;
+				break;
+			}
+
+			if (!bReset)
+			{
+				UE_LOG(LogSuqsPlayState, Warning, TEXT("Ignoring request to accept quest %s because it has status %d"), *QuestID.ToString(), Quest->Status);
+				return false;
+			}
+
+			Quest->Reset();
+		}
+		else
+		{
+			// New quest
+			Quest = NewObject<USuqsQuestState>(this);
+			Quest->Initialise(QDef, this);
+			ActiveQuests.Add(QuestID, Quest);
+		}
+
+		OnQuestAccepted.Broadcast(Quest);
 		return true;
-		
-		//OnQuestAccepted.Broadcast(Quest);
 	}
 	else
 	{
@@ -133,11 +167,24 @@ bool USuqsPlayState::AcceptQuest(FName QuestID, bool bResetIfComplete, bool bRes
 	
 }
 
+
+void USuqsPlayState::ResetQuest(FName QuestID)
+{
+	auto Q = FindQuestState(QuestID);
+	if (Q)
+		Q->Reset();
+
+	// note we don't update quest lists here, but we rely on callbacks since you could reset or re-activate using the quest itself
+	
+}
+
 void USuqsPlayState::FailQuest(FName QuestID)
 {
-	auto Q = FindQuestStatus(QuestID);
+	auto Q = FindQuestState(QuestID);
 	if (Q)
 		Q->Fail();
+
+	// note we don't update quest lists here, but we rely on callbacks since you could fail via the quest itself
 }
 
 void USuqsPlayState::FailTask(FName QuestID, FName TaskIdentifier)
@@ -169,11 +216,10 @@ void USuqsPlayState::ProgressTask(FName QuestID, FName TaskIdentifier, int Delta
 }
 
 
-void USuqsPlayState::RaiseQuestUpdated(USuqsQuestState* Quest)
+void USuqsPlayState::RaiseTaskUpdated(USuqsTaskState* Task)
 {
-	// might be worth queuing these up and raising combined, since one change can
-	// trigger this from e.g. task, objective and quest all changing as a cascade
-	OnQuestUpdated.Broadcast(Quest);
+	// might be worth queuing these up and raising combined?
+	OnTaskUpdated.Broadcast(Task);
 }
 
 void USuqsPlayState::RaiseTaskCompleted(USuqsTaskState* Task)
@@ -199,6 +245,10 @@ void USuqsPlayState::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
 
 void USuqsPlayState::RaiseQuestCompleted(USuqsQuestState* Quest)
 {
+	// Move quest to the correct list
+	ActiveQuests.Remove(Quest->GetIdentifier());
+	QuestArchive.Add(Quest->GetIdentifier(), Quest);
+
 	OnQuestCompleted.Broadcast(Quest);
 
 	// TODO: trigger the acceptance of quests which depend on this completion
@@ -206,9 +256,21 @@ void USuqsPlayState::RaiseQuestCompleted(USuqsQuestState* Quest)
 
 void USuqsPlayState::RaiseQuestFailed(USuqsQuestState* Quest)
 {
+	// Move quest to the correct list
+	ActiveQuests.Remove(Quest->GetIdentifier());
+	QuestArchive.Add(Quest->GetIdentifier(), Quest);
+
 	OnQuestFailed.Broadcast(Quest);
 
 	// TODO: trigger the acceptance of quests which depend on this failure
+}
+
+void USuqsPlayState::RaiseQuestReset(USuqsQuestState* Quest)
+{
+	// Move quest to the correct list
+	QuestArchive.Remove(Quest->GetIdentifier());
+	ActiveQuests.Add(Quest->GetIdentifier(), Quest);
+	OnQuestAccepted.Broadcast(Quest);
 }
 
 // FTickableGameObject start
