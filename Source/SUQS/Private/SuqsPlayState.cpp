@@ -6,12 +6,6 @@
 
 DEFINE_LOG_CATEGORY(LogSuqsPlayState)
 
-void USuqsPlayState::EnsureStateBuilt()
-{
-	EnsureQuestDefinitionsBuilt();
-}
-
-
 void USuqsPlayState::EnsureQuestDefinitionsBuilt()
 {
 	// Build unified quest table
@@ -115,6 +109,8 @@ void USuqsPlayState::GetArchivedQuests(TArray<USuqsQuestState*>& ArchivedQuestsO
 
 bool USuqsPlayState::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bResetIfComplete, bool bResetIfInProgress)
 {
+	EnsureQuestDefinitionsBuilt();
+
 	auto QDef = QuestDefinitions.Find(QuestID);
 	if (QDef)
 	{

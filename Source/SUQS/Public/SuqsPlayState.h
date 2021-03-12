@@ -50,7 +50,6 @@ protected:
 	const USuqsQuestState* FindQuestState(const FName& QuestID) const;
 	USuqsTaskState* FindTaskStatus(const FName& QuestID, const FName& TaskID);
 
-	void EnsureStateBuilt();
 	void EnsureQuestDefinitionsBuilt();
 	
 public:
