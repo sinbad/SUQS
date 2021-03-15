@@ -78,7 +78,7 @@ public:
 	/// Manually fail this objective. Normally you should fail a specific task, but if you call this then it will mark
 	/// the current task(s) failed. Does nothing if there are no outstanding tasks
 	UFUNCTION(BlueprintCallable)
-    void FailOustandingTasks();
+    void FailOutstandingTasks();
     
 	
 	void NotifyTaskStatusChanged();

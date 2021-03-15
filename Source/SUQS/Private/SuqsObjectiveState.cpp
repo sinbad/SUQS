@@ -60,7 +60,7 @@ void USuqsObjectiveState::Reset()
 	}
 }
 
-void USuqsObjectiveState::FailOustandingTasks()
+void USuqsObjectiveState::FailOutstandingTasks()
 {
 	for (auto Task : Tasks)
 	{
