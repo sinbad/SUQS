@@ -121,7 +121,7 @@ void USuqsQuestState::Fail()
 	auto Obj = GetCurrentObjective();
 	if (Obj)
 	{
-		Obj->FailOustandingTasks();
+		Obj->FailOutstandingTasks();
 	}
 }
 
