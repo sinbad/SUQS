@@ -1,5 +1,6 @@
 #include "SuqsObjectiveState.h"
 #include "SuqsPlayState.h"
+#include "SuqsModule.h"
 #include "SuqsTaskState.h"
 
 void USuqsObjectiveState::Initialise(const FSuqsObjective* ObjDef, USuqsQuestState* QuestState,
@@ -71,6 +72,49 @@ void USuqsObjectiveState::FailOutstandingTasks()
 	}
 }
 
+USuqsTaskState* USuqsObjectiveState::GetNextMandatoryTask() const
+{
+	for (auto Task : Tasks)
+	{
+		if (Task->IsIncomplete() && Task->IsMandatory())
+		{
+			return Task;
+		}
+	}
+	return nullptr;
+}
+
+
+void USuqsObjectiveState::GetIncompleteTasks(TArray<USuqsTaskState*>& IncompleteTasksOut) const
+{
+	IncompleteTasksOut.Empty();
+	for (auto Task : Tasks)
+	{
+		if (Task->IsIncomplete())
+			IncompleteTasksOut.Add(Task);
+	}
+}
+
+void USuqsObjectiveState::GetCompletedTasks(TArray<USuqsTaskState*>& CompletedTasksOut) const
+{
+	CompletedTasksOut.Empty();
+	for (auto Task : Tasks)
+	{
+		if (Task->GetStatus() == ESuqsTaskStatus::Completed)
+			CompletedTasksOut.Add(Task);
+	}
+}
+
+void USuqsObjectiveState::GetFailedTasks(TArray<USuqsTaskState*>& FailedTasksOut) const
+{
+	FailedTasksOut.Empty();
+	for (auto Task : Tasks)
+	{
+		if (Task->GetStatus() == ESuqsTaskStatus::Failed)
+			FailedTasksOut.Add(Task);
+	}
+}
+
 void USuqsObjectiveState::NotifyTaskStatusChanged()
 {
 	// Re-scan our tasks and decide what this means for our own state
@@ -119,7 +163,6 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 	}
 
 }
-
 
 void USuqsObjectiveState::ChangeStatus(ESuqsObjectiveStatus NewStatus)
 {

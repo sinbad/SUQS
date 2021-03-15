@@ -84,7 +84,7 @@ public:
 	void Fail();
 	/// Complete this task (setting number to target number automatically)
 	UFUNCTION(BlueprintCallable)
-	void Complete();
+	bool Complete();
 	/// Advance the number associated with progress on this quest. If it reaches the target number or more, it will automatically complete
 	UFUNCTION(BlueprintCallable)
 	void Progress(int Delta);

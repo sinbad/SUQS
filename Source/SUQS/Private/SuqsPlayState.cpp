@@ -200,13 +200,14 @@ void USuqsPlayState::FailTask(FName QuestID, FName TaskIdentifier)
 }
 
 
-void USuqsPlayState::CompleteTask(FName QuestID, FName TaskIdentifier)
+bool USuqsPlayState::CompleteTask(FName QuestID, FName TaskIdentifier)
 {
 	auto T = FindTaskStatus(QuestID, TaskIdentifier);
 	if (T)
 	{
-		T->Complete();
+		return T->Complete();
 	}
+	return false;
 }
 
 void USuqsPlayState::ProgressTask(FName QuestID, FName TaskIdentifier, int Delta)

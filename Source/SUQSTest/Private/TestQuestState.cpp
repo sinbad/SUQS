@@ -68,7 +68,7 @@ bool FTestQuestAcceptFailedComplete::RunTest(const FString& Parameters)
 	// Test accepting completed
 	TestTrue("Accept smallest quest", PlayState->AcceptQuest("Q_Smol"));
 	TestEqual("Smol quest should be incomplete", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
-	PlayState->CompleteTask("Q_Smol", "T_Smol");
+	TestTrue("Smol task should complete OK", PlayState->CompleteTask("Q_Smol", "T_Smol"));
 	TestEqual("Smol quest should now be completed", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
 	TestFalse("Accepting completed quest should do nothing by default", PlayState->AcceptQuest("Q_Smol"));
 	TestEqual("Smol quest should still be completed", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
@@ -104,7 +104,7 @@ bool FTestQuestReset::RunTest(const FString& Parameters)
 	TestEqual("O1 objective should be not started", Obj->GetStatus(), ESuqsObjectiveStatus::NotStarted);
 
 	// Complete first task via top-level API
-	PlayState->CompleteTask("Q_Main1", "T_ReachThePlace");
+	TestTrue("Task should complete OK", PlayState->CompleteTask("Q_Main1", "T_ReachThePlace"));
 	TestEqual("Main quest should still be incomplete", PlayState->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
 	// Now let's do things via the object interface
 	Obj = Q->GetCurrentObjective();
@@ -116,16 +116,14 @@ bool FTestQuestReset::RunTest(const FString& Parameters)
 	TestEqual("Should be correct number of tasks", Tasks.Num(), 3);
 	TestEqual("First task should be complete", Tasks[0]->GetStatus(), ESuqsTaskStatus::Completed);
 	TestEqual("Second task should be not started", Tasks[1]->GetStatus(), ESuqsTaskStatus::NotStarted);
-	TestEqual("Third task should be not started", Tasks[2]->GetStatus(), ESuqsTaskStatus::NotStarted);
 
-	// now complete the other 2 tasks, but via the bottom level API
-	Tasks[1]->Complete();
-	Tasks[2]->Complete();
+	// now complete the other (mandatory) task, but via the bottom level API
+	// third task is optional so actually cannot be completed *after* the mandatory one
+	TestTrue("Task should complete", Tasks[1]->Complete());
 	// This should now complete one objective and set the next one to be active
 
 	TestEqual("First task should be complete", Tasks[0]->GetStatus(), ESuqsTaskStatus::Completed);
 	TestEqual("Second task should be complete", Tasks[1]->GetStatus(), ESuqsTaskStatus::Completed);
-	TestEqual("Third task should be complete", Tasks[2]->GetStatus(), ESuqsTaskStatus::Completed);
 	TestEqual("O1 objective should be complete", Obj->GetStatus(), ESuqsObjectiveStatus::Completed);
 	Obj = Q->GetCurrentObjective();
 	TestNotNull("Current Objective should be valid", Obj);
@@ -133,7 +131,7 @@ bool FTestQuestReset::RunTest(const FString& Parameters)
 	TestEqual("O2 objective should be not started", Obj->GetStatus(), ESuqsObjectiveStatus::NotStarted);
 
 	// We'll complete one task of the objective
-	Obj->GetTasks()[0]->Complete();
+	TestTrue("Task should complete", Obj->GetTasks()[0]->Complete());
 	TestEqual("O2 objective should now be in progress", Obj->GetStatus(), ESuqsObjectiveStatus::InProgress);
 	TestEqual("O2 first task should be done", Obj->GetTasks()[0]->GetStatus(), ESuqsTaskStatus::Completed);
 
@@ -153,5 +151,39 @@ bool FTestQuestReset::RunTest(const FString& Parameters)
 	TestEqual("O2 first task should be not started again", Obj->GetTasks()[0]->GetStatus(), ESuqsTaskStatus::NotStarted);
 	
 	
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestOrderedTasks, "SUQSTest.QuestOrderedTasks",
+    EAutomationTestFlags::EditorContext |
+    EAutomationTestFlags::ClientContext |
+    EAutomationTestFlags::ProductFilter)
+
+bool FTestQuestOrderedTasks::RunTest(const FString& Parameters)
+{
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestUnorderedTasks, "SUQSTest.QuestUnorderedTasks",
+    EAutomationTestFlags::EditorContext |
+    EAutomationTestFlags::ClientContext |
+    EAutomationTestFlags::ProductFilter)
+
+bool FTestQuestUnorderedTasks::RunTest(const FString& Parameters)
+{
+
+	return true;
+}
+
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestOptionals, "SUQSTest.QuestOptionals",
+    EAutomationTestFlags::EditorContext |
+    EAutomationTestFlags::ClientContext |
+    EAutomationTestFlags::ProductFilter)
+
+bool FTestQuestOptionals::RunTest(const FString& Parameters)
+{
+
 	return true;
 }

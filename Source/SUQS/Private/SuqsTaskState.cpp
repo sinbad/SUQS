@@ -1,7 +1,7 @@
 #include "SuqsTaskState.h"
 
 #include <algorithm>
-
+#include "SuqsModule.h"
 #include "SuqsPlayState.h"
 
 void USuqsTaskState::Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsPlayState* Root)
@@ -62,10 +62,31 @@ void USuqsTaskState::Fail()
 	ChangeStatus(ESuqsTaskStatus::Failed);
 }
 
-void USuqsTaskState::Complete()
+bool USuqsTaskState::Complete()
 {
-	Number = TaskDefinition->TargetNumber;
-	ChangeStatus(ESuqsTaskStatus::Completed);
+	if (Status != ESuqsTaskStatus::Completed)
+	{
+		// Check sequencing
+		if (ParentObjective->GetParentQuest()->GetCurrentObjective() != ParentObjective)
+		{
+			UE_LOG(LogSuqs, Warning, TEXT("Tried to complete task %s but parent objective %s is not current, ignoring"),
+				*GetIdentifier().ToString(), *ParentObjective->GetIdentifier().ToString())
+			return false;
+		}
+		if (ParentObjective->AreTasksSequential())
+		{
+			// Only allowed if optional or next in sequence
+			if (IsMandatory() && ParentObjective->GetNextMandatoryTask() != this)
+			{
+				UE_LOG(LogSuqs, Warning, TEXT("Tried to complete mandatory task %s out of order, ignoring"), *GetIdentifier().ToString())
+				return false;
+			}
+		}
+		
+		Number = TaskDefinition->TargetNumber;
+		ChangeStatus(ESuqsTaskStatus::Completed);
+	}
+	return true;
 }
 
 void USuqsTaskState::Progress(int Delta)

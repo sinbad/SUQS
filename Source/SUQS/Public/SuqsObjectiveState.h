@@ -66,6 +66,10 @@ public:
     USuqsQuestState* GetParentQuest() const { return ParentQuest.Get(); }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const FName& GetBranch() const { return ObjectiveDefinition->Branch; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool AreTasksSequential() const { return ObjectiveDefinition->bSequentialTasks; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool AreAllMandatoryTasksRequired() const { return ObjectiveDefinition->bAllMandatoryTasksRequired; }
 	/// Get the additional description to be added to quest description for this objective, if any
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FText& GetDescription() const;
@@ -79,7 +83,22 @@ public:
 	/// the current task(s) failed. Does nothing if there are no outstanding tasks
 	UFUNCTION(BlueprintCallable)
     void FailOutstandingTasks();
-    
+
+	/// Get the next incomplete mandatory task required to fulfil this objective
+	/// If there are multiple mandatory tasks and ordering doesn't matter, returns the first one found
+	UFUNCTION(BlueprintCallable)
+	USuqsTaskState* GetNextMandatoryTask() const;
+
+	/// Get a list of tasks which are incomplete
+	UFUNCTION(BlueprintCallable)
+	void GetIncompleteTasks(TArray<USuqsTaskState*>& IncompleteTasksOut) const;
+	/// Get a list of tasks which are completed
+	UFUNCTION(BlueprintCallable)
+    void GetCompletedTasks(TArray<USuqsTaskState*>& CompletedTasksOut) const;
+	/// Get a list of tasks which have been failed
+	UFUNCTION(BlueprintCallable)
+    void GetFailedTasks(TArray<USuqsTaskState*>& FailedTasksOut) const;
+
 	
 	void NotifyTaskStatusChanged();
 };

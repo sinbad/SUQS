@@ -164,9 +164,10 @@ public:
 	 * cascades upwards to the quest if that's the last mandatory objective.
 	 * @param QuestID The ID of the quest
 	 * @param TaskIdentifier The identifier of the task within the quest
+	 * @returns Whether the task was successfully completed
 	 */
 	UFUNCTION(BlueprintCallable)
-	void CompleteTask(FName QuestID, FName TaskIdentifier);
+	bool CompleteTask(FName QuestID, FName TaskIdentifier);
 
 	/**
 	 * Increment task progress. Increases the number value on a task, clamping it to the min/max numbers in the quest

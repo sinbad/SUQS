@@ -1,9 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Modules/ModuleManager.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogSuqsModule, Verbose, Verbose);
+DECLARE_LOG_CATEGORY_EXTERN(LogSuqs, Verbose, Verbose);
 
 class FSuqsModule : public IModuleInterface
 {
