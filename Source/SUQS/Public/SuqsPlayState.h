@@ -131,9 +131,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool AcceptQuest(FName QuestID, bool bResetIfFailed = true, bool bResetIfComplete = false, bool bResetIfInProgress = false);
 
-	/// Reset all progress on a quest. Works whether a quest is in progress, complete or failed
+	/// Reset all progress on a quest. Works whether a quest is in progress, complete or failed. Quest will remain accepted & incomplete
 	UFUNCTION(BlueprintCallable)
     void ResetQuest(FName QuestID);
+
+	/**
+	 * Remove a quest from this play state entirely. This is akin to "unaccepting" a quest.
+	 * @param QuestID The identifier of the quest
+	 * @param bRemoveActive Whether active quests should be removed by this call (default true)
+	 * @param bRemoveArchived Whether archived (failed/completed) quests should be removed (default true)
+	 */
+	UFUNCTION(BlueprintCallable)
+	void RemoveQuest(FName QuestID, bool bRemoveActive = true, bool bRemoveArchived = true);
+
 
 	/// Manually fail a quest. You should prefer using FailTask() instead if you need to explain which specific part
 	/// of a quest failed. Otherwise, this will mark all current tasks /objectives as failed.

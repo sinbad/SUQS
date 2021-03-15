@@ -173,6 +173,14 @@ void USuqsPlayState::ResetQuest(FName QuestID)
 	
 }
 
+void USuqsPlayState::RemoveQuest(FName QuestID, bool bRemoveActive, bool bRemoveArchived)
+{
+	if (bRemoveActive)
+		ActiveQuests.Remove(QuestID);
+	if (bRemoveArchived)
+		QuestArchive.Remove(QuestID);
+}
+
 void USuqsPlayState::FailQuest(FName QuestID)
 {
 	auto Q = FindQuestState(QuestID);
