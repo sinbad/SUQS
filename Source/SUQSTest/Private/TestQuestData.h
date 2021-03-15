@@ -215,3 +215,37 @@ const FString SimpleSideQuestJson = R"RAWJSON([
 		]
 	},
 ])RAWJSON";
+
+const FString SmallestPossibleQuestJson = R"RAWJSON([
+	{
+		"Name": "Q_Smol",
+		"Identifier": "Q_Smol",
+		"bPlayerVisible": true,
+		"Title": "NSLOCTEXT(\"[TestQuests]\", \"SmolQuestTitle\", \"Smol Quest\")",
+		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SmolQuestDesc\", \"The smallest possible quest\")",
+		"DescriptionWhenCompleted": "",
+		"AutoAccept": false,
+		"PrerequisiteQuests": [],
+		"PrerequisiteQuestFailures": [],
+		"Objectives": [
+			{
+				"Identifier": "O1",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"SmolObjTitle\", \"Small Objective\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SmolObjDesc\", \"This is super easy\")",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"bAllMandatoryTasksRequired": true,
+				"Branch": "None",
+				"Tasks": [
+					{
+						"Identifier": "T_Smol",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"SmolQuestTaskTitle\", \"Easiest possible thing\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			}
+		]
+	},
+])RAWJSON";
