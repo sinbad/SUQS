@@ -99,6 +99,8 @@ int USuqsTaskState::Progress(int Delta)
 
 	if (Number == TaskDefinition->TargetNumber)
 		Complete();
+	else
+		ChangeStatus(Number > 0 ? ESuqsTaskStatus::InProgress : ESuqsTaskStatus::NotStarted);
 
 	return GetNumberOutstanding();
 }
