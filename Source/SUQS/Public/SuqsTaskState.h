@@ -71,10 +71,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsTimeLimited() const { return TaskDefinition->TimeLimit > 0; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	const FText& GetTitle() { return TaskDefinition->Title; }
+	const FText& GetTitle() const { return TaskDefinition->Title; }
 	/// The target number of things to be achieved
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int GetTargetNumber() { return TaskDefinition->TargetNumber; }
+	int GetTargetNumber() const { return TaskDefinition->TargetNumber; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsObjectiveState* GetParentObjective() const { return ParentObjective.Get(); }
@@ -85,13 +85,31 @@ public:
 	/// Complete this task (setting number to target number automatically)
 	UFUNCTION(BlueprintCallable)
 	bool Complete();
-	/// Advance the number associated with progress on this quest. If it reaches the target number or more, it will automatically complete
+	
+	/**
+	 * Advance the number associated with progress on this quest. If it reaches the target number or more, it will automatically complete
+	 * @param Delta The number to change the progress by
+	 * @return The number of things outstanding after the delta was applied
+	 */
 	UFUNCTION(BlueprintCallable)
-	void Progress(int Delta);
+	int Progress(int Delta);
+
+	/// Get the number of "things" still left to do, will only be > 1 if TargetNumber on the task was > 1
+	UFUNCTION(BlueprintCallable)
+    int GetNumberOutstanding() const;
+	
 
 	/// Return whether a task is neither complete nor failed 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     bool IsIncomplete() const { return Status != ESuqsTaskStatus::Completed && Status != ESuqsTaskStatus::Failed; }
+
+	/// Return whether a task is completed 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool IsCompleted() const { return Status == ESuqsTaskStatus::Completed; }
+
+	/// Return whether a task is failed 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool IsFailed() const { return Status == ESuqsTaskStatus::Failed; }
 
 	/// Reset the progress on this task back to the initial state
 	UFUNCTION(BlueprintCallable)

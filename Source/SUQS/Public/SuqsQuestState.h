@@ -95,6 +95,26 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsObjectiveState* GetCurrentObjective() const;
 
+	/// Find a given objective
+	UFUNCTION(BlueprintCallable)
+	USuqsObjectiveState* GetObjective(const FName& ObjectiveID) const;
+
+	/// Return whether an objective is complete
+	UFUNCTION(BlueprintCallable)
+	bool IsObjectiveCompleted(const FName& ObjectiveID) const;
+
+	/// Return whether an objective failed
+	UFUNCTION(BlueprintCallable)
+    bool IsObjectiveFailed(const FName& ObjectiveID) const;
+
+	/// Return whether a task is complete
+	UFUNCTION(BlueprintCallable)
+    bool IsTaskCompleted(const FName& TaskID) const;
+
+	/// Return whether a task failed
+	UFUNCTION(BlueprintCallable)
+    bool IsTaskFailed(const FName& TaskID) const;
+
 	/// Reset all the progress on this quest back to the initial state
 	UFUNCTION(BlueprintCallable)
 	void Reset();
@@ -112,5 +132,4 @@ public:
 
 	/// Find a task with the given identifier in this quest
 	USuqsTaskState* FindTask(const FName& Identifier) const;
-
 };

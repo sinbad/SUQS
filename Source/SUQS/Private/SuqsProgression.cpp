@@ -210,15 +210,52 @@ bool USuqsProgression::CompleteTask(FName QuestID, FName TaskIdentifier)
 	return false;
 }
 
-void USuqsProgression::ProgressTask(FName QuestID, FName TaskIdentifier, int Delta)
+int USuqsProgression::ProgressTask(FName QuestID, FName TaskIdentifier, int Delta)
 {
 	auto T = FindTaskStatus(QuestID, TaskIdentifier);
 	if (T)
 	{
-		T->Progress(Delta);
+		return T->Progress(Delta);
 	}
+	return 0;
 }
 
+
+bool USuqsProgression::IsObjectiveCompleted(FName QuestID, FName ObjectiveID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsObjectiveCompleted(ObjectiveID);
+	}
+	return false;
+}
+
+bool USuqsProgression::IsObjectiveFailed(FName QuestID, FName ObjectiveID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsObjectiveFailed(ObjectiveID);
+	}
+	return false;
+}
+
+bool USuqsProgression::IsTaskCompleted(FName QuestID, FName TaskID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsTaskCompleted(TaskID);
+	}
+	return false;
+}
+
+bool USuqsProgression::IsTaskFailed(FName QuestID, FName TaskID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsTaskFailed(TaskID);
+	}
+	return false;
+}
 
 void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)
 {

@@ -176,10 +176,26 @@ public:
 	 * @param QuestID The ID of the quest
 	 * @param TaskIdentifier The identifier of the task within the quest
 	 * @param Delta The change to make to the number on the task
+	 * @returns The number of "things" outstanding on the task after progress was applied
 	 */
 	UFUNCTION(BlueprintCallable)
-	void ProgressTask(FName QuestID, FName TaskIdentifier, int Delta);
+	int ProgressTask(FName QuestID, FName TaskIdentifier, int Delta);
 
+	/// Return whether a given objective is completed. For more information, retrieve the objective itself
+	UFUNCTION(BlueprintCallable)
+    bool IsObjectiveCompleted(FName QuestID, FName ObjectiveID) const;
+
+	/// Return whether the objective has failed. For more information, retrieve the objective itself
+	UFUNCTION(BlueprintCallable)
+    bool IsObjectiveFailed(FName QuestID, FName ObjectiveID) const;
+
+	/// Return whether a given task is completed. For more information, retrieve the task
+	UFUNCTION(BlueprintCallable)
+    bool IsTaskCompleted(FName QuestID, FName TaskID) const;
+
+	/// Return whether the task has failed. For more information, retrieve the task
+	UFUNCTION(BlueprintCallable)
+    bool IsTaskFailed(FName QuestID, FName TaskID) const;
 
 	void RaiseTaskUpdated(USuqsTaskState* Task);
 	void RaiseTaskFailed(USuqsTaskState* Task);

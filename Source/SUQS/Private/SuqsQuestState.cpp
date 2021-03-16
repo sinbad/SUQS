@@ -94,6 +94,54 @@ USuqsObjectiveState* USuqsQuestState::GetCurrentObjective() const
 	return nullptr;
 }
 
+USuqsObjectiveState* USuqsQuestState::GetObjective(const FName& Identifier) const
+{
+	for (auto O : Objectives)
+	{
+		if (O->GetIdentifier() == Identifier)
+			return O;
+	}
+	return nullptr;
+}
+
+bool USuqsQuestState::IsObjectiveCompleted(const FName& Identifier) const
+{
+	if (auto O = GetObjective(Identifier))
+	{
+		return O->IsCompleted();
+	}
+	return false;
+}
+
+
+bool USuqsQuestState::IsObjectiveFailed(const FName& Identifier) const
+{
+	if (auto O = GetObjective(Identifier))
+	{
+		return O->IsFailed();
+	}
+	return false;
+}
+
+
+bool USuqsQuestState::IsTaskCompleted(const FName& TaskID) const
+{
+	if (auto T = FindTask(TaskID))
+	{
+		return T->IsCompleted();
+	}
+	return false;
+}
+
+bool USuqsQuestState::IsTaskFailed(const FName& TaskID) const
+{
+	if (auto T = FindTask(TaskID))
+	{
+		return T->IsFailed();
+	}
+	return false;
+}
+
 void USuqsQuestState::Reset()
 {
 	for (auto Obj : Objectives)

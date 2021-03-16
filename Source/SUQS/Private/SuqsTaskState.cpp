@@ -90,7 +90,7 @@ bool USuqsTaskState::Complete()
 	return true;
 }
 
-void USuqsTaskState::Progress(int Delta)
+int USuqsTaskState::Progress(int Delta)
 {
 	Number += Delta;
 	Number = std::min(std::max(0, Number), TaskDefinition->TargetNumber);
@@ -99,6 +99,15 @@ void USuqsTaskState::Progress(int Delta)
 
 	if (Number == TaskDefinition->TargetNumber)
 		Complete();
+
+	return GetNumberOutstanding();
+}
+
+
+int USuqsTaskState::GetNumberOutstanding() const
+{
+	// Number should be limited already so don't waste time clamping
+	return GetTargetNumber() - Number;
 }
 
 void USuqsTaskState::Reset()
