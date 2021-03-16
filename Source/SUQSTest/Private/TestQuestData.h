@@ -413,6 +413,13 @@ const FString AnyOfTasksQuestJson = R"RAWJSON([
 						"bMandatory": true,
 						"TargetNumber": 1,
 						"TimeLimit": 0
+					},
+					{
+						"Identifier": "T_Optional",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfQuestTask4Title\", \"Optional Task\")",
+						"bMandatory": false,
+						"TargetNumber": 1,
+						"TimeLimit": 0
 					}
 				]
 			}

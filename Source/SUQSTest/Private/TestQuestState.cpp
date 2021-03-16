@@ -236,11 +236,17 @@ bool FTestQuestAnyOfTasks::RunTest(const FString& Parameters)
 	TestTrue("Quest should be complete after any tasks complete", Progression->IsQuestCompleted("Q_AnyOf"));
 
 	Progression->ResetQuest("Q_AnyOf");
-	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_AnyOf"));
-	
+	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_AnyOf"));	
 
 	TestTrue("Task 3 should complete OK", Progression->CompleteTask("Q_AnyOf", "T_3"));
 	TestTrue("Quest should be complete after any tasks complete", Progression->IsQuestCompleted("Q_AnyOf"));
+
+	Progression->ResetQuest("Q_AnyOf");
+	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_AnyOf"));
+
+	// Completing an optional task should not complete the anyof group
+	TestTrue("Optional task should complete OK", Progression->CompleteTask("Q_AnyOf", "T_Optional"));
+	TestFalse("Quest should remain incomplete after optional task completed", Progression->IsQuestCompleted("Q_AnyOf"));
 
 	return true;
 }
