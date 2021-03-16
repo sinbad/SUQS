@@ -86,6 +86,7 @@ bool USuqsTaskState::Complete()
 		Number = TaskDefinition->TargetNumber;
 		ChangeStatus(ESuqsTaskStatus::Completed);
 	}
+	// Already completed
 	return true;
 }
 

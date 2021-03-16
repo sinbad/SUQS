@@ -161,6 +161,33 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestOrderedTasks, "SUQSTest.QuestOrderedT
 
 bool FTestQuestOrderedTasks::RunTest(const FString& Parameters)
 {
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	UDataTable* QuestTable = NewObject<UDataTable>();
+	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->CreateTableFromJSONString(OrderedTasksQuestJson);
+
+	Progression->QuestDataTables.Add(QuestTable);
+
+	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Ordered"));
+	TestFalse("Should not be allowed to complete task out of order", Progression->CompleteTask("Q_Ordered", "T_2"));
+	TestFalse("Should not be allowed to complete task out of order", Progression->CompleteTask("Q_Ordered", "T_3"));
+	TestFalse("Should not be allowed to complete a task on a later objective", Progression->CompleteTask("Q_Ordered", "T_11"));
+	
+	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_Ordered", "T_1"));
+	TestFalse("Should not be allowed to complete task out of order", Progression->CompleteTask("Q_Ordered", "T_3"));
+
+
+	TestTrue("Task 2 should complete OK", Progression->CompleteTask("Q_Ordered", "T_2"));
+	TestTrue("Completing an already completed previous task should pass but do nothing", Progression->CompleteTask("Q_Ordered", "T_1"));
+	
+	TestTrue("Task 3 should complete OK", Progression->CompleteTask("Q_Ordered", "T_3"));
+
+	TestFalse("Objective 2 Task 2 is out of order still", Progression->CompleteTask("Q_Ordered", "T_12"));
+
+	TestTrue("Objective 2 Task 1 should complete OK now", Progression->CompleteTask("Q_Ordered", "T_11"));
+	TestTrue("Objective 2 Task 2 should complete OK now", Progression->CompleteTask("Q_Ordered", "T_12"));
+
+	TestTrue("Quest should be complete now", Progression->IsQuestCompleted("Q_Ordered"));
 
 	return true;
 }
@@ -173,9 +200,50 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestUnorderedTasks, "SUQSTest.QuestUnorde
 bool FTestQuestUnorderedTasks::RunTest(const FString& Parameters)
 {
 
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	UDataTable* QuestTable = NewObject<UDataTable>();
+	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->CreateTableFromJSONString(UnorderedTasksQuestJson);
+
+	Progression->QuestDataTables.Add(QuestTable);
+
+	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Unordered"));
+	TestTrue("Task 3 should complete out of order OK", Progression->CompleteTask("Q_Unordered", "T_3"));
+	TestTrue("Task 1 should complete out of order OK", Progression->CompleteTask("Q_Unordered", "T_1"));
+	TestTrue("Task 2 should complete out of order OK", Progression->CompleteTask("Q_Unordered", "T_2"));
+	
+	TestTrue("Quest should be complete now", Progression->IsQuestCompleted("Q_Unordered"));
+	
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAnyOfTasks, "SUQSTest.QuestAnyOfTasks",
+    EAutomationTestFlags::EditorContext |
+    EAutomationTestFlags::ClientContext |
+    EAutomationTestFlags::ProductFilter)
+
+bool FTestQuestAnyOfTasks::RunTest(const FString& Parameters)
+{
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	UDataTable* QuestTable = NewObject<UDataTable>();
+	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->CreateTableFromJSONString(AnyOfTasksQuestJson);
+
+	Progression->QuestDataTables.Add(QuestTable);
+
+	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_AnyOf"));
+	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_AnyOf", "T_1"));
+	TestTrue("Quest should be complete after any tasks complete", Progression->IsQuestCompleted("Q_AnyOf"));
+
+	Progression->ResetQuest("Q_AnyOf");
+	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_AnyOf"));
+	
+
+	TestTrue("Task 3 should complete OK", Progression->CompleteTask("Q_AnyOf", "T_3"));
+	TestTrue("Quest should be complete after any tasks complete", Progression->IsQuestCompleted("Q_AnyOf"));
+
+	return true;
+}
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestOptionals, "SUQSTest.QuestOptionals",
     EAutomationTestFlags::EditorContext |
@@ -185,5 +253,6 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestOptionals, "SUQSTest.QuestOptionals",
 bool FTestQuestOptionals::RunTest(const FString& Parameters)
 {
 
-	return true;
+	// TODO
+	return false;
 }

@@ -249,3 +249,173 @@ const FString SmallestPossibleQuestJson = R"RAWJSON([
 		]
 	},
 ])RAWJSON";
+
+const FString OrderedTasksQuestJson = R"RAWJSON([
+	{
+		"Name": "Q_Ordered",
+		"Identifier": "Q_Ordered",
+		"bPlayerVisible": true,
+		"Title": "NSLOCTEXT(\"[TestQuests]\", \"OrderedQuestTitle\", \"Ordered Quest\")",
+		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"OrderedQuestDesc\", \"Ordered quest\")",
+		"DescriptionWhenCompleted": "",
+		"AutoAccept": false,
+		"PrerequisiteQuests": [],
+		"PrerequisiteQuestFailures": [],
+		"Objectives": [
+			{
+				"Identifier": "O1",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"OrderedObjTitle\", \"Ordered Objective\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"OrderedObjDesc\", \"These have to be done in order\")",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"bAllMandatoryTasksRequired": true,
+				"Branch": "None",
+				"Tasks": [
+					{
+						"Identifier": "T_1",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"OrderedQuestTask1Title\", \"Task 1\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					},
+					{
+						"Identifier": "T_2",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"OrderedQuestTask2Title\", \"Task 2\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					},
+					{
+						"Identifier": "T_3",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"OrderedQuestTask3Title\", \"Task 3\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			},
+			{
+				"Identifier": "O2",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"OrderedObjTitle\", \"Ordered Objective 2\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"OrderedObjDesc\", \"These have to be done in order\")",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"bAllMandatoryTasksRequired": true,
+				"Branch": "None",
+				"Tasks": [
+					{
+						"Identifier": "T_11",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"OrderedQuestTask1Title\", \"Task 1\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					},
+					{
+						"Identifier": "T_12",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"OrderedQuestTask2Title\", \"Task 2\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			}
+		]
+	},
+])RAWJSON";
+
+const FString UnorderedTasksQuestJson = R"RAWJSON([
+	{
+		"Name": "Q_Unordered",
+		"Identifier": "Q_Unordered",
+		"bPlayerVisible": true,
+		"Title": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedQuestTitle\", \"Unordered Quest\")",
+		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedQuestDesc\", \"Unordered quest\")",
+		"DescriptionWhenCompleted": "",
+		"AutoAccept": false,
+		"PrerequisiteQuests": [],
+		"PrerequisiteQuestFailures": [],
+		"Objectives": [
+			{
+				"Identifier": "O1",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedObjTitle\", \"Unordered Objective\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedObjDesc\", \"These can be done in any order, but still all of them\")",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": false,
+				"bAllMandatoryTasksRequired": true,
+				"Branch": "None",
+				"Tasks": [
+					{
+						"Identifier": "T_1",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedQuestTask1Title\", \"Task 1\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					},
+					{
+						"Identifier": "T_2",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedQuestTask2Title\", \"Task 2\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					},
+					{
+						"Identifier": "T_3",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedQuestTask3Title\", \"Task 3\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			}
+		]
+	},
+])RAWJSON";
+
+
+const FString AnyOfTasksQuestJson = R"RAWJSON([
+	{
+		"Name": "Q_AnyOf",
+		"Identifier": "Q_AnyOf",
+		"bPlayerVisible": true,
+		"Title": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfQuestTitle\", \"AnyOf Quest\")",
+		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfQuestDesc\", \"AnyOf quest\")",
+		"DescriptionWhenCompleted": "",
+		"AutoAccept": false,
+		"PrerequisiteQuests": [],
+		"PrerequisiteQuestFailures": [],
+		"Objectives": [
+			{
+				"Identifier": "O1",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfObjTitle\", \"AnyOf Objective\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfObjDesc\", \"Only one of these tasks needs to be done\")",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": false,
+				"bAllMandatoryTasksRequired": false,
+				"Branch": "None",
+				"Tasks": [
+					{
+						"Identifier": "T_1",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfQuestTask1Title\", \"Task 1\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					},
+					{
+						"Identifier": "T_2",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfQuestTask2Title\", \"Task 2\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					},
+					{
+						"Identifier": "T_3",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfQuestTask3Title\", \"Task 3\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			}
+		]
+	},
+])RAWJSON";
