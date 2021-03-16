@@ -5,9 +5,9 @@
 #include "SuqsQuestState.h"
 #include "Engine/DataTable.h"
 #include "UObject/Object.h"
-#include "SuqsPlayState.generated.h"
+#include "SuqsProgression.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogSuqsPlayState, Verbose, Verbose);
+DECLARE_LOG_CATEGORY_EXTERN(LogSuqsProgression, Verbose, Verbose);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskUpdated, USuqsTaskState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskCompleted, USuqsTaskState*, Task);
@@ -21,11 +21,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActiveQuestChanged, USuqsQuestSta
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, Quest);
 
 /**
- * Holder for all the state relating to quests and their objectives/tasks for a single player.
+ * Progression holds all the state relating to all quests and their objectives/tasks for a single player.
  * Add this somewhere that's useful to you, e.g. your PlayerState or GameInstance.
+ * And of course, you'll want to include it in your save games.
  */
 UCLASS(BlueprintType)
-class SUQS_API USuqsPlayState : public UObject, public FTickableGameObject
+class SUQS_API USuqsProgression : public UObject, public FTickableGameObject
 {
 	GENERATED_BODY()
 public:

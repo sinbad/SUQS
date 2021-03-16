@@ -1,12 +1,12 @@
-#include "SuqsPlayState.h"
+#include "SuqsProgression.h"
 #include "SuqsObjectiveState.h"
 #include "SuqsQuestState.h"
 #include "SuqsTaskState.h"
 
 
-DEFINE_LOG_CATEGORY(LogSuqsPlayState)
+DEFINE_LOG_CATEGORY(LogSuqsProgression)
 
-void USuqsPlayState::EnsureQuestDefinitionsBuilt()
+void USuqsProgression::EnsureQuestDefinitionsBuilt()
 {
 	// Build unified quest table
 	if (QuestDefinitions.Num() == 0 && QuestDataTables.Num() > 0)
@@ -16,7 +16,7 @@ void USuqsPlayState::EnsureQuestDefinitionsBuilt()
 			Table->ForeachRow<FSuqsQuest>("", [this, Table](const FName& Key, const FSuqsQuest& Quest)
             {
                 if (QuestDefinitions.Contains(Quest.Identifier))
-                	UE_LOG(LogSuqsPlayState, Error, TEXT("Quest ID '%s' has been used more than once! Duplicate entry was in %s"), *Quest.Identifier.ToString(), *Table->GetName());
+                	UE_LOG(LogSuqsProgression, Error, TEXT("Quest ID '%s' has been used more than once! Duplicate entry was in %s"), *Quest.Identifier.ToString(), *Table->GetName());
 
                 // Check task IDs are unique
                 TSet<FName> TaskIDSet;
@@ -27,7 +27,7 @@ void USuqsPlayState::EnsureQuestDefinitionsBuilt()
                         bool bDuplicate;
                         TaskIDSet.Add(Task.Identifier, &bDuplicate);
                         if (bDuplicate)
-                        	UE_LOG(LogSuqsPlayState, Error, TEXT("Task ID '%s' has been used more than once! Duplicate entry title: %s"), *Task.Identifier.ToString(), *Task.Title.ToString());
+                        	UE_LOG(LogSuqsProgression, Error, TEXT("Task ID '%s' has been used more than once! Duplicate entry title: %s"), *Task.Identifier.ToString(), *Task.Title.ToString());
                     }
                 }
 				
@@ -37,7 +37,7 @@ void USuqsPlayState::EnsureQuestDefinitionsBuilt()
 	}
 }
 
-ESuqsQuestStatus USuqsPlayState::GetQuestStatus(FName QuestID) const
+ESuqsQuestStatus USuqsProgression::GetQuestStatus(FName QuestID) const
 {
 	// Could make a lookup for this, but we'd need to post-load call to re-populate it, leave for now
 	const auto State = FindQuestState(QuestID);
@@ -49,14 +49,14 @@ ESuqsQuestStatus USuqsPlayState::GetQuestStatus(FName QuestID) const
 	
 }
 
-USuqsQuestState* USuqsPlayState::GetQuest(FName QuestID)
+USuqsQuestState* USuqsProgression::GetQuest(FName QuestID)
 {
 	auto Status = FindQuestState(QuestID);
 	return Status;
 }
 
 
-USuqsQuestState* USuqsPlayState::FindQuestState(const FName& QuestID)
+USuqsQuestState* USuqsProgression::FindQuestState(const FName& QuestID)
 {
 	auto PQ = ActiveQuests.Find(QuestID);
 	if (PQ)
@@ -69,12 +69,12 @@ USuqsQuestState* USuqsPlayState::FindQuestState(const FName& QuestID)
 	
 }
 
-const USuqsQuestState* USuqsPlayState::FindQuestState(const FName& QuestID) const
+const USuqsQuestState* USuqsProgression::FindQuestState(const FName& QuestID) const
 {
-	return const_cast<USuqsPlayState*>(this)->FindQuestState(QuestID);
+	return const_cast<USuqsProgression*>(this)->FindQuestState(QuestID);
 }
 
-USuqsTaskState* USuqsPlayState::FindTaskStatus(const FName& QuestID, const FName& TaskID)
+USuqsTaskState* USuqsProgression::FindTaskStatus(const FName& QuestID, const FName& TaskID)
 {
 	auto Q = FindQuestState(QuestID);
 	if (Q)
@@ -86,28 +86,28 @@ USuqsTaskState* USuqsPlayState::FindTaskStatus(const FName& QuestID, const FName
 }
 
 
-void USuqsPlayState::GetAcceptedQuestIdentifiers(TArray<FName>& AcceptedQuestIDsOut) const
+void USuqsProgression::GetAcceptedQuestIdentifiers(TArray<FName>& AcceptedQuestIDsOut) const
 {
 	ActiveQuests.GenerateKeyArray(AcceptedQuestIDsOut);
 }
 
-void USuqsPlayState::GetArchivedQuestIdentifiers(TArray<FName>& ArchivedQuestIDsOut) const
+void USuqsProgression::GetArchivedQuestIdentifiers(TArray<FName>& ArchivedQuestIDsOut) const
 {
 	QuestArchive.GenerateKeyArray(ArchivedQuestIDsOut);
 }
 
 
-void USuqsPlayState::GetAcceptedQuests(TArray<USuqsQuestState*>& AcceptedQuestsOut) const
+void USuqsProgression::GetAcceptedQuests(TArray<USuqsQuestState*>& AcceptedQuestsOut) const
 {
 	ActiveQuests.GenerateValueArray(AcceptedQuestsOut);
 }
 
-void USuqsPlayState::GetArchivedQuests(TArray<USuqsQuestState*>& ArchivedQuestsOut) const
+void USuqsProgression::GetArchivedQuests(TArray<USuqsQuestState*>& ArchivedQuestsOut) const
 {
 	QuestArchive.GenerateValueArray(ArchivedQuestsOut);
 }
 
-bool USuqsPlayState::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bResetIfComplete, bool bResetIfInProgress)
+bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bResetIfComplete, bool bResetIfInProgress)
 {
 	EnsureQuestDefinitionsBuilt();
 
@@ -137,7 +137,7 @@ bool USuqsPlayState::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bReset
 
 			if (!bReset)
 			{
-				UE_LOG(LogSuqsPlayState, Warning, TEXT("Ignoring request to accept quest %s because it has status %d"), *QuestID.ToString(), Quest->Status);
+				UE_LOG(LogSuqsProgression, Warning, TEXT("Ignoring request to accept quest %s because it has status %d"), *QuestID.ToString(), Quest->Status);
 				return false;
 			}
 
@@ -156,14 +156,14 @@ bool USuqsPlayState::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bReset
 	}
 	else
 	{
-		UE_LOG(LogSuqsPlayState, Error , TEXT("Attempted to accept a non-existent quest %s"), *QuestID.ToString());
+		UE_LOG(LogSuqsProgression, Error , TEXT("Attempted to accept a non-existent quest %s"), *QuestID.ToString());
 		return false;
 	}
 	
 }
 
 
-void USuqsPlayState::ResetQuest(FName QuestID)
+void USuqsProgression::ResetQuest(FName QuestID)
 {
 	auto Q = FindQuestState(QuestID);
 	if (Q)
@@ -173,7 +173,7 @@ void USuqsPlayState::ResetQuest(FName QuestID)
 	
 }
 
-void USuqsPlayState::RemoveQuest(FName QuestID, bool bRemoveActive, bool bRemoveArchived)
+void USuqsProgression::RemoveQuest(FName QuestID, bool bRemoveActive, bool bRemoveArchived)
 {
 	if (bRemoveActive)
 		ActiveQuests.Remove(QuestID);
@@ -181,7 +181,7 @@ void USuqsPlayState::RemoveQuest(FName QuestID, bool bRemoveActive, bool bRemove
 		QuestArchive.Remove(QuestID);
 }
 
-void USuqsPlayState::FailQuest(FName QuestID)
+void USuqsProgression::FailQuest(FName QuestID)
 {
 	auto Q = FindQuestState(QuestID);
 	if (Q)
@@ -190,7 +190,7 @@ void USuqsPlayState::FailQuest(FName QuestID)
 	// note we don't update quest lists here, but we rely on callbacks since you could fail via the quest itself
 }
 
-void USuqsPlayState::FailTask(FName QuestID, FName TaskIdentifier)
+void USuqsProgression::FailTask(FName QuestID, FName TaskIdentifier)
 {
 	auto T = FindTaskStatus(QuestID, TaskIdentifier);
 	if (T)
@@ -200,7 +200,7 @@ void USuqsPlayState::FailTask(FName QuestID, FName TaskIdentifier)
 }
 
 
-bool USuqsPlayState::CompleteTask(FName QuestID, FName TaskIdentifier)
+bool USuqsProgression::CompleteTask(FName QuestID, FName TaskIdentifier)
 {
 	auto T = FindTaskStatus(QuestID, TaskIdentifier);
 	if (T)
@@ -210,7 +210,7 @@ bool USuqsPlayState::CompleteTask(FName QuestID, FName TaskIdentifier)
 	return false;
 }
 
-void USuqsPlayState::ProgressTask(FName QuestID, FName TaskIdentifier, int Delta)
+void USuqsProgression::ProgressTask(FName QuestID, FName TaskIdentifier, int Delta)
 {
 	auto T = FindTaskStatus(QuestID, TaskIdentifier);
 	if (T)
@@ -220,34 +220,34 @@ void USuqsPlayState::ProgressTask(FName QuestID, FName TaskIdentifier, int Delta
 }
 
 
-void USuqsPlayState::RaiseTaskUpdated(USuqsTaskState* Task)
+void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)
 {
 	// might be worth queuing these up and raising combined?
 	OnTaskUpdated.Broadcast(Task);
 }
 
-void USuqsPlayState::RaiseTaskCompleted(USuqsTaskState* Task)
+void USuqsProgression::RaiseTaskCompleted(USuqsTaskState* Task)
 {
 	OnTaskCompleted.Broadcast(Task);
 }
-void USuqsPlayState::RaiseTaskFailed(USuqsTaskState* Task)
+void USuqsProgression::RaiseTaskFailed(USuqsTaskState* Task)
 {
 	OnTaskFailed.Broadcast(Task);
 }
 
 
-void USuqsPlayState::RaiseObjectiveCompleted(USuqsObjectiveState* Objective)
+void USuqsProgression::RaiseObjectiveCompleted(USuqsObjectiveState* Objective)
 {
 	OnObjectiveCompleted.Broadcast(Objective);
 }
 
-void USuqsPlayState::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
+void USuqsProgression::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
 {
 	OnObjectiveFailed.Broadcast(Objective);
 }
 
 
-void USuqsPlayState::RaiseQuestCompleted(USuqsQuestState* Quest)
+void USuqsProgression::RaiseQuestCompleted(USuqsQuestState* Quest)
 {
 	// Move quest to the correct list
 	ActiveQuests.Remove(Quest->GetIdentifier());
@@ -258,7 +258,7 @@ void USuqsPlayState::RaiseQuestCompleted(USuqsQuestState* Quest)
 	// TODO: trigger the acceptance of quests which depend on this completion
 }
 
-void USuqsPlayState::RaiseQuestFailed(USuqsQuestState* Quest)
+void USuqsProgression::RaiseQuestFailed(USuqsQuestState* Quest)
 {
 	// Move quest to the correct list
 	ActiveQuests.Remove(Quest->GetIdentifier());
@@ -269,7 +269,7 @@ void USuqsPlayState::RaiseQuestFailed(USuqsQuestState* Quest)
 	// TODO: trigger the acceptance of quests which depend on this failure
 }
 
-void USuqsPlayState::RaiseQuestReset(USuqsQuestState* Quest)
+void USuqsProgression::RaiseQuestReset(USuqsQuestState* Quest)
 {
 	// Move quest to the correct list
 	QuestArchive.Remove(Quest->GetIdentifier());
@@ -278,7 +278,7 @@ void USuqsPlayState::RaiseQuestReset(USuqsQuestState* Quest)
 }
 
 // FTickableGameObject start
-void USuqsPlayState::Tick(float DeltaTime)
+void USuqsProgression::Tick(float DeltaTime)
 {
 	for (auto& QuestPair : ActiveQuests)
 	{
@@ -286,7 +286,7 @@ void USuqsPlayState::Tick(float DeltaTime)
 	}
 }
 
-TStatId USuqsPlayState::GetStatId() const
+TStatId USuqsProgression::GetStatId() const
 {
 	RETURN_QUICK_DECLARE_CYCLE_STAT(USuqsStatus, STATGROUP_Tickables);
 }

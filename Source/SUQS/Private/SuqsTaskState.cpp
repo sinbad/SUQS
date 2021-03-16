@@ -2,13 +2,13 @@
 
 #include <algorithm>
 #include "SuqsModule.h"
-#include "SuqsPlayState.h"
+#include "SuqsProgression.h"
 
-void USuqsTaskState::Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsPlayState* Root)
+void USuqsTaskState::Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsProgression* Root)
 {
 	TaskDefinition = TaskDef;
 	ParentObjective = ObjState;
-	PlayState = Root;
+	Progression = Root;
 
 	Reset();
 }
@@ -24,7 +24,7 @@ void USuqsTaskState::Tick(float DeltaTime)
 	{
 		TimeRemaining -= DeltaTime;
 		
-		PlayState->RaiseTaskUpdated(this);
+		Progression->RaiseTaskUpdated(this);
 		if (TimeRemaining <= 0)
 		{
 			TimeRemaining = 0;
@@ -40,14 +40,14 @@ void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus)
 	{
 		Status = NewStatus;
 
-		PlayState->RaiseTaskUpdated(this);
+		Progression->RaiseTaskUpdated(this);
 		switch(NewStatus)
 		{
 		case ESuqsTaskStatus::Completed: 
-			PlayState->RaiseTaskCompleted(this);
+			Progression->RaiseTaskCompleted(this);
 			break;
 		case ESuqsTaskStatus::Failed:
-			PlayState->RaiseTaskFailed(this);
+			Progression->RaiseTaskFailed(this);
 			break;
 		default: break;
 		}
@@ -94,7 +94,7 @@ void USuqsTaskState::Progress(int Delta)
 	Number += Delta;
 	Number = std::min(std::max(0, Number), TaskDefinition->TargetNumber);
 
-	PlayState->RaiseTaskUpdated(this);
+	Progression->RaiseTaskUpdated(this);
 
 	if (Number == TaskDefinition->TargetNumber)
 		Complete();

@@ -132,7 +132,7 @@ public:
 	FText DescriptionWhenCompleted;
 
 	/// Whether this quest should be automatically accepted when its prerequisites are fulfilled (default false)
-	/// When false, this quest can only be accepted by calling USuqsPlayState::AcceptQuest
+	/// When false, this quest can only be accepted by calling USuqsProgression::AcceptQuest
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	bool AutoAccept = false;
 

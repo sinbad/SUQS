@@ -47,10 +47,10 @@ protected:
 
 	const FSuqsTask* TaskDefinition;
 	TWeakObjectPtr<USuqsObjectiveState> ParentObjective;
-	TWeakObjectPtr<USuqsPlayState> PlayState;
+	TWeakObjectPtr<USuqsProgression> Progression;
 
 	
-	void Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsPlayState* Root);
+	void Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsTaskStatus NewStatus);
 public:

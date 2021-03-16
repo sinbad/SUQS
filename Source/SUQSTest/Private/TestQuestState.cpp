@@ -2,12 +2,12 @@
 #include "Tests/AutomationCommon.h"
 #include "Engine.h"
 #include "SuqsObjectiveState.h"
-#include "SuqsPlayState.h"
+#include "SuqsProgression.h"
 #include "SuqsTaskState.h"
 #include "TestQuestData.h"
 
 
-class USuqsPlayState;
+class USuqsProgression;
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAcceptSimple, "SUQSTest.QuestAcceptSimple",
                                  EAutomationTestFlags::EditorContext |
                                  EAutomationTestFlags::ClientContext |
@@ -15,7 +15,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAcceptSimple, "SUQSTest.QuestAcceptSi
 
 bool FTestQuestAcceptSimple::RunTest(const FString& Parameters)
 {
-	USuqsPlayState* PlayState = NewObject<USuqsPlayState>();
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable1 = NewObject<UDataTable>();
 	QuestTable1->RowStruct = FSuqsQuest::StaticStruct();
 	QuestTable1->CreateTableFromJSONString(SimpleMainQuestJson);
@@ -24,16 +24,16 @@ bool FTestQuestAcceptSimple::RunTest(const FString& Parameters)
 	QuestTable2->RowStruct = FSuqsQuest::StaticStruct();
 	QuestTable2->CreateTableFromJSONString(SimpleSideQuestJson);
 
-	PlayState->QuestDataTables.Add(QuestTable1);
-	PlayState->QuestDataTables.Add(QuestTable2);	
+	Progression->QuestDataTables.Add(QuestTable1);
+	Progression->QuestDataTables.Add(QuestTable2);	
 
-	TestEqual("Main quest should be unavailable", PlayState->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Unavailable);
-	TestEqual("Side quest should be unavailable", PlayState->GetQuestStatus("Q_Side1"), ESuqsQuestStatus::Unavailable);
-	TestTrue("Should be able to accept main quest", PlayState->AcceptQuest("Q_Main1"));
-	TestEqual("Main quest should be incomplete", PlayState->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
-	TestTrue("Should be able to accept side quest", PlayState->AcceptQuest("Q_Side1"));
-	TestEqual("Side quest should be incomplete", PlayState->GetQuestStatus("Q_Side1"), ESuqsQuestStatus::Incomplete);
-	TestFalse("Accepting Main quest again should do nothing", PlayState->AcceptQuest("Q_Main1"));
+	TestEqual("Main quest should be unavailable", Progression->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Unavailable);
+	TestEqual("Side quest should be unavailable", Progression->GetQuestStatus("Q_Side1"), ESuqsQuestStatus::Unavailable);
+	TestTrue("Should be able to accept main quest", Progression->AcceptQuest("Q_Main1"));
+	TestEqual("Main quest should be incomplete", Progression->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
+	TestTrue("Should be able to accept side quest", Progression->AcceptQuest("Q_Side1"));
+	TestEqual("Side quest should be incomplete", Progression->GetQuestStatus("Q_Side1"), ESuqsQuestStatus::Incomplete);
+	TestFalse("Accepting Main quest again should do nothing", Progression->AcceptQuest("Q_Main1"));
 
 	
 	
@@ -47,33 +47,33 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAcceptFailedComplete, "SUQSTest.Quest
 
 bool FTestQuestAcceptFailedComplete::RunTest(const FString& Parameters)
 {
-	USuqsPlayState* PlayState = NewObject<USuqsPlayState>();
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
 
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
 	QuestTable->CreateTableFromJSONString(SmallestPossibleQuestJson);
 
-	PlayState->QuestDataTables.Add(QuestTable);
+	Progression->QuestDataTables.Add(QuestTable);
 
 	// Test accepting failed
-	TestTrue("Accept smallest quest", PlayState->AcceptQuest("Q_Smol"));
-	TestEqual("Smol quest should be incomplete", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
-	PlayState->FailQuest("Q_Smol");
-	TestEqual("Smol quest should now be failed", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Failed);
-	TestTrue("Accepting failed quest should succeeed (and reset)", PlayState->AcceptQuest("Q_Smol"));
-	TestEqual("Smol quest should be incomplete again", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
+	TestTrue("Accept smallest quest", Progression->AcceptQuest("Q_Smol"));
+	TestEqual("Smol quest should be incomplete", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
+	Progression->FailQuest("Q_Smol");
+	TestEqual("Smol quest should now be failed", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Failed);
+	TestTrue("Accepting failed quest should succeeed (and reset)", Progression->AcceptQuest("Q_Smol"));
+	TestEqual("Smol quest should be incomplete again", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
 	// remove so we can go again
-	PlayState->RemoveQuest("Q_Smol");
+	Progression->RemoveQuest("Q_Smol");
 
 	// Test accepting completed
-	TestTrue("Accept smallest quest", PlayState->AcceptQuest("Q_Smol"));
-	TestEqual("Smol quest should be incomplete", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
-	TestTrue("Smol task should complete OK", PlayState->CompleteTask("Q_Smol", "T_Smol"));
-	TestEqual("Smol quest should now be completed", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
-	TestFalse("Accepting completed quest should do nothing by default", PlayState->AcceptQuest("Q_Smol"));
-	TestEqual("Smol quest should still be completed", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
-	TestTrue("Accepting completed quest with reset option should reset", PlayState->AcceptQuest("Q_Smol", false, true));
-	TestEqual("Smol quest should be incomplete again", PlayState->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
+	TestTrue("Accept smallest quest", Progression->AcceptQuest("Q_Smol"));
+	TestEqual("Smol quest should be incomplete", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
+	TestTrue("Smol task should complete OK", Progression->CompleteTask("Q_Smol", "T_Smol"));
+	TestEqual("Smol quest should now be completed", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
+	TestFalse("Accepting completed quest should do nothing by default", Progression->AcceptQuest("Q_Smol"));
+	TestEqual("Smol quest should still be completed", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
+	TestTrue("Accepting completed quest with reset option should reset", Progression->AcceptQuest("Q_Smol", false, true));
+	TestEqual("Smol quest should be incomplete again", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
 
 	
 	
@@ -87,25 +87,25 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestReset, "SUQSTest.QuestReset",
 
 bool FTestQuestReset::RunTest(const FString& Parameters)
 {
-	USuqsPlayState* PlayState = NewObject<USuqsPlayState>();
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
 	QuestTable->CreateTableFromJSONString(SimpleMainQuestJson);
 
-	PlayState->QuestDataTables.Add(QuestTable);
+	Progression->QuestDataTables.Add(QuestTable);
 
-	TestTrue("Should be able to accept main quest", PlayState->AcceptQuest("Q_Main1"));
-	TestEqual("Main quest should be incomplete", PlayState->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
+	TestTrue("Should be able to accept main quest", Progression->AcceptQuest("Q_Main1"));
+	TestEqual("Main quest should be incomplete", Progression->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
 
-	auto Q = PlayState->GetQuest("Q_Main1");
+	auto Q = Progression->GetQuest("Q_Main1");
 	auto Obj = Q->GetCurrentObjective();
 	TestNotNull("Current Objective should be valid", Obj);
 	TestEqual("O1 objective should be current", Obj->GetIdentifier(), FName("O1"));
 	TestEqual("O1 objective should be not started", Obj->GetStatus(), ESuqsObjectiveStatus::NotStarted);
 
 	// Complete first task via top-level API
-	TestTrue("Task should complete OK", PlayState->CompleteTask("Q_Main1", "T_ReachThePlace"));
-	TestEqual("Main quest should still be incomplete", PlayState->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
+	TestTrue("Task should complete OK", Progression->CompleteTask("Q_Main1", "T_ReachThePlace"));
+	TestEqual("Main quest should still be incomplete", Progression->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
 	// Now let's do things via the object interface
 	Obj = Q->GetCurrentObjective();
 	TestNotNull("Current Objective should be valid", Obj);

@@ -1,10 +1,10 @@
 #include "SuqsQuestState.h"
 
 #include "SuqsObjectiveState.h"
-#include "SuqsPlayState.h"
+#include "SuqsProgression.h"
 #include "SuqsTaskState.h"
 
-void USuqsQuestState::Initialise(FSuqsQuest* Def, USuqsPlayState* Root)
+void USuqsQuestState::Initialise(FSuqsQuest* Def, USuqsProgression* Root)
 {
 	// We always build quest state from the master quest definition
 	// Then when we restore, we do it into this structure.
@@ -13,7 +13,7 @@ void USuqsQuestState::Initialise(FSuqsQuest* Def, USuqsPlayState* Root)
 
 	// Quest definitions are static data so it's OK to keep this (it's owned by parent)
 	QuestDefinition = Def;
-	PlayState = Root;
+	Progression = Root;
 	Status = ESuqsQuestStatus::Incomplete;
 	FastTaskLookup.Empty();
 	ActiveBranches.Empty();
@@ -178,13 +178,13 @@ void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
 		switch(NewStatus)
 		{
 		case ESuqsQuestStatus::Completed: 
-			PlayState->RaiseQuestCompleted(this);
+			Progression->RaiseQuestCompleted(this);
 			break;
 		case ESuqsObjectiveStatus::Failed:
-			PlayState->RaiseQuestFailed(this);
+			Progression->RaiseQuestFailed(this);
 			break;
 		case ESuqsQuestStatus::Incomplete:
-			PlayState->RaiseQuestReset(this);
+			Progression->RaiseQuestReset(this);
 			break;
 		default: break;
 		}

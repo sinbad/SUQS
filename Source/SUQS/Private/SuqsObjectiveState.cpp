@@ -1,14 +1,14 @@
 #include "SuqsObjectiveState.h"
-#include "SuqsPlayState.h"
+#include "SuqsProgression.h"
 #include "SuqsModule.h"
 #include "SuqsTaskState.h"
 
 void USuqsObjectiveState::Initialise(const FSuqsObjective* ObjDef, USuqsQuestState* QuestState,
-	USuqsPlayState* Root)
+	USuqsProgression* Root)
 {
 	ObjectiveDefinition = ObjDef;
 	ParentQuest = QuestState;
-	PlayState = Root;
+	Progression = Root;
 
 	Status = ESuqsObjectiveStatus::NotStarted;
 	MandatoryTasksNeededToComplete = ObjDef->bAllMandatoryTasksRequired ? 0 : 1;
@@ -173,10 +173,10 @@ void USuqsObjectiveState::ChangeStatus(ESuqsObjectiveStatus NewStatus)
 		switch(NewStatus)
 		{
 		case ESuqsObjectiveStatus::Completed: 
-			PlayState->RaiseObjectiveCompleted(this);
+			Progression->RaiseObjectiveCompleted(this);
 			break;
 		case ESuqsObjectiveStatus::Failed:
-			PlayState->RaiseObjectiveFailed(this);
+			Progression->RaiseObjectiveFailed(this);
 			break;
 		default: break;
 		}

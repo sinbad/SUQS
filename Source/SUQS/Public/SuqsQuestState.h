@@ -35,7 +35,7 @@ class SUQS_API USuqsQuestState : public UObject
 {
 	GENERATED_BODY()
 
-	friend class USuqsPlayState;
+	friend class USuqsProgression;
 protected:
 
 	/// Whether this objective has been started, completed, failed (quick access to looking at tasks)
@@ -60,9 +60,9 @@ protected:
 
 	// Pointer to quest definition, for convenience (this is static data)
 	FSuqsQuest* QuestDefinition;
-	TWeakObjectPtr<USuqsPlayState> PlayState;
+	TWeakObjectPtr<USuqsProgression> Progression;
 
-	void Initialise(FSuqsQuest* Def, USuqsPlayState* Root);
+	void Initialise(FSuqsQuest* Def, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsQuestStatus NewStatus);
 	

@@ -42,12 +42,12 @@ protected:
 
 	const FSuqsObjective* ObjectiveDefinition;
 	TWeakObjectPtr<USuqsQuestState> ParentQuest;
-	TWeakObjectPtr<USuqsPlayState> PlayState;
+	TWeakObjectPtr<USuqsProgression> Progression;
 
 	int MandatoryTasksNeededToComplete;
 
 	
-	void Initialise(const FSuqsObjective* ObjDef, USuqsQuestState* QuestState, USuqsPlayState* Root);
+	void Initialise(const FSuqsObjective* ObjDef, USuqsQuestState* QuestState, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	// Private fail/complete since users should only ever call task fail/complete
 	void ChangeStatus(ESuqsObjectiveStatus NewStatus);
