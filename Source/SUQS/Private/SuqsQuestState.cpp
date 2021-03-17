@@ -44,7 +44,7 @@ void USuqsQuestState::Tick(float DeltaTime)
 }
 
 
-USuqsTaskState* USuqsQuestState::FindTask(const FName& Identifier) const
+USuqsTaskState* USuqsQuestState::GetTask(const FName& Identifier) const
 {
 	return FastTaskLookup.FindChecked(Identifier);
 }
@@ -126,7 +126,7 @@ bool USuqsQuestState::IsObjectiveFailed(const FName& Identifier) const
 
 bool USuqsQuestState::IsTaskCompleted(const FName& TaskID) const
 {
-	if (auto T = FindTask(TaskID))
+	if (auto T = GetTask(TaskID))
 	{
 		return T->IsCompleted();
 	}
@@ -135,7 +135,7 @@ bool USuqsQuestState::IsTaskCompleted(const FName& TaskID) const
 
 bool USuqsQuestState::IsTaskFailed(const FName& TaskID) const
 {
-	if (auto T = FindTask(TaskID))
+	if (auto T = GetTask(TaskID))
 	{
 		return T->IsFailed();
 	}

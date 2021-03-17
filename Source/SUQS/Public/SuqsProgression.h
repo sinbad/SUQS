@@ -197,6 +197,10 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsTaskFailed(FName QuestID, FName TaskID) const;
 
+	/// Shortcut to getting the whole task state for a specific quest
+	UFUNCTION(BlueprintCallable)
+	USuqsTaskState* GetTaskState(FName QuestID, FName TaskID) const;
+
 	void RaiseTaskUpdated(USuqsTaskState* Task);
 	void RaiseTaskFailed(USuqsTaskState* Task);
 	void RaiseTaskCompleted(USuqsTaskState* Task);

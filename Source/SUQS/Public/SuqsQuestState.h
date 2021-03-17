@@ -131,5 +131,5 @@ public:
 	void NotifyObjectiveStatusChanged();
 
 	/// Find a task with the given identifier in this quest
-	USuqsTaskState* FindTask(const FName& Identifier) const;
+	USuqsTaskState* GetTask(const FName& TaskID) const;
 };

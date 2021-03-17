@@ -79,7 +79,7 @@ USuqsTaskState* USuqsProgression::FindTaskStatus(const FName& QuestID, const FNa
 	auto Q = FindQuestState(QuestID);
 	if (Q)
 	{
-		return Q->FindTask(TaskID);
+		return Q->GetTask(TaskID);
 	}
 	
 	return nullptr;
@@ -255,6 +255,16 @@ bool USuqsProgression::IsTaskFailed(FName QuestID, FName TaskID) const
 		return Q->IsTaskFailed(TaskID);
 	}
 	return false;
+}
+
+USuqsTaskState* USuqsProgression::GetTaskState(FName QuestID, FName TaskID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->GetTask(TaskID);
+	}
+	return nullptr;
+	
 }
 
 void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)

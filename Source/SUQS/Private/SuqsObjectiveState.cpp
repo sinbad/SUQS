@@ -1,6 +1,5 @@
 #include "SuqsObjectiveState.h"
 #include "SuqsProgression.h"
-#include "SuqsModule.h"
 #include "SuqsTaskState.h"
 
 void USuqsObjectiveState::Initialise(const FSuqsObjective* ObjDef, USuqsQuestState* QuestState,

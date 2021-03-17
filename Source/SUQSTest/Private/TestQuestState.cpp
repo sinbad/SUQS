@@ -251,14 +251,69 @@ bool FTestQuestAnyOfTasks::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestOptionals, "SUQSTest.QuestOptionals",
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestTargetNumber, "SUQSTest.QuestTargetNumber",
     EAutomationTestFlags::EditorContext |
     EAutomationTestFlags::ClientContext |
     EAutomationTestFlags::ProductFilter)
 
-bool FTestQuestOptionals::RunTest(const FString& Parameters)
+bool FTestTargetNumber::RunTest(const FString& Parameters)
+{
+
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	UDataTable* QuestTable = NewObject<UDataTable>();
+	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->CreateTableFromJSONString(TargetNumberQuestJson);
+
+	Progression->QuestDataTables.Add(QuestTable);
+
+	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_TargetNumbers"));
+
+	TestEqual("First task only has a target number of 1", Progression->ProgressTask("Q_TargetNumbers", "T_TargetOf1", 1), 0);
+	TestTrue("First task should now be complete", Progression->IsTaskCompleted("Q_TargetNumbers", "T_TargetOf1"));
+
+	TestEqual("Second task should be not started", Progression->GetTaskState("Q_TargetNumbers", "T_TargetOf3")->GetStatus(), ESuqsTaskStatus::NotStarted);
+	TestEqual("Second task should have 2 left", Progression->ProgressTask("Q_TargetNumbers", "T_TargetOf3", 1), 2);
+	
+	TestEqual("Second task should be in progress", Progression->GetTaskState("Q_TargetNumbers", "T_TargetOf3")->GetStatus(), ESuqsTaskStatus::InProgress);
+	TestEqual("Second task should have 0 left", Progression->ProgressTask("Q_TargetNumbers", "T_TargetOf3", 2), 0);
+	TestTrue("Second task should be completed", Progression->IsTaskCompleted("Q_TargetNumbers", "T_TargetOf3"));
+
+	TestEqual("Third task should have 4 left", Progression->ProgressTask("Q_TargetNumbers", "T_TargetOf6", 2), 4);
+	TestEqual("Third task should have 3 left", Progression->ProgressTask("Q_TargetNumbers", "T_TargetOf6", 1), 3);
+	// go backwards
+	TestEqual("Third task should have 4 left after -1", Progression->ProgressTask("Q_TargetNumbers", "T_TargetOf6", -1), 4);
+	// now go forward again, test clamping at max
+	auto T3 = Progression->GetTaskState("Q_TargetNumbers", "T_TargetOf6");
+	TestEqual("Third task should have 0 left", Progression->ProgressTask("Q_TargetNumbers", "T_TargetOf6", 12), 0);
+	TestEqual("Third task should have clamped progress at max", T3->GetNumber(), 6);
+	TestTrue("Third task should be completed", Progression->IsTaskCompleted("Q_TargetNumbers", "T_TargetOf6"));
+	TestTrue("Quest should be complete now", Progression->IsQuestCompleted("Q_TargetNumbers"));
+	
+	// test going backwards from complete
+	TestEqual("Third task should have 2 left after -2", Progression->ProgressTask("Q_TargetNumbers", "T_TargetOf6", -2), 2);
+	TestEqual("Third task should be back in progress after negative", Progression->GetTaskState("Q_TargetNumbers", "T_TargetOf6")->GetStatus(), ESuqsTaskStatus::InProgress);
+	TestFalse("Quest should be incomplete now", Progression->IsQuestCompleted("Q_TargetNumbers"));
+
+	// test going backwards to negative, should clamp to 0
+	TestEqual("Third task should have 6 left after -12", Progression->ProgressTask("Q_TargetNumbers", "T_TargetOf6", -12), 6);
+	TestEqual("Third task should have clamped progress at 0", T3->GetNumber(), 0);
+	TestEqual("Task should be not started again now", T3->GetStatus(), ESuqsTaskStatus::NotStarted);
+	
+	
+
+	return true;
+}
+
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestMultiObjective, "SUQSTest.QuestMultiObjective",
+    EAutomationTestFlags::EditorContext |
+    EAutomationTestFlags::ClientContext |
+    EAutomationTestFlags::ProductFilter)
+
+bool FTestMultiObjective::RunTest(const FString& Parameters)
 {
 
 	// TODO
 	return false;
 }
+
