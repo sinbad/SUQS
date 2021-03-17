@@ -243,6 +243,143 @@ bool FTestQuestDynamicBranchChange::RunTest(const FString& Parameters)
 }
 
 
+// Create 2 more quests - they're basically the same but that doesn't matter, we're just testing global branch changes
+const FString BranchingQuest2Json = R"RAWJSON([
+    {
+        "Name": "Q_Branching2",
+        "Identifier": "Q_Branching2",
+        "bPlayerVisible": true,
+        "Title": "NSLOCTEXT(\"[TestQuests]\", \"Branching2QuestTitle\", \"Branching Quest 2\")",
+        "DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"BranchingQuestDesc\", \"Another branching quest\")",
+        "DescriptionWhenCompleted": "",
+        "AutoAccept": false,
+        "PrerequisiteQuests": [],
+        "PrerequisiteQuestFailures": [],
+        "Objectives": [
+            {
+                "Identifier": "O1",
+                "Title": "NSLOCTEXT(\"[TestQuests]\", \"BObj1Title\", \"A common objective (all branches)\")",
+                "DescriptionWhenActive": "",
+                "DescriptionWhenCompleted": "",
+                "bSequentialTasks": true,
+                "bAllMandatoryTasksRequired": true,
+                "Branch": "None",
+                "Tasks": [
+                    {
+                        "Identifier": "T_1",
+                        "Title": "NSLOCTEXT(\"[TestQuests]\", \"BQT1Desc\", \"It's a common task\")",
+                        "bMandatory": true,
+                        "TargetNumber": 1,
+                        "TimeLimit": 0
+                    }
+                ]
+            },
+            {
+                "Identifier": "O_BranchA_Q2",
+                "Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBA1Title\", \"First objective on branch A\")",
+                "DescriptionWhenActive": "",
+                "DescriptionWhenCompleted": "",
+                "bSequentialTasks": true,
+                "bAllMandatoryTasksRequired": true,
+                "Branch": "BranchA",
+                "Tasks": [
+                    {
+                        "Identifier": "T_BA_1",
+                        "Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBA1Desc\", \"This is the only task on BranchA\")",
+                        "bMandatory": true,
+                        "TargetNumber": 1,
+                        "TimeLimit": 0
+                    }
+                ]
+            },
+			{
+				"Identifier": "O_BranchB_Q2",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBB1Title\", \"First objective on branch B\")",
+				"DescriptionWhenActive": "",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"bAllMandatoryTasksRequired": true,
+				"Branch": "BranchB",
+				"Tasks": [
+					{
+						"Identifier": "T_BB_1",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBB1Desc\", \"This is task 1 on BranchB\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			}
+        ]
+    },
+    {
+        "Name": "Q_Branching3",
+        "Identifier": "Q_Branching3",
+        "bPlayerVisible": true,
+        "Title": "NSLOCTEXT(\"[TestQuests]\", \"Branching2QuestTitle\", \"Branching Quest 2\")",
+        "DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"BranchingQuestDesc\", \"Another branching quest\")",
+        "DescriptionWhenCompleted": "",
+        "AutoAccept": false,
+        "PrerequisiteQuests": [],
+        "PrerequisiteQuestFailures": [],
+        "Objectives": [
+            {
+                "Identifier": "O1",
+                "Title": "NSLOCTEXT(\"[TestQuests]\", \"BObj1Title\", \"A common objective (all branches)\")",
+                "DescriptionWhenActive": "",
+                "DescriptionWhenCompleted": "",
+                "bSequentialTasks": true,
+                "bAllMandatoryTasksRequired": true,
+                "Branch": "None",
+                "Tasks": [
+                    {
+                        "Identifier": "T_1",
+                        "Title": "NSLOCTEXT(\"[TestQuests]\", \"BQT1Desc\", \"It's a common task\")",
+                        "bMandatory": true,
+                        "TargetNumber": 1,
+                        "TimeLimit": 0
+                    }
+                ]
+            },
+            {
+                "Identifier": "O_BranchA_Q3",
+                "Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBA1Title\", \"First objective on branch A\")",
+                "DescriptionWhenActive": "",
+                "DescriptionWhenCompleted": "",
+                "bSequentialTasks": true,
+                "bAllMandatoryTasksRequired": true,
+                "Branch": "BranchA",
+                "Tasks": [
+                    {
+                        "Identifier": "T_BA_1",
+                        "Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBA1Desc\", \"This is the only task on BranchA\")",
+                        "bMandatory": true,
+                        "TargetNumber": 1,
+                        "TimeLimit": 0
+                    }
+                ]
+            },
+			{
+				"Identifier": "O_BranchB_Q3",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBB1Title\", \"First objective on branch B\")",
+				"DescriptionWhenActive": "",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"bAllMandatoryTasksRequired": true,
+				"Branch": "BranchB",
+				"Tasks": [
+					{
+						"Identifier": "T_BB_1",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBB1Desc\", \"This is task 1 on BranchB\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			}
+        ]
+    }
+])RAWJSON";
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestGlobalBranch, "SUQSTest.QuestGlobalBranch",
                                  EAutomationTestFlags::EditorContext |
                                  EAutomationTestFlags::ClientContext |
@@ -250,6 +387,80 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestGlobalBranch, "SUQSTest.QuestGlobalBr
 
 bool FTestQuestGlobalBranch::RunTest(const FString& Parameters)
 {
-	// TODO
-	return false;
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	UDataTable* QuestTable1 = NewObject<UDataTable>();
+	QuestTable1->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable1->CreateTableFromJSONString(BranchingQuestJson);
+	UDataTable* QuestTable2 = NewObject<UDataTable>();
+	QuestTable2->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable2->CreateTableFromJSONString(BranchingQuest2Json);
+
+	Progression->QuestDataTables.Add(QuestTable1);
+	Progression->QuestDataTables.Add(QuestTable2);
+
+	TArray<USuqsObjectiveState*> ActiveObjectives;
+
+
+	// Initially accept 2 quests
+	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching"));
+	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching2"));
+
+	auto Q1 = Progression->GetQuest("Q_Branching");
+	auto Q2 = Progression->GetQuest("Q_Branching2");
+
+	Q1->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Should only be main branch active objectives", ActiveObjectives.Num(), 2);
+	TestEqual("O3 should be second objective", ActiveObjectives[1]->GetIdentifier(), FName("O3"));
+	// Q2 only has starter common objective
+	Q2->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Should only be main branch active objectives", ActiveObjectives.Num(), 1);
+	
+	// Set BranchA enabled over all quests
+	Progression->SetGlobalQuestBranchActive("BranchA", true);
+	// Check that the second objective has now changed
+	Q1->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Should now have BranchA objectives", ActiveObjectives.Num(), 3);
+	TestEqual("BranchA should be second objective", ActiveObjectives[1]->GetIdentifier(), FName("O_BranchA_1"));
+	// Q2 only has starter common objective
+	Q2->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Should now have BranchA objectives", ActiveObjectives.Num(), 2);
+	TestEqual("BranchA should be second objective", ActiveObjectives[1]->GetIdentifier(), FName("O_BranchA_Q2"));
+
+	// Test that on accepting a new quest, it gets the current global branch settings
+	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching3"));	
+	auto Q3 = Progression->GetQuest("Q_Branching3");
+	Q3->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Q3 should immediately have BranchA objectives", ActiveObjectives.Num(), 2);
+	TestEqual("BranchA should be second objective", ActiveObjectives[1]->GetIdentifier(), FName("O_BranchA_Q3"));
+
+	// Now let's switch
+	Progression->SetGlobalQuestBranchActive("BranchB", true);
+	Progression->SetGlobalQuestBranchActive("BranchA", false);
+
+	// Check that the second objective has flipped to BranchB for all
+	Q1->GetActiveObjectives(ActiveObjectives);
+	// there are 2 objectives in BranchB compared to 1 in BranchA
+	TestEqual("Should now have BranchB objectives", ActiveObjectives.Num(), 4);
+	TestEqual("BranchB should be second objective on Q1", ActiveObjectives[1]->GetIdentifier(), FName("O_BranchB_1"));
+	Q2->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Should now have BranchB objectives", ActiveObjectives.Num(), 2);
+	TestEqual("BranchB should be second objective on Q2", ActiveObjectives[1]->GetIdentifier(), FName("O_BranchB_Q2"));
+	Q3->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Should now have BranchB objectives", ActiveObjectives.Num(), 2);
+	TestEqual("BranchB should be second objective on Q3", ActiveObjectives[1]->GetIdentifier(), FName("O_BranchB_Q3"));
+
+	// Back to main branch
+	Progression->ResetGlobalQuestBranches();
+
+	Q1->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Should only be main branch active objectives", ActiveObjectives.Num(), 2);
+	TestEqual("O3 should be second objective", ActiveObjectives[1]->GetIdentifier(), FName("O3"));
+	// Q2/3 only has starter common objective
+	Q2->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Should only be main branch active objectives", ActiveObjectives.Num(), 1);
+	Q3->GetActiveObjectives(ActiveObjectives);
+	TestEqual("Should only be main branch active objectives", ActiveObjectives.Num(), 1);
+	
+	
+	return true;
 }
