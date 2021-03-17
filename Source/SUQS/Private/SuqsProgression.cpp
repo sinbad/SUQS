@@ -360,9 +360,15 @@ void USuqsProgression::SetGlobalQuestBranchActive(FName Branch, bool bActive)
 	if (Branch.IsNone())
 		return;
 
-	bool bChanged;
+	bool bChanged = false;;
 	if (bActive)
-		bChanged = GlobalActiveBranches.AddUnique(Branch) > 0;
+	{
+		if (!GlobalActiveBranches.Contains(Branch))
+		{
+			GlobalActiveBranches.Add(Branch);
+			bChanged = true;
+		}
+	}
 	else
 		bChanged = GlobalActiveBranches.Remove(Branch) > 0;
 

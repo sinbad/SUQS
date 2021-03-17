@@ -55,13 +55,19 @@ void USuqsQuestState::SetBranchActive(FName Branch, bool bActive)
 	if (Branch.IsNone())
 		return;
 
-	int Changes;
+	bool bChanged = false;
 	if (bActive)
-		Changes = ActiveBranches.AddUnique(Branch);
+	{
+		if (!ActiveBranches.Contains(Branch))
+		{
+			ActiveBranches.Add(Branch);
+			bChanged = true;
+		}
+	}
 	else
-		Changes = ActiveBranches.Remove(Branch);
+		bChanged = ActiveBranches.Remove(Branch) > 0;
 
-	if (Changes > 0)
+	if (bChanged)
 		NotifyObjectiveStatusChanged();
 }
 
