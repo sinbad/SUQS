@@ -376,3 +376,36 @@ bool FTestMultiObjective::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestDescriptions, "SUQSTest.QuestDescriptions",
+    EAutomationTestFlags::EditorContext |
+    EAutomationTestFlags::ClientContext |
+    EAutomationTestFlags::ProductFilter)
+
+bool FTestDescriptions::RunTest(const FString& Parameters)
+{
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	UDataTable* QuestTable = NewObject<UDataTable>();
+	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->CreateTableFromJSONString(SimpleMainQuestJson);
+
+	Progression->QuestDataTables.Add(QuestTable);
+
+	TestTrue("Accept main quest OK", Progression->AcceptQuest("Q_Main1"));
+	auto Q = Progression->GetQuest("Q_Main1");
+	auto O1 = Q->GetObjective("O1");
+	TestEqual("Quest description should be incomplete version", Q->GetDescription().ToString(), "This is the main quest");
+	TestEqual("Objective description should be incomplete version", O1->GetDescription().ToString(), "This is the thing you do first");
+
+	// complete the tasks (only 2 needed, 3rd is optional)
+	TestTrue("Task 1 should complete OK", Q->CompleteTask("T_ReachThePlace"));
+	TestEqual("Objective description should be incomplete version", O1->GetDescription().ToString(), "This is the thing you do first");
+	TestTrue("Task 2 should complete OK", Q->CompleteTask("T_DoTheThing"));
+	TestEqual("Objective description should have changed to complete version", O1->GetDescription().ToString(), "You did the thing you do first!");
+	TestEqual("Quest description should still be incomplete version", Q->GetDescription().ToString(), "This is the main quest");
+
+	// Complete everything en masse
+	Q->Complete();
+	TestEqual("Quest description should have changed to the complete version", Q->GetDescription().ToString(), "You did the main quest!");
+	
+	return true;
+}
