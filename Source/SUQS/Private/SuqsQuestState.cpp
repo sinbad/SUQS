@@ -237,20 +237,22 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 	for (int i = 0; i < Objectives.Num(); ++i)
 	{
 		auto Obj = Objectives[i];
+		// We ignore objectives not on the current branch entirely
 		// The first objective that's on an active branch and incomplete is the current objective
-		if (IsBranchActive(Obj->GetBranch()) &&
-			Obj->IsIncomplete())
+		if (IsBranchActive(Obj->GetBranch()))
 		{
-			CurrentObjectiveIndex = i;
-			// Call this anyway, may not change but that's OK
-			ChangeStatus(ESuqsQuestStatus::Incomplete);
-			// first incomplete unfiltered objective is the next one 
-			break;
-		}
-		else
-		{
-			if (Obj->GetStatus() == ESuqsObjectiveStatus::Failed)
+			if (Obj->IsIncomplete())
+			{
+				CurrentObjectiveIndex = i;
+				// Call this anyway, may not change but that's OK
+				ChangeStatus(ESuqsQuestStatus::Incomplete);
+				// first incomplete unfiltered objective is the next one 
+				break;
+			}
+			else if (Obj->IsFailed())
+			{
 				ObjectivesFailed = true;
+			}
 		}
 	}
 
