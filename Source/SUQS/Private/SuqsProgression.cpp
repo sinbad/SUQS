@@ -1,10 +1,9 @@
 #include "SuqsProgression.h"
+#include "SuqsInternal.h"
 #include "SuqsObjectiveState.h"
 #include "SuqsQuestState.h"
 #include "SuqsTaskState.h"
 
-
-DEFINE_LOG_CATEGORY(LogSuqsProgression)
 
 void USuqsProgression::EnsureQuestDefinitionsBuilt()
 {
@@ -16,7 +15,7 @@ void USuqsProgression::EnsureQuestDefinitionsBuilt()
 			Table->ForeachRow<FSuqsQuest>("", [this, Table](const FName& Key, const FSuqsQuest& Quest)
             {
                 if (QuestDefinitions.Contains(Quest.Identifier))
-                	UE_LOG(LogSuqsProgression, Error, TEXT("Quest ID '%s' has been used more than once! Duplicate entry was in %s"), *Quest.Identifier.ToString(), *Table->GetName());
+                	UE_LOG(LogSUQS, Error, TEXT("Quest ID '%s' has been used more than once! Duplicate entry was in %s"), *Quest.Identifier.ToString(), *Table->GetName());
 
                 // Check task IDs are unique
                 TSet<FName> TaskIDSet;
@@ -27,7 +26,7 @@ void USuqsProgression::EnsureQuestDefinitionsBuilt()
                         bool bDuplicate;
                         TaskIDSet.Add(Task.Identifier, &bDuplicate);
                         if (bDuplicate)
-                        	UE_LOG(LogSuqsProgression, Error, TEXT("Task ID '%s' has been used more than once! Duplicate entry title: %s"), *Task.Identifier.ToString(), *Task.Title.ToString());
+                        	UE_LOG(LogSUQS, Error, TEXT("Task ID '%s' has been used more than once! Duplicate entry title: %s"), *Task.Identifier.ToString(), *Task.Title.ToString());
                     }
                 }
 				
@@ -137,7 +136,7 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 
 			if (!bReset)
 			{
-				UE_LOG(LogSuqsProgression, Warning, TEXT("Ignoring request to accept quest %s because it has status %d"), *QuestID.ToString(), Quest->Status);
+				UE_LOG(LogSUQS, Warning, TEXT("Ignoring request to accept quest %s because it has status %d"), *QuestID.ToString(), Quest->Status);
 				return false;
 			}
 
@@ -162,7 +161,7 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 	}
 	else
 	{
-		UE_LOG(LogSuqsProgression, Error , TEXT("Attempted to accept a non-existent quest %s"), *QuestID.ToString());
+		UE_LOG(LogSUQS, Error , TEXT("Attempted to accept a non-existent quest %s"), *QuestID.ToString());
 		return false;
 	}
 	

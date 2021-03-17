@@ -5,7 +5,6 @@
 #include "SuqsTaskState.h"
 #include "TestQuestData.h"
 
-
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAcceptSimple, "SUQSTest.QuestAcceptSimple",
                                  EAutomationTestFlags::EditorContext |
                                  EAutomationTestFlags::ClientContext |
@@ -31,9 +30,11 @@ bool FTestQuestAcceptSimple::RunTest(const FString& Parameters)
 	TestEqual("Main quest should be incomplete", Progression->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
 	TestTrue("Should be able to accept side quest", Progression->AcceptQuest("Q_Side1"));
 	TestEqual("Side quest should be incomplete", Progression->GetQuestStatus("Q_Side1"), ESuqsQuestStatus::Incomplete);
-	TestFalse("Accepting Main quest again should do nothing", Progression->AcceptQuest("Q_Main1"));
 
-	
+	// This raises a warning, which would turn the test results yellow, so let's disable those
+	GEngine->Exec(nullptr, TEXT("Log LogSUQS Off"));
+	TestFalse("Accepting Main quest again should do nothing", Progression->AcceptQuest("Q_Main1"));
+	GEngine->Exec(nullptr, TEXT("Log LogSUQS On"));
 	
 	return true;
 }
@@ -68,7 +69,11 @@ bool FTestQuestAcceptFailedComplete::RunTest(const FString& Parameters)
 	TestEqual("Smol quest should be incomplete", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
 	TestTrue("Smol task should complete OK", Progression->CompleteTask("Q_Smol", "T_Smol"));
 	TestEqual("Smol quest should now be completed", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
+	// Suppress warning logs
+	GEngine->Exec(nullptr, TEXT("Log LogSUQS Off"));
 	TestFalse("Accepting completed quest should do nothing by default", Progression->AcceptQuest("Q_Smol"));
+	GEngine->Exec(nullptr, TEXT("Log LogSUQS On"));
+
 	TestEqual("Smol quest should still be completed", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
 	TestTrue("Accepting completed quest with reset option should reset", Progression->AcceptQuest("Q_Smol", false, true));
 	TestEqual("Smol quest should be incomplete again", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);

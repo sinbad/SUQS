@@ -7,8 +7,6 @@
 #include "UObject/Object.h"
 #include "SuqsProgression.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogSuqsProgression, Verbose, Verbose);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskUpdated, USuqsTaskState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskCompleted, USuqsTaskState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskFailed, USuqsTaskState*, Task);

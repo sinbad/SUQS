@@ -1,7 +1,7 @@
 #include "SuqsTaskState.h"
 
 #include <algorithm>
-#include "SuqsModule.h"
+#include "SuqsInternal.h"
 #include "SuqsProgression.h"
 
 void USuqsTaskState::Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsProgression* Root)
@@ -69,7 +69,7 @@ bool USuqsTaskState::Complete()
 		// Check sequencing
 		if (ParentObjective->GetParentQuest()->GetCurrentObjective() != ParentObjective)
 		{
-			UE_LOG(LogSuqs, Warning, TEXT("Tried to complete task %s but parent objective %s is not current, ignoring"),
+			UE_LOG(LogSUQS, Warning, TEXT("Tried to complete task %s but parent objective %s is not current, ignoring"),
 				*GetIdentifier().ToString(), *ParentObjective->GetIdentifier().ToString())
 			return false;
 		}
@@ -78,7 +78,7 @@ bool USuqsTaskState::Complete()
 			// Only allowed if optional or next in sequence
 			if (IsMandatory() && ParentObjective->GetNextMandatoryTask() != this)
 			{
-				UE_LOG(LogSuqs, Warning, TEXT("Tried to complete mandatory task %s out of order, ignoring"), *GetIdentifier().ToString())
+				UE_LOG(LogSUQS, Warning, TEXT("Tried to complete mandatory task %s out of order, ignoring"), *GetIdentifier().ToString())
 				return false;
 			}
 		}
