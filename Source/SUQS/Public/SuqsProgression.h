@@ -47,6 +47,9 @@ protected:
 	UPROPERTY()
 	TMap<FName, USuqsQuestState*> QuestArchive;
 
+	UPROPERTY()
+	TArray<FName> GlobalActiveBranches;
+
 	USuqsQuestState* FindQuestState(const FName& QuestID);
 	const USuqsQuestState* FindQuestState(const FName& QuestID) const;
 	USuqsTaskState* FindTaskStatus(const FName& QuestID, const FName& TaskID);
@@ -217,6 +220,29 @@ public:
 	/// Shortcut to getting the whole task state for a specific quest
 	UFUNCTION(BlueprintCallable)
 	USuqsTaskState* GetTaskState(FName QuestID, FName TaskID) const;
+
+	/// Set a branch to be active in a specific quest. Objectives in this quest that are associated with this
+	/// branch will then be allowed to activate.
+	UFUNCTION(BlueprintCallable)
+    void SetQuestBranchActive(FName QuestID, FName Branch, bool bActive);
+
+	/// Return whether an objective branch is active or not for a given quest
+	UFUNCTION(BlueprintCallable)
+    bool IsQuestBranchActive(FName QuestID, FName Branch);
+
+	/// Set a branch to be active globally for ALL quests. For all quests, objectives associated with that branch will be active.
+	/// This setting affects ALL quests, including any which are accepted after calling this
+	UFUNCTION(BlueprintCallable)
+    void SetGlobalQuestBranchActive(FName Branch, bool bActive);
+
+	/// Reset the globally active quest branches so that none are active
+	/// This setting affects ALL quests
+	UFUNCTION(BlueprintCallable)
+    void ResetGlobalQuestBranches();
+
+	/// Return whether a branch is active globally for all quests or not
+	UFUNCTION(BlueprintCallable)
+    bool IsGlobalQuestBranchActive(FName Branch);
 
 	void RaiseTaskUpdated(USuqsTaskState* Task);
 	void RaiseTaskFailed(USuqsTaskState* Task);

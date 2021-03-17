@@ -149,6 +149,12 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 			Quest = NewObject<USuqsQuestState>(this);
 			Quest->Initialise(QDef, this);
 			ActiveQuests.Add(QuestID, Quest);
+
+			// Propagate global quest branches
+			for (auto& Branch : GlobalActiveBranches)
+			{
+				Quest->SetBranchActive(Branch, true);
+			}
 		}
 
 		OnQuestAccepted.Broadcast(Quest);
@@ -329,6 +335,65 @@ USuqsTaskState* USuqsProgression::GetTaskState(FName QuestID, FName TaskID) cons
 	}
 	return nullptr;
 	
+}
+
+void USuqsProgression::SetQuestBranchActive(FName QuestID, FName Branch, bool bActive)
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		Q->SetBranchActive(Branch, bActive);
+	}
+}
+
+
+bool USuqsProgression::IsQuestBranchActive(FName QuestID, FName Branch)
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsBranchActive(Branch);
+	}
+	return false;
+}
+
+void USuqsProgression::SetGlobalQuestBranchActive(FName Branch, bool bActive)
+{
+	if (Branch.IsNone())
+		return;
+
+	bool bChanged;
+	if (bActive)
+		bChanged = GlobalActiveBranches.AddUnique(Branch) > 0;
+	else
+		bChanged = GlobalActiveBranches.Remove(Branch) > 0;
+
+	if (bChanged)
+	{
+		for (auto Pair : ActiveQuests)
+		{
+			Pair.Value->SetBranchActive(Branch, bActive);
+		}
+	}
+}
+
+void USuqsProgression::ResetGlobalQuestBranches()
+{
+	for (auto& Branch : GlobalActiveBranches)
+	{
+		for (auto Pair : ActiveQuests)
+		{
+			Pair.Value->SetBranchActive(Branch, false);
+		}
+	}
+	GlobalActiveBranches.Empty();
+}
+
+bool USuqsProgression::IsGlobalQuestBranchActive(FName Branch)
+{
+	// No branch is always active
+	if (Branch.IsNone())
+		return true;
+
+	return GlobalActiveBranches.Contains(Branch);
 }
 
 void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)

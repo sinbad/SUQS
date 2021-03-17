@@ -87,6 +87,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetBranchActive(FName Branch, bool bActive);
 
+	/// Reset quest branches so all are inactive
+	UFUNCTION(BlueprintCallable)
+	void ResetBranches();
+
 	/// Return whether an objective branch is active or not
 	UFUNCTION(BlueprintCallable)
     bool IsBranchActive(FName Branch);

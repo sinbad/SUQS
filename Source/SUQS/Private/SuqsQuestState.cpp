@@ -52,6 +52,9 @@ USuqsTaskState* USuqsQuestState::GetTask(const FName& Identifier) const
 
 void USuqsQuestState::SetBranchActive(FName Branch, bool bActive)
 {
+	if (Branch.IsNone())
+		return;
+
 	int Changes;
 	if (bActive)
 		Changes = ActiveBranches.AddUnique(Branch);
@@ -60,6 +63,15 @@ void USuqsQuestState::SetBranchActive(FName Branch, bool bActive)
 
 	if (Changes > 0)
 		NotifyObjectiveStatusChanged();
+}
+
+void USuqsQuestState::ResetBranches()
+{
+	if (ActiveBranches.Num() > 0)
+	{
+		ActiveBranches.Empty();
+		NotifyObjectiveStatusChanged();
+	}
 }
 
 bool USuqsQuestState::IsBranchActive(FName Branch)
