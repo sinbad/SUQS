@@ -97,7 +97,7 @@ public:
 
 	/// Return whether the quest has failed
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestFailed(FName QuestID) const { return GetQuestStatus(QuestID) == ESuqsQuestStatus::Completed; }
+    bool IsQuestFailed(FName QuestID) const { return GetQuestStatus(QuestID) == ESuqsQuestStatus::Failed; }
 
 	/// Get a list of the IDs of accepted quests
 	UFUNCTION(BlueprintCallable)
