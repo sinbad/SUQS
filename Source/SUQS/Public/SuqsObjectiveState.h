@@ -110,6 +110,9 @@ public:
 	/// Get a list of tasks which have been failed
 	UFUNCTION(BlueprintCallable)
     void GetFailedTasks(TArray<USuqsTaskState*>& FailedTasksOut) const;
+	/// Return whether this objective is on an active quest branch
+	UFUNCTION(BlueprintCallable)
+    bool IsOnActiveBranch() const;
 
 	
 	void NotifyTaskStatusChanged();

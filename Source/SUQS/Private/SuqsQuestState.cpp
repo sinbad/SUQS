@@ -130,6 +130,16 @@ USuqsObjectiveState* USuqsQuestState::GetObjective(const FName& Identifier) cons
 	return nullptr;
 }
 
+void USuqsQuestState::GetActiveObjectives(TArray<USuqsObjectiveState*>& ActiveObjectivesOut) const
+{
+	ActiveObjectivesOut.Reset();
+	for (auto O : Objectives)
+	{
+		if (O->IsOnActiveBranch())
+			ActiveObjectivesOut.Add(O);
+	}	
+}
+
 bool USuqsQuestState::IsObjectiveIncomplete(const FName& Identifier) const
 {
 	if (auto O = GetObjective(Identifier))

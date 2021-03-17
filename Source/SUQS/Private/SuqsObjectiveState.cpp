@@ -128,6 +128,11 @@ void USuqsObjectiveState::GetFailedTasks(TArray<USuqsTaskState*>& FailedTasksOut
 	}
 }
 
+bool USuqsObjectiveState::IsOnActiveBranch() const
+{
+	return ParentQuest->IsBranchActive(GetBranch());
+}
+
 void USuqsObjectiveState::NotifyTaskStatusChanged()
 {
 	// Re-scan our tasks and decide what this means for our own state

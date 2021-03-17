@@ -113,6 +113,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	USuqsObjectiveState* GetObjective(const FName& ObjectiveID) const;
 
+	/// Get a list of all the active objectives on this quest, given the active branches
+	/// These objectives are in order of required completion
+	UFUNCTION(BlueprintCallable)
+	void GetActiveObjectives(TArray<USuqsObjectiveState*>& ActiveObjectivesOut) const;
+
 	/// Return whether this quest is incomplete, i.e. accepted but not completed or failed. 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     bool IsIncomplete() const { return Status == ESuqsQuestStatus::Incomplete; }
