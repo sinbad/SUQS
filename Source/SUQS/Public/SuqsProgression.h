@@ -89,15 +89,19 @@ public:
 
 	/// Return whether the quest is or has been accepted for the player (may also be completed / failed)
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestAccepted(FName QuestID) const { return GetQuestStatus(QuestID) != ESuqsQuestStatus::Unavailable; }
+    bool IsQuestAccepted(FName QuestID) const;
+
+	/// Return whether the quest is incomplete, i.e. accepted but not completed or failed. 
+	UFUNCTION(BlueprintCallable)
+    bool IsQuestIncomplete(FName QuestID) const;
 
 	/// Return whether the quest is completed
 	UFUNCTION(BlueprintCallable)
-	bool IsQuestCompleted(FName QuestID) const { return GetQuestStatus(QuestID) == ESuqsQuestStatus::Completed; }
+	bool IsQuestCompleted(FName QuestID) const;
 
 	/// Return whether the quest has failed
 	UFUNCTION(BlueprintCallable)
-    bool IsQuestFailed(FName QuestID) const { return GetQuestStatus(QuestID) == ESuqsQuestStatus::Failed; }
+    bool IsQuestFailed(FName QuestID) const;
 
 	/// Get a list of the IDs of accepted quests
 	UFUNCTION(BlueprintCallable)
@@ -181,6 +185,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int ProgressTask(FName QuestID, FName TaskIdentifier, int Delta);
 
+	/// Return whether a given objective is incomplete ie not failed or completed. For more information, retrieve the objective itself
+	UFUNCTION(BlueprintCallable)
+    bool IsObjectiveIncomplete(FName QuestID, FName ObjectiveID) const;
+
 	/// Return whether a given objective is completed. For more information, retrieve the objective itself
 	UFUNCTION(BlueprintCallable)
     bool IsObjectiveCompleted(FName QuestID, FName ObjectiveID) const;
@@ -188,6 +196,10 @@ public:
 	/// Return whether the objective has failed. For more information, retrieve the objective itself
 	UFUNCTION(BlueprintCallable)
     bool IsObjectiveFailed(FName QuestID, FName ObjectiveID) const;
+
+	/// Return whether a given task is incomplete ie not failed or completed. For more information, retrieve the task itself
+	UFUNCTION(BlueprintCallable)
+    bool IsTaskIncomplete(FName QuestID, FName TaskID) const;
 
 	/// Return whether a given task is completed. For more information, retrieve the task
 	UFUNCTION(BlueprintCallable)

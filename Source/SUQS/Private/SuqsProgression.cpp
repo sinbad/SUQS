@@ -221,6 +221,52 @@ int USuqsProgression::ProgressTask(FName QuestID, FName TaskIdentifier, int Delt
 }
 
 
+bool USuqsProgression::IsQuestAccepted(FName QuestID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool USuqsProgression::IsQuestIncomplete(FName QuestID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsIncomplete();
+	}
+	return false;
+}
+
+bool USuqsProgression::IsQuestCompleted(FName QuestID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsCompleted();
+	}
+	return false;
+}
+
+bool USuqsProgression::IsQuestFailed(FName QuestID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsFailed();
+	}
+	return false;
+}
+
+bool USuqsProgression::IsObjectiveIncomplete(FName QuestID, FName ObjectiveID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsObjectiveIncomplete(ObjectiveID);
+	}
+	return false;
+	
+}
+
 bool USuqsProgression::IsObjectiveCompleted(FName QuestID, FName ObjectiveID) const
 {
 	if (auto Q = FindQuestState(QuestID))
@@ -235,6 +281,16 @@ bool USuqsProgression::IsObjectiveFailed(FName QuestID, FName ObjectiveID) const
 	if (auto Q = FindQuestState(QuestID))
 	{
 		return Q->IsObjectiveFailed(ObjectiveID);
+	}
+	return false;
+}
+
+
+bool USuqsProgression::IsTaskIncomplete(FName QuestID, FName TaskID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsTaskIncomplete(TaskID);
 	}
 	return false;
 }

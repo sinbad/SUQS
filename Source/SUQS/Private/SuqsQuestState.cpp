@@ -104,6 +104,16 @@ USuqsObjectiveState* USuqsQuestState::GetObjective(const FName& Identifier) cons
 	return nullptr;
 }
 
+bool USuqsQuestState::IsObjectiveIncomplete(const FName& Identifier) const
+{
+	if (auto O = GetObjective(Identifier))
+	{
+		return O->IsIncomplete();
+	}
+	return false;
+	
+}
+
 bool USuqsQuestState::IsObjectiveCompleted(const FName& Identifier) const
 {
 	if (auto O = GetObjective(Identifier))
@@ -123,6 +133,15 @@ bool USuqsQuestState::IsObjectiveFailed(const FName& Identifier) const
 	return false;
 }
 
+
+bool USuqsQuestState::IsTaskIncomplete(const FName& TaskID) const
+{
+	if (auto T = GetTask(TaskID))
+	{
+		return T->IsIncomplete();
+	}
+	return false;
+}
 
 bool USuqsQuestState::IsTaskCompleted(const FName& TaskID) const
 {

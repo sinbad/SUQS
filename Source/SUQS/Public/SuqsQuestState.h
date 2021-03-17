@@ -99,6 +99,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	USuqsObjectiveState* GetObjective(const FName& ObjectiveID) const;
 
+	/// Return whether this quest is incomplete, i.e. accepted but not completed or failed. 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool IsIncomplete() const { return Status == ESuqsQuestStatus::Incomplete; }
+
+	/// Return whether this quest is completed
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool IsCompleted() const { return Status == ESuqsQuestStatus::Completed; }
+
+	/// Return whether the quest has failed
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool IsFailed() const { return Status == ESuqsQuestStatus::Failed; }
+
+	/// Return whether a given objective is incomplete ie not failed or completed
+	UFUNCTION(BlueprintCallable)
+	bool IsObjectiveIncomplete(const FName& Identifier) const;
+	
 	/// Return whether an objective is complete
 	UFUNCTION(BlueprintCallable)
 	bool IsObjectiveCompleted(const FName& ObjectiveID) const;
@@ -106,6 +122,10 @@ public:
 	/// Return whether an objective failed
 	UFUNCTION(BlueprintCallable)
     bool IsObjectiveFailed(const FName& ObjectiveID) const;
+
+	/// Return whether a given task is incomplete ie not failed or completed
+	UFUNCTION(BlueprintCallable)
+	bool IsTaskIncomplete(const FName& TaskID) const;
 
 	/// Return whether a task is complete
 	UFUNCTION(BlueprintCallable)
@@ -128,8 +148,11 @@ public:
 	UFUNCTION(BlueprintCallable)
     void Fail();
 
+	/// Find a task with the given identifier in this quest
+	UFUNCTION(BlueprintCallable)
+	USuqsTaskState* GetTask(const FName& TaskID) const;
+
 	void NotifyObjectiveStatusChanged();
 
-	/// Find a task with the given identifier in this quest
-	USuqsTaskState* GetTask(const FName& TaskID) const;
+	
 };
