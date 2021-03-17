@@ -91,6 +91,11 @@ public:
 	UFUNCTION(BlueprintCallable)
     void FailOutstandingTasks();
 
+	/// Manually complete all mandatory tasks on this this objective. You shouldn't really use this, you should complete
+	/// specific tasks and let it resolve from there, but if you call this then it will mark all mandatory task(s) completed,
+	/// including those previously failed.
+	void CompleteAllMandatoryTasks();
+
 	/// Get the next incomplete mandatory task required to fulfil this objective
 	/// If there are multiple mandatory tasks and ordering doesn't matter, returns the first one found
 	UFUNCTION(BlueprintCallable)

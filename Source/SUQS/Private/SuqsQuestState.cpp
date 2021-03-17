@@ -71,6 +71,14 @@ bool USuqsQuestState::IsBranchActive(FName Branch)
 	return ActiveBranches.Contains(Branch);
 }
 
+bool USuqsQuestState::CompleteTask(FName TaskID)
+{
+	if (auto T = GetTask(TaskID))
+	{
+		return T->Complete();
+	}
+	return false;
+}
 
 const FText& USuqsQuestState::GetDescription() const
 {
@@ -189,6 +197,14 @@ void USuqsQuestState::Fail()
 	if (Obj)
 	{
 		Obj->FailOutstandingTasks();
+	}
+}
+
+void USuqsQuestState::Complete()
+{
+	for (auto Obj : Objectives)
+	{
+		Obj->CompleteAllMandatoryTasks();
 	}
 }
 

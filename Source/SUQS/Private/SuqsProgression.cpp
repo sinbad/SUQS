@@ -190,6 +190,14 @@ void USuqsProgression::FailQuest(FName QuestID)
 	// note we don't update quest lists here, but we rely on callbacks since you could fail via the quest itself
 }
 
+void USuqsProgression::CompleteQuest(FName QuestID)
+{
+	auto Q = FindQuestState(QuestID);
+	if (Q)
+		Q->Complete();
+	
+}
+
 void USuqsProgression::FailTask(FName QuestID, FName TaskIdentifier)
 {
 	auto T = FindTaskStatus(QuestID, TaskIdentifier);

@@ -71,6 +71,20 @@ void USuqsObjectiveState::FailOutstandingTasks()
 	}
 }
 
+void USuqsObjectiveState::CompleteAllMandatoryTasks()
+{
+	for (auto Task : Tasks)
+	{
+		if (Task->IsMandatory())
+		{
+			// Override failed as well
+			Task->Complete();
+			if (!AreAllMandatoryTasksRequired())
+				break;
+		}
+	}	
+}
+
 USuqsTaskState* USuqsObjectiveState::GetNextMandatoryTask() const
 {
 	for (auto Task : Tasks)

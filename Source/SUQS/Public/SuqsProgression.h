@@ -155,6 +155,11 @@ public:
 	UFUNCTION(BlueprintCallable)
     void FailQuest(FName QuestID);
 
+	/// Manually complete a quest. You should prefer using CompleteTask() instead of using this, since that will
+	/// automatically bubble up. This will mark all mandatory tasks as complete
+	UFUNCTION(BlueprintCallable)
+    void CompleteQuest(FName QuestID);
+
 	/**
 	 * Mark a task as failed. If this is a mandatory task, it will fail the objective the task is attached to.
 	   If the objective is mandatory, it will fail the quest. 

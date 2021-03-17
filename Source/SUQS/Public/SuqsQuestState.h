@@ -91,6 +91,16 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsBranchActive(FName Branch);
 
+	/// Complete a task with the given TaskID
+	/**
+	 * Fully complete a task. If this is the last mandatory task in an objective, also completes the objective, and
+	 * cascades upwards to the quest if that's the last mandatory objective.
+	 * @param TaskID The identifier of the task within the quest
+	 * @returns Whether the task was successfully completed
+	 */
+	UFUNCTION(BlueprintCallable)
+	bool CompleteTask(FName TaskID);
+
 	/// Get the current objective on this quest. Will return null if quest is complete.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsObjectiveState* GetCurrentObjective() const;
@@ -147,6 +157,11 @@ public:
 	/// the current task(s) failed and then fail this quest. Does nothing if the quest doesn't have outstanding tasks
 	UFUNCTION(BlueprintCallable)
     void Fail();
+
+	/// Manually complete all the required mandatory tasks on this quest. You should *really* be completing tasks
+	/// instead of calling this, but if you need it, this bypasses that marks all mandatory tasks as complete
+	UFUNCTION(BlueprintCallable)
+	void Complete();
 
 	/// Find a task with the given identifier in this quest
 	UFUNCTION(BlueprintCallable)
