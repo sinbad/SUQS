@@ -84,14 +84,14 @@ const FString SimpleMainQuestJson = R"RAWJSON([
 				"Branch": "None",
 				"Tasks": [
 					{
-						"Identifier": "TOptional1",
+						"Identifier": "TOptionA",
 						"Title": "NSLOCTEXT(\"[TestQuests]\", \"DoThis\", \"Do this OR\")",
 						"bMandatory": true,
 						"TargetNumber": 1,
 						"TimeLimit": 0
 					},
 					{
-						"Identifier": "TOptional2",
+						"Identifier": "TOptionB",
 						"Title": "NSLOCTEXT(\"[TestQuests]\", \"DoThat\", \"Do That\")",
 						"bMandatory": true,
 						"TargetNumber": 1,

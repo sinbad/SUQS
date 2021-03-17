@@ -312,8 +312,67 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestMultiObjective, "SUQSTest.QuestMultiObject
 
 bool FTestMultiObjective::RunTest(const FString& Parameters)
 {
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	UDataTable* QuestTable = NewObject<UDataTable>();
+	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->CreateTableFromJSONString(SimpleMainQuestJson);
 
-	// TODO
-	return false;
+	Progression->QuestDataTables.Add(QuestTable);
+
+	// I could access the task objects using the API but I want to test that the top-level interface is working, which
+	// uses the nested objects anyway.
+	FName TaskIDs[] = {
+		"T_ReachThePlace",	// O1
+		"T_DoTheThing",		// O1
+		"T_CollectDoobries",// O1, optional
+		"T_Something1",		// O2
+		"T_Something2",		// O2
+		"TOptionA",			// O3, either or
+		"TOptionB"			// O3, either or
+	};
+
+	// Roll through the whole of a quest with multiple objectives
+	TestTrue("Accept main quest OK", Progression->AcceptQuest("Q_Main1"));
+	TestTrue("Quest should be incomplete", Progression->IsQuestIncomplete("Q_Main1"));
+	TestTrue("Objective 1 should be incomplete", Progression->IsObjectiveIncomplete("Q_Main1", "O1"));
+	TestTrue("Objective 2 should be incomplete", Progression->IsObjectiveIncomplete("Q_Main1", "O2"));
+	TestTrue("Objective 3 should be incomplete", Progression->IsObjectiveIncomplete("Q_Main1", "O3"));
+	for (auto& TaskID : TaskIDs)
+	{
+		TestTrue("Tasks should all be incomplete", Progression->IsTaskIncomplete("Q_Main1", TaskID));
+	}
+
+	// We won't complete the optional (index 2)
+	for (int i = 0; i < 2; ++i)
+	{
+		TestTrue("Task should complete", Progression->CompleteTask("Q_Main1", TaskIDs[i]));
+		TestTrue("Task should report completed", Progression->IsTaskCompleted("Q_Main1", TaskIDs[i]));
+		if (i < 1)
+			TestTrue("Objective 1 should be incomplete", Progression->IsObjectiveIncomplete("Q_Main1", "O1"));
+		else
+			TestTrue("Objective 1 should be completed even though optional wasn't", Progression->IsObjectiveCompleted("Q_Main1", "O1"));
+	}
+	TestTrue("Quest should be incomplete", Progression->IsQuestIncomplete("Q_Main1"));
+	TestTrue("Objective 2 should be incomplete", Progression->IsObjectiveIncomplete("Q_Main1", "O2"));
+	TestTrue("Objective 3 should be incomplete", Progression->IsObjectiveIncomplete("Q_Main1", "O3"));
+	for (int i = 3; i < 5; ++i)
+	{
+		TestTrue("Task should complete", Progression->CompleteTask("Q_Main1", TaskIDs[i]));
+		TestTrue("Task should report completed", Progression->IsTaskCompleted("Q_Main1", TaskIDs[i]));
+		if (i < 4)
+			TestTrue("Objective 2 should be incomplete", Progression->IsObjectiveIncomplete("Q_Main1", "O2"));
+		else
+			TestTrue("Objective 2 should be completed", Progression->IsObjectiveCompleted("Q_Main1", "O2"));
+	}
+	TestTrue("Quest should be incomplete", Progression->IsQuestIncomplete("Q_Main1"));
+	TestTrue("Objective 3 should be incomplete", Progression->IsObjectiveIncomplete("Q_Main1", "O3"));
+
+	// Last objective is either-or so complete only one
+	TestTrue("Task should complete", Progression->CompleteTask("Q_Main1", TaskIDs[6]));
+	TestTrue("Objective 3 should be completed", Progression->IsObjectiveCompleted("Q_Main1", "O3"));
+	TestTrue("Quest should be complete", Progression->IsQuestCompleted("Q_Main1"));
+
+
+	return true;
 }
 
