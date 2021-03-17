@@ -1,5 +1,4 @@
 #include "Misc/AutomationTest.h"
-#include "Tests/AutomationCommon.h"
 #include "Engine.h"
 #include "SuqsObjectiveState.h"
 #include "SuqsProgression.h"
@@ -7,7 +6,6 @@
 #include "TestQuestData.h"
 
 
-class USuqsProgression;
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAcceptSimple, "SUQSTest.QuestAcceptSimple",
                                  EAutomationTestFlags::EditorContext |
                                  EAutomationTestFlags::ClientContext |
