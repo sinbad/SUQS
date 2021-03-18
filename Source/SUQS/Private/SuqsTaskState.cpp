@@ -1,7 +1,7 @@
 #include "SuqsTaskState.h"
 
 #include <algorithm>
-#include "SuqsInternal.h"
+#include "Suqs.h"
 #include "SuqsProgression.h"
 
 void USuqsTaskState::Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsProgression* Root)

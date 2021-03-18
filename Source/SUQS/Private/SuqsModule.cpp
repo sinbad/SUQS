@@ -1,5 +1,5 @@
 #include "SuqsModule.h"
-#include "SuqsInternal.h"
+#include "Suqs.h"
 
 #define LOCTEXT_NAMESPACE "FSuqs"
 

@@ -1,5 +1,6 @@
 #include "Misc/AutomationTest.h"
 #include "Engine.h"
+#include "Suqs.h"
 #include "SuqsObjectiveState.h"
 #include "SuqsProgression.h"
 #include "SuqsTaskState.h"
@@ -32,9 +33,9 @@ bool FTestQuestAcceptSimple::RunTest(const FString& Parameters)
 	TestEqual("Side quest should be incomplete", Progression->GetQuestStatus("Q_Side1"), ESuqsQuestStatus::Incomplete);
 
 	// This raises a warning, which would turn the test results yellow, so let's disable those
-	GEngine->Exec(nullptr, TEXT("Log LogSUQS Off"));
+	LogSUQS.SetVerbosity(ELogVerbosity::NoLogging);
 	TestFalse("Accepting Main quest again should do nothing", Progression->AcceptQuest("Q_Main1"));
-	GEngine->Exec(nullptr, TEXT("Log LogSUQS On"));
+	LogSUQS.SetVerbosity(ELogVerbosity::Verbose);
 	
 	return true;
 }
@@ -70,10 +71,10 @@ bool FTestQuestAcceptFailedComplete::RunTest(const FString& Parameters)
 	TestTrue("Smol task should complete OK", Progression->CompleteTask("Q_Smol", "T_Smol"));
 	TestEqual("Smol quest should now be completed", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
 	// Suppress warning logs
-	GEngine->Exec(nullptr, TEXT("Log LogSUQS Off"));
+	LogSUQS.SetVerbosity(ELogVerbosity::NoLogging);
 	TestFalse("Accepting completed quest should do nothing by default", Progression->AcceptQuest("Q_Smol"));
-	GEngine->Exec(nullptr, TEXT("Log LogSUQS On"));
-
+	LogSUQS.SetVerbosity(ELogVerbosity::Verbose);
+	
 	TestEqual("Smol quest should still be completed", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Completed);
 	TestTrue("Accepting completed quest with reset option should reset", Progression->AcceptQuest("Q_Smol", false, true));
 	TestEqual("Smol quest should be incomplete again", Progression->GetQuestStatus("Q_Smol"), ESuqsQuestStatus::Incomplete);
@@ -172,12 +173,17 @@ bool FTestQuestOrderedTasks::RunTest(const FString& Parameters)
 	Progression->QuestDataTables.Add(QuestTable);
 
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Ordered"));
+	// Suppress the warnings this will raise
+	LogSUQS.SetVerbosity(ELogVerbosity::NoLogging);
 	TestFalse("Should not be allowed to complete task out of order", Progression->CompleteTask("Q_Ordered", "T_2"));
 	TestFalse("Should not be allowed to complete task out of order", Progression->CompleteTask("Q_Ordered", "T_3"));
 	TestFalse("Should not be allowed to complete a task on a later objective", Progression->CompleteTask("Q_Ordered", "T_11"));
+	LogSUQS.SetVerbosity(ELogVerbosity::Verbose);
 	
 	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_Ordered", "T_1"));
+	LogSUQS.SetVerbosity(ELogVerbosity::NoLogging);
 	TestFalse("Should not be allowed to complete task out of order", Progression->CompleteTask("Q_Ordered", "T_3"));
+	LogSUQS.SetVerbosity(ELogVerbosity::Verbose);
 
 
 	TestTrue("Task 2 should complete OK", Progression->CompleteTask("Q_Ordered", "T_2"));
@@ -185,7 +191,9 @@ bool FTestQuestOrderedTasks::RunTest(const FString& Parameters)
 	
 	TestTrue("Task 3 should complete OK", Progression->CompleteTask("Q_Ordered", "T_3"));
 
+	LogSUQS.SetVerbosity(ELogVerbosity::NoLogging);
 	TestFalse("Objective 2 Task 2 is out of order still", Progression->CompleteTask("Q_Ordered", "T_12"));
+	LogSUQS.SetVerbosity(ELogVerbosity::Verbose);
 
 	TestTrue("Objective 2 Task 1 should complete OK now", Progression->CompleteTask("Q_Ordered", "T_11"));
 	TestTrue("Objective 2 Task 2 should complete OK now", Progression->CompleteTask("Q_Ordered", "T_12"));

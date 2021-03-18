@@ -1,5 +1,5 @@
 #include "SuqsProgression.h"
-#include "SuqsInternal.h"
+#include "Suqs.h"
 #include "SuqsObjectiveState.h"
 #include "SuqsQuestState.h"
 #include "SuqsTaskState.h"

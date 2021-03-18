@@ -1,3 +1,3 @@
-#include "SuqsInternal.h"
+#include "Suqs.h"
 
 DEFINE_LOG_CATEGORY(LogSUQS)
