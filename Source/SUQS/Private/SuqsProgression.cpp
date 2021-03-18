@@ -233,6 +233,15 @@ int USuqsProgression::ProgressTask(FName QuestID, FName TaskIdentifier, int Delt
 	return 0;
 }
 
+USuqsObjectiveState* USuqsProgression::GetCurrentObjective(FName QuestID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->GetCurrentObjective();
+	}
+	return nullptr;
+}
+
 
 bool USuqsProgression::IsQuestAccepted(FName QuestID) const
 {
@@ -296,6 +305,16 @@ bool USuqsProgression::IsObjectiveFailed(FName QuestID, FName ObjectiveID) const
 		return Q->IsObjectiveFailed(ObjectiveID);
 	}
 	return false;
+}
+
+USuqsTaskState* USuqsProgression::GetNextMandatoryTask(FName QuestID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->GetNextMandatoryTask();
+	}
+	return nullptr;
+	
 }
 
 

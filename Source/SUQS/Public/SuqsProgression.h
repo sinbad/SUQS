@@ -191,6 +191,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int ProgressTask(FName QuestID, FName TaskIdentifier, int Delta);
 
+	/// Get the current objective for a given quest
+	UFUNCTION(BlueprintCallable)
+	USuqsObjectiveState* GetCurrentObjective(FName QuestID) const;
+
 	/// Return whether a given objective is incomplete ie not failed or completed. For more information, retrieve the objective itself
 	UFUNCTION(BlueprintCallable)
     bool IsObjectiveIncomplete(FName QuestID, FName ObjectiveID) const;
@@ -202,6 +206,12 @@ public:
 	/// Return whether the objective has failed. For more information, retrieve the objective itself
 	UFUNCTION(BlueprintCallable)
     bool IsObjectiveFailed(FName QuestID, FName ObjectiveID) const;
+
+	/// Get the next mandatory task for a given quest.
+	/// If the objective for this quest only requires ONE of a number of tasks to be completed, this will be the first one.
+	/// Check the current objective for more details.
+	UFUNCTION(BlueprintCallable)
+    USuqsTaskState* GetNextMandatoryTask(FName QuestID) const;
 
 	/// Return whether a given task is incomplete ie not failed or completed. For more information, retrieve the task itself
 	UFUNCTION(BlueprintCallable)

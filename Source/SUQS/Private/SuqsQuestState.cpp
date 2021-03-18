@@ -169,6 +169,15 @@ bool USuqsQuestState::IsObjectiveFailed(const FName& Identifier) const
 	return false;
 }
 
+USuqsTaskState* USuqsQuestState::GetNextMandatoryTask() const
+{
+	if (auto O = GetCurrentObjective())
+	{
+		return O->GetNextMandatoryTask();
+	}
+	return nullptr;
+}
+
 
 bool USuqsQuestState::IsTaskIncomplete(const FName& TaskID) const
 {

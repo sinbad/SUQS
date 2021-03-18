@@ -142,6 +142,12 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsObjectiveFailed(const FName& ObjectiveID) const;
 
+	/// Get the next mandatory task for this quest
+	/// If the objective for this quest only requires ONE of a number of tasks to be completed, this will be the first one.
+	/// Check the current objective for more details.
+	UFUNCTION(BlueprintCallable)
+	USuqsTaskState* GetNextMandatoryTask() const;
+
 	/// Return whether a given task is incomplete ie not failed or completed
 	UFUNCTION(BlueprintCallable)
 	bool IsTaskIncomplete(const FName& TaskID) const;
@@ -177,6 +183,4 @@ public:
 	USuqsTaskState* GetTask(const FName& TaskID) const;
 
 	void NotifyObjectiveStatusChanged();
-
-	
 };
