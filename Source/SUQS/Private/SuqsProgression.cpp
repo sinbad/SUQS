@@ -373,9 +373,12 @@ void USuqsProgression::SetGlobalQuestBranchActive(FName Branch, bool bActive)
 
 	if (bChanged)
 	{
-		for (auto Pair : ActiveQuests)
+		// Copy into temporary list because this can change quest state and move between lists
+		TArray<USuqsQuestState*> ListCopy;
+		ActiveQuests.GenerateValueArray(ListCopy);
+		for (auto Q : ListCopy)
 		{
-			Pair.Value->SetBranchActive(Branch, bActive);
+			Q->SetBranchActive(Branch, bActive);
 		}
 	}
 }
@@ -384,9 +387,12 @@ void USuqsProgression::ResetGlobalQuestBranches()
 {
 	for (auto& Branch : GlobalActiveBranches)
 	{
-		for (auto Pair : ActiveQuests)
+		// Copy into temporary list because this can change quest state and move between lists
+		TArray<USuqsQuestState*> ListCopy;
+		ActiveQuests.GenerateValueArray(ListCopy);
+		for (auto Q : ListCopy)
 		{
-			Pair.Value->SetBranchActive(Branch, false);
+			Q->SetBranchActive(Branch, false);
 		}
 	}
 	GlobalActiveBranches.Empty();
@@ -461,9 +467,12 @@ void USuqsProgression::RaiseQuestReset(USuqsQuestState* Quest)
 // FTickableGameObject start
 void USuqsProgression::Tick(float DeltaTime)
 {
-	for (auto& QuestPair : ActiveQuests)
+	// Copy into temporary list because ticking can fail quests and alter the collection
+	TArray<USuqsQuestState*> ListCopy;
+	ActiveQuests.GenerateValueArray(ListCopy);
+	for (auto Q : ListCopy)
 	{
-		QuestPair.Value->Tick(DeltaTime);
+		Q->Tick(DeltaTime);
 	}
 }
 
