@@ -56,6 +56,13 @@ const FString TimeLimitQuestJson = R"RAWJSON([
 						"bMandatory": true,
 						"TargetNumber": 1,
 						"TimeLimit": 50
+					},
+					{
+						"Identifier": "T_NonTimeLimited2",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TNotTimeLimited\", \"This is not time limited\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
 					}
 				]
 			},
@@ -164,6 +171,20 @@ bool FTestQuestTimeLimitNotFirstTask::RunTest(const FString& Parameters)
 	Progression->Tick(50); // Total 60 now
 	TestEqual("Second task should bhave run out of time", T->GetTimeRemaining(), 0.f);
 	TestTrue("Quest should have failed now", Progression->IsQuestFailed("Q_TimeLimits"));
+
+	// Reset so we can test having completed within time limit
+	T->Reset();
+	TestEqual("Time limit should be back", T->GetTimeRemaining(), OrigTimeLeft);
+	TestFalse("Quest should not be failed anymore", Progression->IsQuestFailed("Q_TimeLimits"));
+	Progression->Tick(15); // Tick a little within limit
+	float TimeRemainingAtCompletion = T->GetTimeRemaining();
+	TestEqual("Time remaining should be correct", TimeRemainingAtCompletion, T->GetTimeLimit() - 15);
+	// Complete the tiem limited task
+	T->Complete();
+	// Same objective should still be active, but now moved on to last task
+	// now tick again, and make sure this didn't affect the completed task
+	Progression->Tick(50);
+	TestEqual("Time remaining should not have changed", T->GetTimeRemaining(), TimeRemainingAtCompletion);
 
 	return true;
 }
