@@ -71,6 +71,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsTimeLimited() const { return TaskDefinition->TimeLimit > 0; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetTimeLimit() const { return TaskDefinition->TimeLimit; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const FText& GetTitle() const { return TaskDefinition->Title; }
 	/// The target number of things to be achieved
 	UFUNCTION(BlueprintCallable, BlueprintPure)
