@@ -15,7 +15,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveFailed, USuqsObjectiveSt
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestCompleted, USuqsQuestState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestFailed, USuqsQuestState*, Task);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActiveQuestChanged, USuqsQuestState*, Quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, Quest);
 
 /**
@@ -77,9 +76,6 @@ public:
 	/// Fired when something on the detail of a task has changed (progress, time etc)
 	UPROPERTY(BlueprintAssignable)
 	FOnTaskUpdated OnTaskUpdated;
-	/// Fired when a different quest has been made the active quest
-	UPROPERTY(BlueprintAssignable)
-	FOnActiveQuestChanged OnActiveQuestChanged;
 	/// Fired when a quest has been accepted for the first time
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestAccepted OnQuestAccepted;
