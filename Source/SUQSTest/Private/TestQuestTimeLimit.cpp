@@ -65,38 +65,6 @@ const FString TimeLimitQuestJson = R"RAWJSON([
 						"TimeLimit": 0
 					}
 				]
-			},
-			{
-				"Identifier": "O_MultipleTimeLimitsNonSequential",
-				"Title": "NSLOCTEXT(\"[TestQuests]\", \"DummyTitle\", \"Ignore this for test\")",
-				"DescriptionWhenActive": "",
-				"DescriptionWhenCompleted": "",
-				"bSequentialTasks": false,
-				"bAllMandatoryTasksRequired": true,
-				"Branch": "None",
-				"Tasks": [
-					{
-						"Identifier": "T_NonSequential1",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TNonSeqNonMandTitle\", \"Non-sequential time limited task, not mandatory\")",
-						"bMandatory": false,
-						"TargetNumber": 1,
-						"TimeLimit": 20
-					},
-					{
-						"Identifier": "T_NonSequential2",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TNonSeqNonMandTitle\", \"Non-sequential time limited task, not mandatory\")",
-						"bMandatory": false,
-						"TargetNumber": 1,
-						"TimeLimit": 30
-					},
-					{
-						"Identifier": "T_NonSequential3",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TNonSeqMandTitle\", \"Non-sequential time limited task, the only mandatory\")",
-						"bMandatory": true,
-						"TargetNumber": 1,
-						"TimeLimit": 50
-					}
-				]
 			}
 		]
 	},
@@ -189,6 +157,55 @@ bool FTestQuestTimeLimitNotFirstTask::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+const FString TimeLimitMultipleTasksQuestJson = R"RAWJSON([
+    {
+        "Name": "Q_TimeLimitsMulti",
+        "Identifier": "Q_TimeLimitsMulti",
+        "bPlayerVisible": true,
+        "Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestTitle\", \"Quest With Time Limit\")",
+        "DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestDesc\", \"A quest with a time limit\")",
+        "DescriptionWhenCompleted": "",
+        "AutoAccept": false,
+        "PrerequisiteQuests": [],
+        "PrerequisiteQuestFailures": [],
+        "Objectives": [
+			{
+				"Identifier": "O_MultipleTimeLimitsNonSequential",
+			    "Title": "NSLOCTEXT(\"[TestQuests]\", \"DummyTitle\", \"Ignore this for test\")",
+			    "DescriptionWhenActive": "",
+			    "DescriptionWhenCompleted": "",
+			    "bSequentialTasks": false,
+			    "bAllMandatoryTasksRequired": true,
+			    "Branch": "None",
+			    "Tasks": [
+			        {
+			            "Identifier": "T_NonSequential1",
+			            "Title": "NSLOCTEXT(\"[TestQuests]\", \"TNonSeqNonMandTitle\", \"Non-sequential time limited task, not mandatory\")",
+			            "bMandatory": true,
+			            "TargetNumber": 1,
+			            "TimeLimit": 50
+			        },
+			        {
+			            "Identifier": "T_NonSequential2",
+			            "Title": "NSLOCTEXT(\"[TestQuests]\", \"TNonSeqNonMandTitle\", \"Non-sequential time limited task, not mandatory\")",
+			            "bMandatory": false,
+			            "TargetNumber": 1,
+			            "TimeLimit": 20
+			        },
+			        {
+			            "Identifier": "T_NonSequential3",
+			            "Title": "NSLOCTEXT(\"[TestQuests]\", \"TNonSeqMandTitle\", \"Non-sequential time limited task, the only mandatory\")",
+			            "bMandatory": true,
+			            "TargetNumber": 1,
+			            "TimeLimit": 30
+			        }
+			    ]
+			}
+		]
+    },
+])RAWJSON";
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitMultipleSimultaneousTasks, "SUQSTest.QuestTimeLimitMultipleSimultaneousTasks",
                                  EAutomationTestFlags::EditorContext |
                                  EAutomationTestFlags::ClientContext |
@@ -196,5 +213,33 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitMultipleSimultaneousTasks, "
 
 bool FTestQuestTimeLimitMultipleSimultaneousTasks::RunTest(const FString& Parameters)
 {
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	UDataTable* QuestTable = NewObject<UDataTable>();
+	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->CreateTableFromJSONString(TimeLimitMultipleTasksQuestJson);
+
+	Progression->QuestDataTables.Add(QuestTable);
+
+	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TimeLimitsMulti"));
+	TestTrue("Quest should be incomplete", Progression->IsQuestIncomplete("Q_TimeLimitsMulti"));
+	auto T1 = Progression->GetTaskState("Q_TimeLimitsMulti", "T_NonSequential1");
+	auto T2 = Progression->GetTaskState("Q_TimeLimitsMulti", "T_NonSequential2");
+	auto T3 = Progression->GetTaskState("Q_TimeLimitsMulti", "T_NonSequential3");
+
+	Progression->Tick(10);
+	TestEqual("T1 should have ticked", T1->GetTimeRemaining(), T1->GetTimeLimit() - 10);
+	TestEqual("T2 should have ticked", T2->GetTimeRemaining(), T2->GetTimeLimit() - 10);
+	TestEqual("T3 should have ticked", T3->GetTimeRemaining(), T3->GetTimeLimit() - 10);
+	Progression->Tick(11);
+	TestEqual("T1 should have ticked", T1->GetTimeRemaining(), T1->GetTimeLimit() - 21);
+	TestEqual("T3 should have ticked", T3->GetTimeRemaining(), T3->GetTimeLimit() - 21);
+	TestTrue("T2 should have failed", T2->IsFailed());
+	// Task 2 is non-mandatory though
+	TestFalse("Quest should not have failed", Progression->IsQuestFailed("Q_TimeLimitsMulti"));
+	// Tick enough that Task 3 fails which is mandatory (even if not sequential)
+	Progression->Tick(10);
+	TestTrue("T3 should have failed", T3->IsFailed());
+	TestTrue("Quest should have failed", Progression->IsQuestFailed("Q_TimeLimitsMulti"));
+
 	return true;
 }
