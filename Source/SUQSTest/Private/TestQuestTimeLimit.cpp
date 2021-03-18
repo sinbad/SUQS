@@ -22,7 +22,6 @@ const FString TimeLimitQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -40,7 +39,6 @@ const FString TimeLimitQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -80,6 +78,7 @@ bool FTestQuestTimeLimitSimple::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(TimeLimitQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -114,6 +113,7 @@ bool FTestQuestTimeLimitNotFirstTask::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(TimeLimitQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -176,7 +176,6 @@ const FString TimeLimitMultipleTasksQuestJson = R"RAWJSON([
 			    "DescriptionWhenActive": "",
 			    "DescriptionWhenCompleted": "",
 			    "bSequentialTasks": false,
-			    "bAllMandatoryTasksRequired": true,
 			    "Branch": "None",
 			    "Tasks": [
 			        {
@@ -216,6 +215,7 @@ bool FTestQuestTimeLimitMultipleSimultaneousTasks::RunTest(const FString& Parame
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(TimeLimitMultipleTasksQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);

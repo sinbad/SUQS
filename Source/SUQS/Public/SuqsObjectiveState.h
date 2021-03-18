@@ -69,7 +69,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     bool AreTasksSequential() const { return ObjectiveDefinition->bSequentialTasks; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-    bool AreAllMandatoryTasksRequired() const { return ObjectiveDefinition->bAllMandatoryTasksRequired; }
+    bool AreAllMandatoryTasksRequired() const { return ObjectiveDefinition->NumberOfMandatoryTasksRequired == -1; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+    int NumberOfMandatoryTasksRequired() const { return MandatoryTasksNeededToComplete; }
 	/// Get the additional description to be added to quest description for this objective, if any
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FText& GetDescription() const;

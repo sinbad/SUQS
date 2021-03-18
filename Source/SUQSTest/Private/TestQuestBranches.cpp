@@ -22,7 +22,6 @@ const FString BranchingQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -40,7 +39,6 @@ const FString BranchingQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "BranchA",
 				"Tasks": [
 					{
@@ -58,7 +56,6 @@ const FString BranchingQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "BranchB",
 				"Tasks": [
 					{
@@ -76,7 +73,6 @@ const FString BranchingQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "BranchB",
 				"Tasks": [
 					{
@@ -94,7 +90,6 @@ const FString BranchingQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -122,6 +117,7 @@ bool FTestQuestBranchNoBranches::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(BranchingQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -149,6 +145,7 @@ bool FTestQuestBranchA::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(BranchingQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -180,6 +177,7 @@ bool FTestQuestBranchB::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(BranchingQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -212,6 +210,7 @@ bool FTestQuestDynamicBranchChange::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(BranchingQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -262,7 +261,6 @@ const FString BranchingQuest2Json = R"RAWJSON([
                 "DescriptionWhenActive": "",
                 "DescriptionWhenCompleted": "",
                 "bSequentialTasks": true,
-                "bAllMandatoryTasksRequired": true,
                 "Branch": "None",
                 "Tasks": [
                     {
@@ -280,7 +278,6 @@ const FString BranchingQuest2Json = R"RAWJSON([
                 "DescriptionWhenActive": "",
                 "DescriptionWhenCompleted": "",
                 "bSequentialTasks": true,
-                "bAllMandatoryTasksRequired": true,
                 "Branch": "BranchA",
                 "Tasks": [
                     {
@@ -298,7 +295,6 @@ const FString BranchingQuest2Json = R"RAWJSON([
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "BranchB",
 				"Tasks": [
 					{
@@ -329,7 +325,6 @@ const FString BranchingQuest2Json = R"RAWJSON([
                 "DescriptionWhenActive": "",
                 "DescriptionWhenCompleted": "",
                 "bSequentialTasks": true,
-                "bAllMandatoryTasksRequired": true,
                 "Branch": "None",
                 "Tasks": [
                     {
@@ -347,7 +342,6 @@ const FString BranchingQuest2Json = R"RAWJSON([
                 "DescriptionWhenActive": "",
                 "DescriptionWhenCompleted": "",
                 "bSequentialTasks": true,
-                "bAllMandatoryTasksRequired": true,
                 "Branch": "BranchA",
                 "Tasks": [
                     {
@@ -365,7 +359,6 @@ const FString BranchingQuest2Json = R"RAWJSON([
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "BranchB",
 				"Tasks": [
 					{
@@ -390,9 +383,11 @@ bool FTestQuestGlobalBranch::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable1 = NewObject<UDataTable>();
 	QuestTable1->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable1->bIgnoreMissingFields = true;
 	QuestTable1->CreateTableFromJSONString(BranchingQuestJson);
 	UDataTable* QuestTable2 = NewObject<UDataTable>();
 	QuestTable2->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable2->bIgnoreMissingFields = true;
 	QuestTable2->CreateTableFromJSONString(BranchingQuest2Json);
 
 	Progression->QuestDataTables.Add(QuestTable1);

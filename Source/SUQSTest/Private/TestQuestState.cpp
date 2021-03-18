@@ -16,10 +16,12 @@ bool FTestQuestAcceptSimple::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable1 = NewObject<UDataTable>();
 	QuestTable1->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable1->bIgnoreMissingFields = true;
 	QuestTable1->CreateTableFromJSONString(SimpleMainQuestJson);
 
 	UDataTable* QuestTable2 = NewObject<UDataTable>();
 	QuestTable2->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable2->bIgnoreMissingFields = true;
 	QuestTable2->CreateTableFromJSONString(SimpleSideQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable1);
@@ -51,6 +53,7 @@ bool FTestQuestAcceptFailedComplete::RunTest(const FString& Parameters)
 
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(SmallestPossibleQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -94,6 +97,7 @@ bool FTestQuestReset::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(SimpleMainQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -168,6 +172,7 @@ bool FTestQuestOrderedTasks::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(OrderedTasksQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -214,6 +219,7 @@ bool FTestQuestUnorderedTasks::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(UnorderedTasksQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -228,36 +234,41 @@ bool FTestQuestUnorderedTasks::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAnyOfTasks, "SUQSTest.QuestAnyOfTasks",
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAny2OfTasks, "SUQSTest.QuestAny2OfTasks",
     EAutomationTestFlags::EditorContext |
     EAutomationTestFlags::ClientContext |
     EAutomationTestFlags::ProductFilter)
 
-bool FTestQuestAnyOfTasks::RunTest(const FString& Parameters)
+bool FTestQuestAny2OfTasks::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(AnyOfTasksQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
 
-	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_AnyOf"));
-	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_AnyOf", "T_1"));
-	TestTrue("Quest should be complete after any tasks complete", Progression->IsQuestCompleted("Q_AnyOf"));
+	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Any2Of"));
+	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_Any2Of", "T_1"));
+	TestFalse("Quest should be incomplete after 1 task complete", Progression->IsQuestCompleted("Q_Any2Of"));
+	TestTrue("Task 2 should complete OK", Progression->CompleteTask("Q_Any2Of", "T_2"));
+	TestTrue("Quest should be complete after 2 tasks complete", Progression->IsQuestCompleted("Q_Any2Of"));
 
-	Progression->ResetQuest("Q_AnyOf");
-	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_AnyOf"));	
+	Progression->ResetQuest("Q_Any2Of");
+	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_Any2Of"));	
 
-	TestTrue("Task 3 should complete OK", Progression->CompleteTask("Q_AnyOf", "T_3"));
-	TestTrue("Quest should be complete after any tasks complete", Progression->IsQuestCompleted("Q_AnyOf"));
+	TestTrue("Task 3 should complete OK", Progression->CompleteTask("Q_Any2Of", "T_3"));
+	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_Any2Of", "T_1"));
+	TestTrue("Quest should be complete after any 2 tasks complete", Progression->IsQuestCompleted("Q_Any2Of"));
 
-	Progression->ResetQuest("Q_AnyOf");
-	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_AnyOf"));
+	Progression->ResetQuest("Q_Any2Of");
+	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_Any2Of"));
 
-	// Completing an optional task should not complete the anyof group
-	TestTrue("Optional task should complete OK", Progression->CompleteTask("Q_AnyOf", "T_Optional"));
-	TestFalse("Quest should remain incomplete after optional task completed", Progression->IsQuestCompleted("Q_AnyOf"));
+	// Completing one mandatory and one optional task should not complete the any2of group
+	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_Any2Of", "T_1"));
+	TestTrue("Optional task should complete OK", Progression->CompleteTask("Q_Any2Of", "T_Optional"));
+	TestFalse("Quest should remain incomplete after 2 tasks if one is optional", Progression->IsQuestCompleted("Q_Any2Of"));
 
 	return true;
 }
@@ -273,6 +284,7 @@ bool FTestTargetNumber::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(TargetNumberQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -326,6 +338,7 @@ bool FTestMultiObjective::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(SimpleMainQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);
@@ -397,6 +410,7 @@ bool FTestDescriptions::RunTest(const FString& Parameters)
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	UDataTable* QuestTable = NewObject<UDataTable>();
 	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
 	QuestTable->CreateTableFromJSONString(SimpleMainQuestJson);
 
 	Progression->QuestDataTables.Add(QuestTable);

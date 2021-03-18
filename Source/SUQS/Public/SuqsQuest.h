@@ -69,11 +69,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	bool bSequentialTasks = false;
 
-	/// Whether all mandatory tasks in this objective must be completed for the objective to be complete (default true)
-	/// If you set this to false, completing ONE of the mandatory tasks completes the objective (non-mandatory tasks do
-	/// not complete the objective)
+	/// The number of mandatory tasks under this objective which must complete for the objective to be complete
+	/// Default is -1, which means ALL mandatory tasks. Change this to another number to only require a certain
+	/// number of tasks to complete. Only used if bSequentialTasks = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
-	bool bAllMandatoryTasksRequired = true;
+	int NumberOfMandatoryTasksRequired = -1;
 
 	/// Quest branch which this objective appears on. To support branching quests, if an objective is assigned
 	/// to a branch, that objective is only active if that quest branch is active. No branches

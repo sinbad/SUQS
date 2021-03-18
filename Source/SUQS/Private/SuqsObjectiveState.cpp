@@ -10,7 +10,7 @@ void USuqsObjectiveState::Initialise(const FSuqsObjective* ObjDef, USuqsQuestSta
 	Progression = Root;
 
 	Status = ESuqsObjectiveStatus::NotStarted;
-	MandatoryTasksNeededToComplete = ObjDef->bAllMandatoryTasksRequired ? 0 : 1;
+	MandatoryTasksNeededToComplete = AreAllMandatoryTasksRequired() ? 0 : ObjDef->NumberOfMandatoryTasksRequired;
 
 	for (const auto& TaskDef : ObjDef->Tasks)
 	{
@@ -18,7 +18,7 @@ void USuqsObjectiveState::Initialise(const FSuqsObjective* ObjDef, USuqsQuestSta
 		Task->Initialise(&TaskDef, this, Root);
 		Tasks.Add(Task);
 
-		if (ObjDef->bAllMandatoryTasksRequired && TaskDef.bMandatory)
+		if (AreAllMandatoryTasksRequired() && TaskDef.bMandatory)
 			++MandatoryTasksNeededToComplete;
 	}
 

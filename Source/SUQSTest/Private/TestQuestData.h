@@ -23,7 +23,6 @@ const FString SimpleMainQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"FirstObjectiveDesc\", \"This is the thing you do first\")",
 				"DescriptionWhenCompleted": "NSLOCTEXT(\"[TestQuests]\", \"FirstObjectiveDescComplete\", \"You did the thing you do first!\")",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -55,7 +54,6 @@ const FString SimpleMainQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SecondObjectiveDesc\", \"This is the second set of things\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": false,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -80,7 +78,7 @@ const FString SimpleMainQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"LastObjectiveDesc\", \"Finally, you only have to do one of the tasks below\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": false,
-				"bAllMandatoryTasksRequired": false,
+				"NumberOfMandatoryTasksRequired": 1,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -119,7 +117,6 @@ const FString SimpleMainQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"MainQ2FirstObjectiveDesc\", \"This is the thing you do first\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -154,7 +151,6 @@ const FString SimpleSideQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"MeetTheWizardDesc\", \"So this is where you go meet the wizard\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -186,7 +182,6 @@ const FString SimpleSideQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"KillDerekDesc\", \"Turns out Derek is an asshole. Sort him out.\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -234,7 +229,6 @@ const FString SmallestPossibleQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SmolObjDesc\", \"This is super easy\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -268,7 +262,6 @@ const FString OrderedTasksQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"OrderedObjDesc\", \"These have to be done in order\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -300,7 +293,6 @@ const FString OrderedTasksQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"OrderedObjDesc\", \"These have to be done in order\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -341,7 +333,6 @@ const FString UnorderedTasksQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedObjDesc\", \"These can be done in any order, but still all of them\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": false,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -374,8 +365,8 @@ const FString UnorderedTasksQuestJson = R"RAWJSON([
 
 const FString AnyOfTasksQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_AnyOf",
-		"Identifier": "Q_AnyOf",
+		"Name": "Q_Any2Of",
+		"Identifier": "Q_Any2Of",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfQuestTitle\", \"AnyOf Quest\")",
 		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfQuestDesc\", \"AnyOf quest\")",
@@ -386,11 +377,11 @@ const FString AnyOfTasksQuestJson = R"RAWJSON([
 		"Objectives": [
 			{
 				"Identifier": "O1",
-				"Title": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfObjTitle\", \"AnyOf Objective\")",
-				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfObjDesc\", \"Only one of these tasks needs to be done\")",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"Any2OfObjTitle\", \"Any2Of Objective\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"Any2OfObjDesc\", \"2 tasks need to be done\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": false,
-				"bAllMandatoryTasksRequired": false,
+				"NumberOfMandatoryTasksRequired": 2,
 				"Branch": "None",
 				"Tasks": [
 					{
@@ -445,7 +436,6 @@ const FString TargetNumberQuestJson = R"RAWJSON([
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"TargetNumberObjDesc\", \"These have to be done in order\")",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
-				"bAllMandatoryTasksRequired": true,
 				"Branch": "None",
 				"Tasks": [
 					{
