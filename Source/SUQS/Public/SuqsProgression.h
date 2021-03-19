@@ -44,14 +44,18 @@ protected:
 	UPROPERTY()
 	TMap<FName, USuqsQuestState*> QuestArchive;
 
-	UPROPERTY()
 	TArray<FName> GlobalActiveBranches;
-
+	// Name of quest completed -> names of other quests that depend on its completion
+	TMultiMap<FName, FName> QuestCompletionDeps;
+	// Name of quest completed -> names of other quests that depend on its failure
+	TMultiMap<FName, FName> QuestFailureDeps;
+	
 	USuqsQuestState* FindQuestState(const FName& QuestID);
 	const USuqsQuestState* FindQuestState(const FName& QuestID) const;
 	USuqsTaskState* FindTaskStatus(const FName& QuestID, const FName& TaskID);
 
 	void EnsureQuestDefinitionsBuilt();
+	void AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed);
 	
 public:
 
@@ -134,6 +138,8 @@ public:
 	bool AcceptQuest(FName QuestID, bool bResetIfFailed = true, bool bResetIfComplete = false, bool bResetIfInProgress = false);
 
 	/// Reset all progress on a quest. Works whether a quest is in progress, complete or failed. Quest will remain accepted & incomplete
+	/// Note: this does NOT undo prior auto-acceptance of other quests which were dependent on this quest's completion/failure
+	/// If you need those other quests to reset or be removed if undoing completion/failure, you must do it manually.
 	UFUNCTION(BlueprintCallable)
     void ResetQuest(FName QuestID);
 
@@ -247,6 +253,13 @@ public:
 	/// Return whether a branch is active globally for all quests or not
 	UFUNCTION(BlueprintCallable)
     bool IsGlobalQuestBranchActive(FName Branch);
+
+	/// Return whether the dependencies for a given quest have been met
+	/// You don't usually need to call this yourself, if auto-accept is enabled on your quests. But if you
+	/// want to determine it manually you can.
+	UFUNCTION(BlueprintCallable)
+	bool QuestDependenciesMet(const FName& QuestID);
+
 
 	void RaiseTaskUpdated(USuqsTaskState* Task);
 	void RaiseTaskFailed(USuqsTaskState* Task);

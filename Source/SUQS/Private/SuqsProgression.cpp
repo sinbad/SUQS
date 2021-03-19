@@ -31,6 +31,19 @@ void USuqsProgression::EnsureQuestDefinitionsBuilt()
                 }
 				
                 QuestDefinitions.Add(Quest.Identifier, Quest);
+
+				// Record dependencies
+				if (Quest.AutoAccept)
+				{
+					for (auto& CompletedQuest : Quest.PrerequisiteQuests)
+					{
+                        QuestCompletionDeps.Add(CompletedQuest, Quest.Identifier);
+                    }
+                    for (auto& FailedQuest : Quest.PrerequisiteQuestFailures)
+                    {
+                        QuestFailureDeps.Add(FailedQuest, Quest.Identifier);
+                    }
+				}
             });
 		}
 	}
@@ -167,6 +180,21 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 	
 }
 
+
+void USuqsProgression::AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed)
+{
+	TArray<FName> DependentQuestIDs;
+	if (bFailed)
+		QuestFailureDeps.MultiFind(FinishedQuestID, DependentQuestIDs);
+	else
+		QuestCompletionDeps.MultiFind(FinishedQuestID, DependentQuestIDs);
+	
+	for (const auto& DepQuestID : DependentQuestIDs)
+	{
+		if (!IsQuestAccepted(DepQuestID) && QuestDependenciesMet(DepQuestID))
+			AcceptQuest(DepQuestID);
+	}
+}
 
 void USuqsProgression::ResetQuest(FName QuestID)
 {
@@ -426,6 +454,26 @@ bool USuqsProgression::IsGlobalQuestBranchActive(FName Branch)
 	return GlobalActiveBranches.Contains(Branch);
 }
 
+bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
+{
+	if (auto QuestDef = QuestDefinitions.Find(QuestID))
+	{
+		for (auto& RequiredCompletedID : QuestDef->PrerequisiteQuests)
+		{
+			if (!IsQuestCompleted(RequiredCompletedID))
+				return false;
+		}
+		for (auto& RequiredFailedID : QuestDef->PrerequisiteQuestFailures)
+		{
+			if (!IsQuestFailed(RequiredFailedID))
+				return false;
+		}
+		return true;
+	}
+	return false;
+	
+}
+
 void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)
 {
 	// might be worth queuing these up and raising combined?
@@ -461,7 +509,7 @@ void USuqsProgression::RaiseQuestCompleted(USuqsQuestState* Quest)
 
 	OnQuestCompleted.Broadcast(Quest);
 
-	// TODO: trigger the acceptance of quests which depend on this completion
+	AutoAcceptQuests(Quest->GetIdentifier(), false);
 }
 
 void USuqsProgression::RaiseQuestFailed(USuqsQuestState* Quest)
@@ -472,7 +520,7 @@ void USuqsProgression::RaiseQuestFailed(USuqsQuestState* Quest)
 
 	OnQuestFailed.Broadcast(Quest);
 
-	// TODO: trigger the acceptance of quests which depend on this failure
+	AutoAcceptQuests(Quest->GetIdentifier(), true);
 }
 
 void USuqsProgression::RaiseQuestReset(USuqsQuestState* Quest)

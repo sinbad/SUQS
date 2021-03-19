@@ -133,6 +133,7 @@ public:
 
 	/// Whether this quest should be automatically accepted when its prerequisites are fulfilled (default false)
 	/// When false, this quest can only be accepted by calling USuqsProgression::AcceptQuest
+	/// AutoAccept=true with no prerequisites does nothing.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	bool AutoAccept = false;
 
