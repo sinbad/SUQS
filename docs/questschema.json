@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "SUQS Quest Definition JSON Schema",
+  "type": "array",
+  "items": [
+    {
+      "description": "Quest object",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "Row Name: this is only needed for Unreal Datatables, and can be anything unique per quest. Not used in the quest API",
+          "type": "string"
+        },
+        "Identifier": {
+          "description": "Identifier of this quest. Must be globally unique across all quests in all data files",
+          "type": "string"
+        },
+        "bPlayerVisible": {
+          "description": "Whether it's suggested to display this quest to players, or whether it's for internal tracking only.",
+          "type": "boolean",
+          "default": true
+        },
+        "Title": {
+          "description": "The player-visible title. To support localisation, use NSLOCTEXT(\"[Package]\", \"StringID\", \"Default text\")",
+          "type": "string"
+        },
+        "DescriptionWhenActive": {
+          "description": "Quest description while it's not successfully completed. To support localisation, use NSLOCTEXT(\"[Package]\", \"StringID\", \"Default text\")",
+          "type": "string"
+        },
+        "DescriptionWhenCompleted": {
+          "description": "Quest description when completed. If blank, use DescriptionWhenActive.",
+          "type": "string"
+        },
+        "AutoAccept": {
+          "description": "Whether this quest should be auto-accepted when its prerequisites are met.",
+          "type": "boolean",
+          "default": false
+        },
+        "PrerequisiteQuests": {
+          "description": "List of Quest IDs which must all be completed before this quest is auto-accepted (if enabled).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "PrerequisiteQuestFailures": {
+          "description": "List of Quest IDs which all must have failed before this quest is auto-accepted (if enabled).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Objectives": {
+          "description": "List of sequential objectives which carry the quest forward. Can branch but always in order. Groups nested Tasks which are more flexible.",
+          "type": "array",
+          "items": [
+            {
+              "description": "An objective groups potentially multiple tasks which are the things a player completes. Objectives are always considered to be in order.",
+              "type": "object",
+              "properties": {
+                "Identifier": {
+                  "description": "Identifier for the objective. Must be unique within the Quest.",
+                  "type": "string"
+                },
+                "Title": {
+                  "description": "Player-viaible title for the objective. Can be blank if you only have one task or do not wish to display this level",
+                  "type": "string"
+                },
+                "DescriptionWhenActive": {
+                  "description": "Optional description when the objective is not completed.",
+                  "type": "string"
+                },
+                "DescriptionWhenCompleted": {
+                  "description": "Optional description when the objective is completed.",
+                  "type": "string"
+                },
+                "bSequentialTasks": {
+                  "description": "Whether the nested tasks must be performed in order.",
+                  "type": "boolean",
+                  "default": true
+                },
+                "NumberOfMandatoryTasksRequired": {
+                  "description": "The number of nested mandatory tasks that must be completed to complete this objective. Default -1 means 'all mandatory tasks'.",
+                  "type": "integer",
+                  "default": -1
+                },
+                "Branch": {
+                  "description": "The quest branch this objective is on. If blank, objective is always included. If you specify a branch, this objective will be ignored unless the Quest has that branch enabled.",
+                  "type": "string"
+                },
+                "Tasks": {
+                  "description": "A list of tasks that make up the objective. The list can be sequential or not, can have mandatory or optional tasks",
+                  "type": "array",
+                  "items": [
+                    {
+                      "description": "A task is a unit of progress, the main thing the player will be triggering during play",
+                      "type": "object",
+                      "properties": {
+                        "Identifier": {
+                          "description": "Identifier for the task. Must be unique within the Quest (not just the objective)",
+                          "type": "string"
+                        },
+                        "Title": {
+                          "description": "Player-visible title for the task.",
+                          "type": "string"
+                        },
+                        "bMandatory": {
+                          "description": "Whether the task is mandatory. An objective MUST contain at least one mandatory task.",
+                          "type": "boolean",
+                          "default": true
+                        },
+                        "TargetNumber": {
+                          "description": "A count of things that must be done to complete this task, allowing partial completion of a task. The task completes when this number is reached",
+                          "type": "integer",
+                          "default": 1
+                        },
+                        "TimeLimit": {
+                          "description": "Optional time limit to apply to this task, which starts as soon as it is the next mandatory task. 0 indicates no time limit",
+                          "type": "number",
+                          "default": 0
+                        }
+                      },
+                      "required": [
+                        "Identifier",
+                        "Title"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "Identifier",
+                "Tasks"
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "Name",
+        "Identifier",
+        "Title",
+        "Objectives"
+      ]
+    }
+  ]
+}
