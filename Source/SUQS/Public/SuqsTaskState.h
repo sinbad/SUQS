@@ -96,6 +96,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int Progress(int Delta);
 
+	/// Directly change the number on this task (vs target number of quest)
+	/// See also Progress()
+	UFUNCTION(BlueprintCallable)
+    void SetNumber(int N);
+
+	/// Directly change the time remaining on this task
+	UFUNCTION(BlueprintCallable)
+    void SetTimeRemaining(float T);
+
 	/// Get the number of "things" still left to do, will only be > 1 if TargetNumber on the task was > 1
 	UFUNCTION(BlueprintCallable)
     int GetNumberOutstanding() const;

@@ -4,7 +4,6 @@
 #include "SuqsQuestState.h"
 #include "SuqsTaskState.h"
 
-
 void USuqsProgression::EnsureQuestDefinitionsBuilt()
 {
 	// Build unified quest table
@@ -169,7 +168,8 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 			}
 		}
 
-		OnQuestAccepted.Broadcast(Quest);
+		if (!bSuppressEvents)
+			OnQuestAccepted.Broadcast(Quest);
 		return true;
 	}
 	else
@@ -273,7 +273,7 @@ USuqsObjectiveState* USuqsProgression::GetCurrentObjective(FName QuestID) const
 
 bool USuqsProgression::IsQuestAccepted(FName QuestID) const
 {
-	if (auto Q = FindQuestState(QuestID))
+	if (FindQuestState(QuestID))
 	{
 		return true;
 	}
@@ -477,27 +477,32 @@ bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
 void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)
 {
 	// might be worth queuing these up and raising combined?
-	OnTaskUpdated.Broadcast(Task);
+	if (!bSuppressEvents)
+		OnTaskUpdated.Broadcast(Task);
 }
 
 void USuqsProgression::RaiseTaskCompleted(USuqsTaskState* Task)
 {
-	OnTaskCompleted.Broadcast(Task);
+	if (!bSuppressEvents)
+		OnTaskCompleted.Broadcast(Task);
 }
 void USuqsProgression::RaiseTaskFailed(USuqsTaskState* Task)
 {
-	OnTaskFailed.Broadcast(Task);
+	if (!bSuppressEvents)
+		OnTaskFailed.Broadcast(Task);
 }
 
 
 void USuqsProgression::RaiseObjectiveCompleted(USuqsObjectiveState* Objective)
 {
-	OnObjectiveCompleted.Broadcast(Objective);
+	if (!bSuppressEvents)
+		OnObjectiveCompleted.Broadcast(Objective);
 }
 
 void USuqsProgression::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
 {
-	OnObjectiveFailed.Broadcast(Objective);
+	if (!bSuppressEvents)
+		OnObjectiveFailed.Broadcast(Objective);
 }
 
 
@@ -507,7 +512,8 @@ void USuqsProgression::RaiseQuestCompleted(USuqsQuestState* Quest)
 	ActiveQuests.Remove(Quest->GetIdentifier());
 	QuestArchive.Add(Quest->GetIdentifier(), Quest);
 
-	OnQuestCompleted.Broadcast(Quest);
+	if (!bSuppressEvents)
+		OnQuestCompleted.Broadcast(Quest);
 
 	AutoAcceptQuests(Quest->GetIdentifier(), false);
 }
@@ -518,7 +524,8 @@ void USuqsProgression::RaiseQuestFailed(USuqsQuestState* Quest)
 	ActiveQuests.Remove(Quest->GetIdentifier());
 	QuestArchive.Add(Quest->GetIdentifier(), Quest);
 
-	OnQuestFailed.Broadcast(Quest);
+	if (!bSuppressEvents)
+		OnQuestFailed.Broadcast(Quest);
 
 	AutoAcceptQuests(Quest->GetIdentifier(), true);
 }
@@ -528,7 +535,15 @@ void USuqsProgression::RaiseQuestReset(USuqsQuestState* Quest)
 	// Move quest to the correct list
 	QuestArchive.Remove(Quest->GetIdentifier());
 	ActiveQuests.Add(Quest->GetIdentifier(), Quest);
-	OnQuestAccepted.Broadcast(Quest);
+	
+	if (!bSuppressEvents)
+		OnQuestAccepted.Broadcast(Quest);
+}
+
+const FSuqsQuest* USuqsProgression::GetQuestDefinition(const FName& QuestID)
+{
+	EnsureQuestDefinitionsBuilt();
+	return QuestDefinitions.Find(QuestID);
 }
 
 // FTickableGameObject start
@@ -548,3 +563,116 @@ TStatId USuqsProgression::GetStatId() const
 	RETURN_QUICK_DECLARE_CYCLE_STAT(USuqsStatus, STATGROUP_Tickables);
 }
 // FTickableGameObject end
+
+void USuqsProgression::Serialize(FArchive& Ar)
+{
+	FSuqsSaveData Data;
+	if (Ar.IsLoading())
+	{
+		Data.Serialize(Ar);
+		// Give hook the opportunity to fix up data
+		OnPreLoad.ExecuteIfBound(this, Data);
+
+		LoadFromData(Data);
+	}
+	else
+	{
+		SaveToData(Data);
+		Data.Serialize(Ar);
+	}
+	 	
+}
+
+void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
+{
+	// Save / load from data is deliberately self-contained here in progression and not distributed around
+	// the quest / objective / task classes. Partly this is because we compress out Objectives in the save data
+	// and partly it's because it's just easier to follow, considering it's only a few lines of code
+	ActiveQuests.Empty();
+	QuestArchive.Empty();
+
+	EnsureQuestDefinitionsBuilt();
+
+	bSuppressEvents = true;
+	
+	for (auto& QData : Data.QuestData)
+	{
+		if (auto QDef = GetQuestDefinition(FName(QData.Identifier)))
+		{
+			auto Q = NewObject<USuqsQuestState>();
+			// This will re-create the quest structure, including objectives and tasks, based on *current* definition
+			Q->Initialise(QDef, this);
+
+			for (auto& TData : QData.TaskData)
+			{
+				// Discard task state which isn't in the quest any more
+				if (auto T = Q->GetTask(FName(TData.Identifier)))
+				{
+					T->SetNumber(TData.Number);
+					T->SetTimeRemaining(TData.TimeRemaining);
+				}		
+			}
+			
+            if (QData.Status == ESuqsQuestDataStatus::Incomplete)
+            	ActiveQuests.Add(QDef->Identifier, Q);
+			else
+			{
+				// Manually set the status, in case this isn't borne out by the current quest def
+				Q->OverrideStatus(QData.Status == ESuqsQuestDataStatus::Failed ?
+					ESuqsQuestStatus::Failed : ESuqsQuestStatus::Completed);
+
+				QuestArchive.Add(QDef->Identifier, Q);
+			}
+		}
+		else
+		{
+			UE_LOG(LogSUQS, Warning, TEXT("Ignoring saved quest data for %s because that quest no longer exists"), *QData.Identifier);
+		}
+		
+	}
+
+	bSuppressEvents = false;
+}
+
+void USuqsProgression::SaveToData(FSuqsSaveData& Data) const
+{
+	Data.QuestData.Empty();
+	SaveToData(ActiveQuests, Data);
+	SaveToData(QuestArchive, Data);
+}
+
+void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSaveData& Data)
+{
+	for (auto Pair : Quests)
+	{
+		auto Q = Pair.Value;
+		auto& QData = Data.QuestData.Emplace_GetRef();
+		
+		QData.Identifier = Q->GetIdentifier().ToString();
+		// Status is kept as a separate enum for future insulation
+		switch (Q->Status)
+		{
+		case ESuqsQuestStatus::Incomplete:
+			QData.Status = ESuqsQuestDataStatus::Incomplete;
+			break;
+		case ESuqsQuestStatus::Completed:
+			QData.Status = ESuqsQuestDataStatus::Completed;
+			break;
+		case ESuqsQuestStatus::Failed:
+			QData.Status = ESuqsQuestDataStatus::Failed;
+			break;
+		default: ;
+		}
+
+		for (auto O : Q->Objectives)
+		{
+			for (auto T : O->GetTasks())
+			{
+				auto& TData = QData.TaskData.Emplace_GetRef();
+				TData.Identifier = T->GetIdentifier().ToString();
+				TData.Number = T->GetNumber();
+				TData.TimeRemaining = T->GetTimeRemaining();
+			}
+		}
+	}
+}

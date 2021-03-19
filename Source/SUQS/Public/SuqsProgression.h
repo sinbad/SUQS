@@ -5,6 +5,7 @@
 #include "SuqsQuestState.h"
 #include "Engine/DataTable.h"
 #include "UObject/Object.h"
+#include "SuqsSaveData.h"
 #include "SuqsProgression.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskUpdated, USuqsTaskState*, Task);
@@ -16,6 +17,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveFailed, USuqsObjectiveSt
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestCompleted, USuqsQuestState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestFailed, USuqsQuestState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, Quest);
+
+// C++ only because of non-const struct
+DECLARE_DELEGATE_TwoParams(FOnPreLoad, USuqsProgression*, FSuqsSaveData&);
 
 /**
  * Progression holds all the state relating to all quests and their objectives/tasks for a single player.
@@ -33,6 +37,7 @@ public:
 
 protected:
 	/// Unified quest defs, combined from all entries in QuestDataTables
+	/// These should be statically defined in an asset, they are only processed once
 	UPROPERTY()
 	TMap<FName, FSuqsQuest> QuestDefinitions;
 
@@ -49,14 +54,17 @@ protected:
 	TMultiMap<FName, FName> QuestCompletionDeps;
 	// Name of quest completed -> names of other quests that depend on its failure
 	TMultiMap<FName, FName> QuestFailureDeps;
-	
+
+	bool bSuppressEvents = false;
+
 	USuqsQuestState* FindQuestState(const FName& QuestID);
 	const USuqsQuestState* FindQuestState(const FName& QuestID) const;
 	USuqsTaskState* FindTaskStatus(const FName& QuestID, const FName& TaskID);
 
 	void EnsureQuestDefinitionsBuilt();
 	void AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed);
-	
+	static void SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSaveData& Data);
+
 public:
 
 	/// Fired when a task is completed
@@ -83,6 +91,10 @@ public:
 	/// Fired when a quest has been accepted for the first time
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestAccepted OnQuestAccepted;
+
+	/// Use this from C++ to receive access to the loaded quest data before it's applied to this progression
+	/// You can therefore change the quest data if you need to adapt it due to quest changes
+	FOnPreLoad OnPreLoad;
 
 	/// Get the overall status of a named quest
 	UFUNCTION(BlueprintCallable)
@@ -260,7 +272,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool QuestDependenciesMet(const FName& QuestID);
 
-
 	void RaiseTaskUpdated(USuqsTaskState* Task);
 	void RaiseTaskFailed(USuqsTaskState* Task);
 	void RaiseTaskCompleted(USuqsTaskState* Task);
@@ -270,9 +281,19 @@ public:
 	void RaiseQuestFailed(USuqsQuestState* Quest);
 	void RaiseQuestReset(USuqsQuestState* Quest);
 
+	const FSuqsQuest* GetQuestDefinition(const FName& QuestID);
+
+	/// Standard serialisation support
+	virtual void Serialize(FArchive& Ar) override;
+
+	/// Specific load from our data holder structs, if you prefer over Serialize()
+	void LoadFromData(const FSuqsSaveData& Data);
+	/// Specific save to our data holder structs, if you prefer over Serialize()
+	void SaveToData(FSuqsSaveData& Data) const;
+
 	// FTickableGameObject begin
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override;
 	// FTickableGameObject end
-
+	
 };

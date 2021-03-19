@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "SuqsQuest.h"
+#include "SuqsSaveData.h"
 #include "UObject/Object.h"
 
 #include "SuqsQuestState.generated.h"
@@ -59,10 +60,10 @@ protected:
 	TMap<FName, USuqsTaskState*> FastTaskLookup;
 
 	// Pointer to quest definition, for convenience (this is static data)
-	FSuqsQuest* QuestDefinition;
+	const FSuqsQuest* QuestDefinition;
 	TWeakObjectPtr<USuqsProgression> Progression;
 
-	void Initialise(FSuqsQuest* Def, USuqsProgression* Root);
+	void Initialise(const FSuqsQuest* Def, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsQuestStatus NewStatus);
 	
@@ -183,4 +184,7 @@ public:
 	USuqsTaskState* GetTask(const FName& TaskID) const;
 
 	void NotifyObjectiveStatusChanged();
+
+	void OverrideStatus(ESuqsQuestStatus OverrideStatus);
+	
 };

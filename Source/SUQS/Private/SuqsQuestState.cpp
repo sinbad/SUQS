@@ -4,7 +4,7 @@
 #include "SuqsProgression.h"
 #include "SuqsTaskState.h"
 
-void USuqsQuestState::Initialise(FSuqsQuest* Def, USuqsProgression* Root)
+void USuqsQuestState::Initialise(const FSuqsQuest* Def, USuqsProgression* Root)
 {
 	// We always build quest state from the master quest definition
 	// Then when we restore, we do it into this structure.
@@ -291,6 +291,12 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 	
 
 }
+
+void USuqsQuestState::OverrideStatus(ESuqsQuestStatus OverrideStatus)
+{
+	ChangeStatus(OverrideStatus);
+}
+
 void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
 {
 	if (Status != NewStatus)

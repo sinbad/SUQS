@@ -22,15 +22,22 @@ void USuqsTaskState::Tick(float DeltaTime)
 		IsTimeLimited() &&
 		TimeRemaining > 0)
 	{
-		TimeRemaining -= DeltaTime;
+		SetTimeRemaining(TimeRemaining - DeltaTime);
+	}	
+}
+
+
+void USuqsTaskState::SetTimeRemaining(float T)
+{
+	// Clamp to 0, but allow higher than taskdef time limit if desired
+    TimeRemaining = std::max(0.f, T);
 		
-		Progression->RaiseTaskUpdated(this);
-		if (TimeRemaining <= 0)
-		{
-			TimeRemaining = 0;
-			Fail();
-		}
-	}
+    Progression->RaiseTaskUpdated(this);
+    if (TimeRemaining <= 0)
+    {
+        TimeRemaining = 0;
+        Fail();
+    }		
 	
 }
 
@@ -92,8 +99,16 @@ bool USuqsTaskState::Complete()
 
 int USuqsTaskState::Progress(int Delta)
 {
-	Number += Delta;
-	Number = std::min(std::max(0, Number), TaskDefinition->TargetNumber);
+	SetNumber(Number + Delta);
+
+	return GetNumberOutstanding();
+}
+
+
+void USuqsTaskState::SetNumber(int N)
+{
+	// Clamp
+	Number = std::min(std::max(0, N), TaskDefinition->TargetNumber);
 
 	Progression->RaiseTaskUpdated(this);
 
@@ -101,10 +116,8 @@ int USuqsTaskState::Progress(int Delta)
 		Complete();
 	else
 		ChangeStatus(Number > 0 ? ESuqsTaskStatus::InProgress : ESuqsTaskStatus::NotStarted);
-
-	return GetNumberOutstanding();
+	
 }
-
 
 int USuqsTaskState::GetNumberOutstanding() const
 {
