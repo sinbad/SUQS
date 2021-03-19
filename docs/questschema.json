@@ -1,5 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://raw.githubusercontent.com/sinbad/SUQS/master/docs/questschema.json",
   "title": "SUQS Quest Definition JSON Schema",
   "type": "array",
   "items": [
