@@ -257,8 +257,6 @@ public:
 	void RaiseQuestFailed(USuqsQuestState* Quest);
 	void RaiseQuestReset(USuqsQuestState* Quest);
 
-
-	USuqsProgression::Super::FAssetRegistryTag::FOnGetObjectAssetRegistryTags::FDelegate::RetValType AddMethod(int _cpp_par_);
 	// FTickableGameObject begin
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override;
