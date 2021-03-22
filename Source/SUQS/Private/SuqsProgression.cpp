@@ -454,6 +454,11 @@ bool USuqsProgression::IsGlobalQuestBranchActive(FName Branch)
 	return GlobalActiveBranches.Contains(Branch);
 }
 
+const TArray<FName>& USuqsProgression::GetGlobalActiveQuestBranches() const
+{
+	return GlobalActiveBranches;
+}
+
 bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
 {
 	if (auto QuestDef = QuestDefinitions.Find(QuestID))
@@ -590,6 +595,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 	// and partly it's because it's just easier to follow, considering it's only a few lines of code
 	ActiveQuests.Empty();
 	QuestArchive.Empty();
+	GlobalActiveBranches.Empty();
 
 	EnsureQuestDefinitionsBuilt();
 
@@ -602,6 +608,11 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 			auto Q = NewObject<USuqsQuestState>();
 			// This will re-create the quest structure, including objectives and tasks, based on *current* definition
 			Q->Initialise(QDef, this);
+
+			for (FString Branch : QData.ActiveBranches)
+			{
+				Q->SetBranchActive(FName(Branch), true);
+			}
 
 			for (auto& TData : QData.TaskData)
 			{
@@ -631,12 +642,24 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 		
 	}
 
+	// Now load global branches
+	for (FString Branch : Data.GlobalActiveBranches)
+	{
+		SetGlobalQuestBranchActive(FName(Branch), true);
+	}
+	
+
 	bSuppressEvents = false;
 }
 
 void USuqsProgression::SaveToData(FSuqsSaveData& Data) const
 {
 	Data.QuestData.Empty();
+	Data.GlobalActiveBranches.Empty();
+	for (FName Branch : GlobalActiveBranches)
+	{
+		Data.GlobalActiveBranches.Add(Branch.ToString());		
+	}
 	SaveToData(ActiveQuests, Data);
 	SaveToData(QuestArchive, Data);
 }
@@ -662,6 +685,11 @@ void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSav
 			QData.Status = ESuqsQuestDataStatus::Failed;
 			break;
 		default: ;
+		}
+
+		for (auto Branch : Q->GetActiveBranches())
+		{
+			QData.ActiveBranches.Add(Branch.ToString());
 		}
 
 		for (auto O : Q->Objectives)

@@ -44,6 +44,7 @@ public:
 	// We do store the overall quest state, to avoid resurrecting quests if they're given new tasks in an update but save game has them complete
 	ESuqsQuestDataStatus Status;
 	TArray<FSuqsTaskStateData> TaskData;
+	TArray<FString> ActiveBranches;
 
 	void SaveToArchive(FArchive& Ar);
 	void LoadFromArchive(FArchive& Ar, int FileVersion);
@@ -67,6 +68,7 @@ public:
 
 	int Version;
 	TArray<FSuqsQuestStateData> QuestData;
+	TArray<FString> GlobalActiveBranches;
 
 	void SaveToArchive(FArchive& Ar);
 	void LoadFromArchive(FArchive& Ar);

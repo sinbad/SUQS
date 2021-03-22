@@ -29,6 +29,8 @@ void FSuqsQuestStateData::SaveToArchive(FArchive& Ar)
 	uint8 IntStatus = static_cast<uint8>(Status);
 	Ar << IntStatus;
 
+	Ar << ActiveBranches;
+
 	int NumTasks = TaskData.Num();
 	Ar << NumTasks;
 
@@ -51,6 +53,8 @@ void FSuqsQuestStateData::LoadFromArchive(FArchive& Ar, int FileVersion)
 	Ar << IntStatus;
 	Status = static_cast<ESuqsQuestDataStatus>(IntStatus);
 
+	Ar << ActiveBranches;
+
 	int NumTasks;
 	Ar << NumTasks;
 
@@ -68,6 +72,9 @@ void FSuqsSaveData::SaveToArchive(FArchive& Ar)
 	int V = CurrentFileVersion;
 	Ar << V;
 
+	// Global branches
+	Ar << GlobalActiveBranches;
+	
 	// Quests
 	int NumQuests = QuestData.Num();
 	Ar << NumQuests;
@@ -87,6 +94,9 @@ void FSuqsSaveData::LoadFromArchive(FArchive& Ar)
 	{
 		// Here's where you do any fixes for previous versions		
 	}
+
+	// Global branches
+	Ar << GlobalActiveBranches;
 
 	// Active & archived quests go together
 	int NumQuests = QuestData.Num();

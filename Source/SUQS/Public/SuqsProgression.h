@@ -266,6 +266,10 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsGlobalQuestBranchActive(FName Branch);
 
+	/// Return a NON-MODIFIABLE list of globally active branches
+	UFUNCTION(BlueprintCallable)
+	const TArray<FName>& GetGlobalActiveQuestBranches() const;
+
 	/// Return whether the dependencies for a given quest have been met
 	/// You don't usually need to call this yourself, if auto-accept is enabled on your quests. But if you
 	/// want to determine it manually you can.
