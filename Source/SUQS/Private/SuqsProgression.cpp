@@ -4,10 +4,24 @@
 #include "SuqsQuestState.h"
 #include "SuqsTaskState.h"
 
-void USuqsProgression::EnsureQuestDefinitionsBuilt()
+void USuqsProgression::InitWithQuestDataTables(TArray<UDataTable*> Tables)
 {
+	QuestDataTables = Tables;
+	RebuildAllQuestData();
+}
+
+
+void USuqsProgression::RebuildAllQuestData()
+{
+	QuestDefinitions.Empty();
+	QuestCompletionDeps.Empty();
+	QuestFailureDeps.Empty();
+	ActiveQuests.Empty();
+	QuestArchive.Empty();
+	GlobalActiveBranches.Empty();
+	
 	// Build unified quest table
-	if (QuestDefinitions.Num() == 0 && QuestDataTables.Num() > 0)
+	if (QuestDataTables.Num() > 0)
 	{
 		for (auto Table : QuestDataTables)
 		{
@@ -52,11 +66,8 @@ const TMap<FName, FSuqsQuest>& USuqsProgression::GetQuestDefinitions(bool bForce
 {
 	if (bForceRebuild)
 	{
-		QuestDefinitions.Empty();
-		QuestCompletionDeps.Empty();
-		QuestFailureDeps.Empty();
+		RebuildAllQuestData();
 	}
-	EnsureQuestDefinitionsBuilt();
 	return QuestDefinitions;
 }
 
@@ -132,8 +143,6 @@ void USuqsProgression::GetArchivedQuests(TArray<USuqsQuestState*>& ArchivedQuest
 
 bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bResetIfComplete, bool bResetIfInProgress)
 {
-	EnsureQuestDefinitionsBuilt();
-
 	auto QDef = QuestDefinitions.Find(QuestID);
 	if (QDef)
 	{
@@ -559,7 +568,6 @@ void USuqsProgression::RaiseQuestReset(USuqsQuestState* Quest)
 
 const FSuqsQuest* USuqsProgression::GetQuestDefinition(const FName& QuestID)
 {
-	EnsureQuestDefinitionsBuilt();
 	return QuestDefinitions.Find(QuestID);
 }
 
@@ -620,8 +628,6 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 	ActiveQuests.Empty();
 	QuestArchive.Empty();
 	GlobalActiveBranches.Empty();
-
-	EnsureQuestDefinitionsBuilt();
 
 	bSuppressEvents = true;
 	
@@ -728,3 +734,4 @@ void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSav
 		}
 	}
 }
+

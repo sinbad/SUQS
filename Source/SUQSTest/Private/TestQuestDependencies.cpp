@@ -75,8 +75,12 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestSuccessDependencies, "SUQSTest.QuestS
 bool FTestQuestSuccessDependencies::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TriggerQuestsJson));
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SuccessDependentQuestJson));
+	Progression->InitWithQuestDataTables(
+		TArray<UDataTable*> {
+			USuqsProgression::MakeQuestDataTableFromJSON(TriggerQuestsJson),
+			USuqsProgression::MakeQuestDataTableFromJSON(SuccessDependentQuestJson)
+		}
+	);
 
 	// Accept the 2 trigger quests
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TriggerQuest1"));
@@ -138,8 +142,12 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestFailureDependencies, "SUQSTest.QuestF
 bool FTestQuestFailureDependencies::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TriggerQuestsJson));
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(FailureDependentQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+        	USuqsProgression::MakeQuestDataTableFromJSON(TriggerQuestsJson),
+        	USuqsProgression::MakeQuestDataTableFromJSON(FailureDependentQuestJson)
+        }
+    );
 
 	// Accept the 2 trigger quests
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TriggerQuest1"));
@@ -201,8 +209,12 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestMixedDependencies, "SUQSTest.QuestMix
 bool FTestQuestMixedDependencies::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TriggerQuestsJson));
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(MixedDependentQuestJson));
+	Progression->InitWithQuestDataTables(
+		TArray<UDataTable*>{
+			USuqsProgression::MakeQuestDataTableFromJSON(TriggerQuestsJson),
+			USuqsProgression::MakeQuestDataTableFromJSON(MixedDependentQuestJson)
+		}
+	);
 
 	// Accept the 2 trigger quests
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TriggerQuest1"));

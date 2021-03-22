@@ -14,7 +14,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitSimple, "SUQSTest.QuestTimeL
 bool FTestQuestTimeLimitSimple::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitQuestJson)
+        }
+    );
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TimeLimits"));
 	TestTrue("Quest should be incomplete", Progression->IsQuestIncomplete("Q_TimeLimits"));
@@ -44,7 +48,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitNotFirstTask, "SUQSTest.Ques
 bool FTestQuestTimeLimitNotFirstTask::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitQuestJson)
+        }
+    );
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TimeLimits"));
 	auto T = Progression->GetTaskState("Q_TimeLimits", "T_SecondTimeLimited");
@@ -140,7 +148,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitMultipleSimultaneousTasks, "
 bool FTestQuestTimeLimitMultipleSimultaneousTasks::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitMultipleTasksQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitMultipleTasksQuestJson)
+        }
+    );
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TimeLimitsMulti"));
 	TestTrue("Quest should be incomplete", Progression->IsQuestIncomplete("Q_TimeLimitsMulti"));

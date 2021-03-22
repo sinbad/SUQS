@@ -26,18 +26,15 @@ DECLARE_DELEGATE_TwoParams(FOnPreLoad, USuqsProgression*, FSuqsSaveData&);
  * Add this somewhere that's useful to you, e.g. your PlayerState or GameInstance.
  * And of course, you'll want to include it in your save games.
  */
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, Blueprintable)
 class SUQS_API USuqsProgression : public UObject, public FTickableGameObject
 {
 	GENERATED_BODY()
-public:
-	/// Provide one or more data assets which define the quests that this status is tracking against.
-	/// These should be statically defined in an asset, they are only processed ONCE
-	/// You can add them at runtime too but ONLY before doing anything else on this instance
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest Setup")
-	TArray<UDataTable*> QuestDataTables;
 
 protected:
+	UPROPERTY()
+	TArray<UDataTable*> QuestDataTables;
+
 	/// Unified quest defs, combined from all entries in QuestDataTables
 	UPROPERTY()
 	TMap<FName, FSuqsQuest> QuestDefinitions;
@@ -62,11 +59,17 @@ protected:
 	const USuqsQuestState* FindQuestState(const FName& QuestID) const;
 	USuqsTaskState* FindTaskStatus(const FName& QuestID, const FName& TaskID);
 
-	void EnsureQuestDefinitionsBuilt();
+	void RebuildAllQuestData();
 	void AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed);
 	static void SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSaveData& Data);
 
 public:
+
+	/// Initialise this progress instance with quest definitions contained in the passed in tables
+	/// You should only call this once at startup. Calling it again will reset all progress data.
+	/// You must also call this BEFORE calling any other function
+	UFUNCTION(BlueprintCallable)
+	void InitWithQuestDataTables(TArray<UDataTable*> Tables);
 
 	/// Fired when a task is completed
 	UPROPERTY(BlueprintAssignable)

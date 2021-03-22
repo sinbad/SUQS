@@ -16,24 +16,20 @@ bool FTestQuestSerialize::RunTest(const FString& Parameters)
 
 	// Add a decent number of quest defs
 	// note that only the ones we accept will be saved
-	constexpr int NumQuestTables = 9;
-	FString JsonStrings[NumQuestTables]
+	TArray<UDataTable*> QuestTables
 	{
-		SimpleMainQuestJson,
-		SimpleSideQuestJson,
-		SmallestPossibleQuestJson,
-		OrderedTasksQuestJson,
-		UnorderedTasksQuestJson,
-		AnyOfTasksQuestJson,
-		TargetNumberQuestJson,
-		BranchingQuestJson,
-		TimeLimitQuestJson
+		USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson),
+		USuqsProgression::MakeQuestDataTableFromJSON(SimpleSideQuestJson),
+		USuqsProgression::MakeQuestDataTableFromJSON(SmallestPossibleQuestJson),
+		USuqsProgression::MakeQuestDataTableFromJSON(OrderedTasksQuestJson),
+		USuqsProgression::MakeQuestDataTableFromJSON(UnorderedTasksQuestJson),
+		USuqsProgression::MakeQuestDataTableFromJSON(AnyOfTasksQuestJson),
+		USuqsProgression::MakeQuestDataTableFromJSON(TargetNumberQuestJson),
+		USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson),
+		USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitQuestJson)
 	};
 
-	for (int i = 0; i < NumQuestTables; ++i)
-	{
-		Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(JsonStrings[i]));
-	}
+	Progression->InitWithQuestDataTables(QuestTables);
 
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Main1"));
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Side1"));
@@ -86,10 +82,7 @@ bool FTestQuestSerialize::RunTest(const FString& Parameters)
 	// Read the data back into a new progression
 	USuqsProgression* LoadedProgression = NewObject<USuqsProgression>();
 	// Need to set up the quest definitions separately, those aren't loaded
-	for (int i = 0; i < NumQuestTables; ++i)
-	{
-		LoadedProgression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(JsonStrings[i]));				
-	}
+	LoadedProgression->InitWithQuestDataTables(QuestTables);				
 
 	// register listeners to confirm we don't get events during loading
 	UCallbackCatcher* CallbackCatcher = NewObject<UCallbackCatcher>();

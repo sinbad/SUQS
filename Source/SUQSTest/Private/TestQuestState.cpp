@@ -14,8 +14,12 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAcceptSimple, "SUQSTest.QuestAcceptSi
 bool FTestQuestAcceptSimple::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson));
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SimpleSideQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+        	USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson),
+        	USuqsProgression::MakeQuestDataTableFromJSON(SimpleSideQuestJson)
+        }
+    );
 
 
 	TestEqual("Main quest should be unavailable", Progression->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Unavailable);
@@ -42,7 +46,11 @@ bool FTestQuestAcceptFailedComplete::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SmallestPossibleQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(SmallestPossibleQuestJson)
+        }
+    );
 
 	// Test accepting failed
 	TestTrue("Accept smallest quest", Progression->AcceptQuest("Q_Smol"));
@@ -81,7 +89,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestReset, "SUQSTest.QuestReset",
 bool FTestQuestReset::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson)
+        }
+    );
 
 	TestTrue("Should be able to accept main quest", Progression->AcceptQuest("Q_Main1"));
 	TestEqual("Main quest should be incomplete", Progression->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
@@ -151,7 +163,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestOrderedTasks, "SUQSTest.QuestOrderedT
 bool FTestQuestOrderedTasks::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(OrderedTasksQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(OrderedTasksQuestJson)
+        }
+    );
 
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Ordered"));
 	// Suppress the warnings this will raise
@@ -193,7 +209,11 @@ bool FTestQuestUnorderedTasks::RunTest(const FString& Parameters)
 {
 
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(UnorderedTasksQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(UnorderedTasksQuestJson)
+        }
+    );
 
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Unordered"));
 	TestTrue("Task 3 should complete out of order OK", Progression->CompleteTask("Q_Unordered", "T_3"));
@@ -213,7 +233,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestAny2OfTasks, "SUQSTest.QuestAny2OfTas
 bool FTestQuestAny2OfTasks::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(AnyOfTasksQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(AnyOfTasksQuestJson)
+        }
+    );
 
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Any2Of"));
 	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_Any2Of", "T_1"));
@@ -248,7 +272,11 @@ bool FTestTargetNumber::RunTest(const FString& Parameters)
 {
 
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TargetNumberQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(TargetNumberQuestJson)
+        }
+    );
 
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_TargetNumbers"));
 
@@ -297,7 +325,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestMultiObjective, "SUQSTest.QuestMultiObject
 bool FTestMultiObjective::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson)
+        }
+    );
 
 	// I could access the task objects using the API but I want to test that the top-level interface is working, which
 	// uses the nested objects anyway.
@@ -364,7 +396,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestDescriptions, "SUQSTest.QuestDescriptions"
 bool FTestDescriptions::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson)
+        }
+    );
 
 	TestTrue("Accept main quest OK", Progression->AcceptQuest("Q_Main1"));
 	auto Q = Progression->GetQuest("Q_Main1");

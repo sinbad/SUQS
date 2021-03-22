@@ -15,7 +15,11 @@ bool FTestQuestBranchNoBranches::RunTest(const FString& Parameters)
 {
 	// This tests what happens with no branches enabled
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson)
+        }
+    );
 
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching"));
@@ -39,7 +43,11 @@ bool FTestQuestBranchA::RunTest(const FString& Parameters)
 {
 	// This tests what happens with no branches enabled
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson)
+        }
+    );
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching"));
 	auto Q = Progression->GetQuest("Q_Branching");
@@ -66,7 +74,11 @@ bool FTestQuestBranchB::RunTest(const FString& Parameters)
 {
 	// This tests what happens with no branches enabled
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson)
+        }
+    );
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching"));
 	auto Q = Progression->GetQuest("Q_Branching");
@@ -94,7 +106,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestDynamicBranchChange, "SUQSTest.QuestD
 bool FTestQuestDynamicBranchChange::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson)
+        }
+    );
 
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching"));
@@ -261,8 +277,12 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestGlobalBranch, "SUQSTest.QuestGlobalBr
 bool FTestQuestGlobalBranch::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
-	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuest2Json));
+	Progression->InitWithQuestDataTables(
+        TArray<UDataTable*> {
+            USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson),
+        	USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuest2Json)
+        }
+    );
 
 	TArray<USuqsObjectiveState*> ActiveObjectives;
 
