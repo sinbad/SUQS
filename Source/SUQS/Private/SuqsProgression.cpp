@@ -55,6 +55,7 @@ void USuqsProgression::RebuildAllQuestData()
 	{
 		for (auto Table : QuestDataTables)
 		{
+			UE_LOG(LogSUQS, Verbose, TEXT("Loading quest definitions from %s"), *Table->GetName());
 			Table->ForeachRow<FSuqsQuest>("", [this, Table](const FName& Key, const FSuqsQuest& Quest)
             {
                 if (QuestDefinitions.Contains(Quest.Identifier))
