@@ -1,4 +1,6 @@
 #include "SuqsProgression.h"
+
+#include "EngineUtils.h"
 #include "Suqs.h"
 #include "SuqsObjectiveState.h"
 #include "SuqsQuestState.h"
@@ -8,6 +10,34 @@ void USuqsProgression::InitWithQuestDataTables(TArray<UDataTable*> Tables)
 {
 	QuestDataTables = Tables;
 	RebuildAllQuestData();
+}
+
+void USuqsProgression::InitWithQuestDataTablesInPath(const FString& Path)
+{
+	InitWithQuestDataTablesInPaths(TArray<FString> { Path });
+	
+}
+
+void USuqsProgression::InitWithQuestDataTablesInPaths(const TArray<FString>& Paths)
+{
+	TArray<UDataTable*> DataTables;
+	for (const FString& Path : Paths)
+	{
+		TArray<UObject*> Assets;
+		EngineUtils::FindOrLoadAssetsByPath(Path, Assets, EngineUtils::ATL_Regular);
+		for (auto Asset : Assets)
+		{
+			if (auto DataTable = Cast<UDataTable>(Asset))
+			{
+				if (DataTable->RowStruct == FSuqsQuest::StaticStruct())
+				{
+					DataTables.Add(DataTable);
+				}
+			}
+		}
+	}
+
+	InitWithQuestDataTables(DataTables);
 }
 
 

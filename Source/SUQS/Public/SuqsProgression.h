@@ -71,6 +71,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void InitWithQuestDataTables(TArray<UDataTable*> Tables);
 
+	/// Initialise this progress instance with quest definitions contained in all datatables found in a given content location.
+	/// Path must be of the form "/Game/Sub/Folder/Within/Content". Will recurse into subdirectories.
+	/// You must also call this BEFORE calling any other function
+	UFUNCTION(BlueprintCallable)
+    void InitWithQuestDataTablesInPath(const FString& Path);
+
+	/// Initialise this progress instance with quest definitions contained in all datatables found in a given content locations.
+	/// Paths must be of the form "/Game/Sub/Folder/Within/Content". Will recurse into subdirectories.
+	/// You must also call this BEFORE calling any other function
+	UFUNCTION(BlueprintCallable)
+    void InitWithQuestDataTablesInPaths(const TArray<FString>& Paths);
+
 	/// Fired when a task is completed
 	UPROPERTY(BlueprintAssignable)
 	FOnTaskCompleted OnTaskCompleted;
