@@ -3,7 +3,7 @@
   "$id": "https://raw.githubusercontent.com/sinbad/SUQS/master/docs/questschema.json",
   "title": "SUQS Quest Definition JSON Schema",
   "type": "array",
-  "items": [
+  "items": 
     {
       "description": "Quest object",
       "type": "object",
@@ -51,7 +51,7 @@
         "Objectives": {
           "description": "List of sequential objectives which carry the quest forward. Can branch but always in order. Groups nested Tasks which are more flexible.",
           "type": "array",
-          "items": [
+          "items": 
             {
               "description": "An objective groups potentially multiple tasks which are the things a player completes. Objectives are always considered to be in order.",
               "type": "object",
@@ -89,7 +89,7 @@
                 "Tasks": {
                   "description": "A list of tasks that make up the objective. The list can be sequential or not, can have mandatory or optional tasks",
                   "type": "array",
-                  "items": [
+                  "items":
                     {
                       "description": "A task is a unit of progress, the main thing the player will be triggering during play",
                       "type": "object",
@@ -123,7 +123,6 @@
                         "Title"
                       ]
                     }
-                  ]
                 }
               },
               "required": [
@@ -131,7 +130,6 @@
                 "Tasks"
               ]
             }
-          ]
         }
       },
       "required": [
@@ -140,5 +138,4 @@
         "Objectives"
       ]
     }
-  ]
 }
