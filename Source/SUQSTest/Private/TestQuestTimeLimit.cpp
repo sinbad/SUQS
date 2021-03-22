@@ -2,71 +2,8 @@
 #include "Engine.h"
 #include "SuqsProgression.h"
 #include "SuqsTaskState.h"
+#include "TestQuestData.h"
 
-
-const FString TimeLimitQuestJson = R"RAWJSON([
-	{
-		"Name": "Q_TimeLimits",
-		"Identifier": "Q_TimeLimits",
-		"bPlayerVisible": true,
-		"Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestTitle\", \"Quest With Time Limit\")",
-		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestDesc\", \"A quest with a time limit\")",
-		"DescriptionWhenCompleted": "",
-		"AutoAccept": false,
-		"PrerequisiteQuests": [],
-		"PrerequisiteQuestFailures": [],
-		"Objectives": [
-			{
-				"Identifier": "O_Single",
-				"Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitO1\", \"First objective, single task\")",
-				"DescriptionWhenActive": "",
-				"DescriptionWhenCompleted": "",
-				"bSequentialTasks": true,
-				"Branch": "None",
-				"Tasks": [
-					{
-						"Identifier": "T_Single",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TSingleDesc\", \"Single time limit task\")",
-						"bMandatory": true,
-						"TargetNumber": 1,
-						"TimeLimit": 100
-					}
-				]
-			},
-			{
-				"Identifier": "O_SingleButNotFirst",
-				"Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitO2\", \"Objective with 2 sequential tasks, later one is timed\")",
-				"DescriptionWhenActive": "",
-				"DescriptionWhenCompleted": "",
-				"bSequentialTasks": true,
-				"Branch": "None",
-				"Tasks": [
-					{
-						"Identifier": "T_NonTimeLimited",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TNotTimeLimited\", \"This is not time limited\")",
-						"bMandatory": true,
-						"TargetNumber": 1,
-						"TimeLimit": 0
-					},
-					{
-						"Identifier": "T_SecondTimeLimited",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TTimeLimited\", \"This is time limited\")",
-						"bMandatory": true,
-						"TargetNumber": 1,
-						"TimeLimit": 50
-					},
-					{
-						"Identifier": "T_NonTimeLimited2",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TNotTimeLimited\", \"This is not time limited\")",
-						"bMandatory": true,
-						"TargetNumber": 1,
-						"TimeLimit": 0
-					}
-				]
-			}
-		]
-	},
-])RAWJSON";
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitSimple, "SUQSTest.QuestTimeLimitSimple",
                                  EAutomationTestFlags::EditorContext |

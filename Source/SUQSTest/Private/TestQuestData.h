@@ -464,3 +464,169 @@ const FString TargetNumberQuestJson = R"RAWJSON([
 		]
 	},
 ])RAWJSON";
+
+const FString BranchingQuestJson = R"RAWJSON([
+	{
+		"Name": "Q_Branching",
+		"Identifier": "Q_Branching",
+		"bPlayerVisible": true,
+		"Title": "NSLOCTEXT(\"[TestQuests]\", \"BranchineQuestTitle\", \"Branching Quest\")",
+		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"BranchingQuestDesc\", \"A branching quest\")",
+		"DescriptionWhenCompleted": "",
+		"AutoAccept": false,
+		"PrerequisiteQuests": [],
+		"PrerequisiteQuestFailures": [],
+		"Objectives": [
+			{
+				"Identifier": "O1",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"BObj1Title\", \"A common objective (all branches)\")",
+				"DescriptionWhenActive": "",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"Branch": "None",
+				"Tasks": [
+					{
+						"Identifier": "T_1",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"BQT1Desc\", \"It's a common task\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			},
+			{
+				"Identifier": "O_BranchA_1",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBA1Title\", \"First objective on branch A\")",
+				"DescriptionWhenActive": "",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"Branch": "BranchA",
+				"Tasks": [
+					{
+						"Identifier": "T_BA_1",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBA1Desc\", \"This is the only task on BranchA\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			},
+			{
+				"Identifier": "O_BranchB_1",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBB1Title\", \"First objective on branch B\")",
+				"DescriptionWhenActive": "",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"Branch": "BranchB",
+				"Tasks": [
+					{
+						"Identifier": "T_BB_1",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBB1Desc\", \"This is task 1 on BranchB\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			},
+			{
+				"Identifier": "O_BranchB_2",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBB2Title\", \"Second objective on branch B\")",
+				"DescriptionWhenActive": "",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"Branch": "BranchB",
+				"Tasks": [
+					{
+						"Identifier": "T_BB_2",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBB2Desc\", \"This is task 1 on BranchB\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			},
+			{
+				"Identifier": "O3",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"BObj3Title\", \"Finishing objective (common to all branches)\")",
+				"DescriptionWhenActive": "",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"Branch": "None",
+				"Tasks": [
+					{
+						"Identifier": "T_3",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"BQT3Desc\", \"Common task to finish\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			},
+
+		]
+	},
+])RAWJSON";
+
+const FString TimeLimitQuestJson = R"RAWJSON([
+	{
+		"Name": "Q_TimeLimits",
+		"Identifier": "Q_TimeLimits",
+		"bPlayerVisible": true,
+		"Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestTitle\", \"Quest With Time Limit\")",
+		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestDesc\", \"A quest with a time limit\")",
+		"DescriptionWhenCompleted": "",
+		"AutoAccept": false,
+		"PrerequisiteQuests": [],
+		"PrerequisiteQuestFailures": [],
+		"Objectives": [
+			{
+				"Identifier": "O_Single",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitO1\", \"First objective, single task\")",
+				"DescriptionWhenActive": "",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"Branch": "None",
+				"Tasks": [
+					{
+						"Identifier": "T_Single",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TSingleDesc\", \"Single time limit task\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 100
+					}
+				]
+			},
+			{
+				"Identifier": "O_SingleButNotFirst",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitO2\", \"Objective with 2 sequential tasks, later one is timed\")",
+				"DescriptionWhenActive": "",
+				"DescriptionWhenCompleted": "",
+				"bSequentialTasks": true,
+				"Branch": "None",
+				"Tasks": [
+					{
+						"Identifier": "T_NonTimeLimited",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TNotTimeLimited\", \"This is not time limited\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					},
+					{
+						"Identifier": "T_SecondTimeLimited",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TTimeLimited\", \"This is time limited\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 50
+					},
+					{
+						"Identifier": "T_NonTimeLimited2",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TNotTimeLimited\", \"This is not time limited\")",
+						"bMandatory": true,
+						"TargetNumber": 1,
+						"TimeLimit": 0
+					}
+				]
+			}
+		]
+	},
+])RAWJSON";
