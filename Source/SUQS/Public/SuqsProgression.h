@@ -32,12 +32,13 @@ class SUQS_API USuqsProgression : public UObject, public FTickableGameObject
 	GENERATED_BODY()
 public:
 	/// Provide one or more data assets which define the quests that this status is tracking against.
+	/// These should be statically defined in an asset, they are only processed ONCE
+	/// You can add them at runtime too but ONLY before doing anything else on this instance
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest Setup")
 	TArray<UDataTable*> QuestDataTables;
 
 protected:
 	/// Unified quest defs, combined from all entries in QuestDataTables
-	/// These should be statically defined in an asset, they are only processed once
 	UPROPERTY()
 	TMap<FName, FSuqsQuest> QuestDefinitions;
 
@@ -95,6 +96,17 @@ public:
 	/// Use this from C++ to receive access to the loaded quest data before it's applied to this progression
 	/// You can therefore change the quest data if you need to adapt it due to quest changes
 	FOnPreLoad OnPreLoad;
+
+	
+	/**
+	 * Return the quest definitions available. These are separate to the list of accepted quests or quest archive and
+	 * represents all of the quests available.
+	 * @param bForceRebuild If true, force the internal rebuild of quest definitions. Only needed if you have changed the
+	 *   QuestDataTables property at runtime after using other methods on this instance, which is highly discouraged.
+	 * @return The quest definitions
+	 */
+	UFUNCTION(BlueprintCallable)
+	const TMap<FName, FSuqsQuest>& GetQuestDefinitions(bool bForceRebuild = false);
 
 	/// Get the overall status of a named quest
 	UFUNCTION(BlueprintCallable)
@@ -299,5 +311,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override;
 	// FTickableGameObject end
-	
+
+	/**
+	 * @brief 
+	 * @param JsonString Quest definition in a JSON string
+	 * @return A quest data table suitable for adding to USuqsProgression's QuestDataTables property
+	 */
+	UFUNCTION(BlueprintCallable, Category="SUQS")
+	static UDataTable* MakeQuestDataTableFromJSON(const FString& JsonString);
+
 };

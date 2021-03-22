@@ -15,12 +15,8 @@ bool FTestQuestBranchNoBranches::RunTest(const FString& Parameters)
 {
 	// This tests what happens with no branches enabled
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(BranchingQuestJson);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
 
-	Progression->QuestDataTables.Add(QuestTable);
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching"));
 	auto Q = Progression->GetQuest("Q_Branching");
@@ -43,12 +39,7 @@ bool FTestQuestBranchA::RunTest(const FString& Parameters)
 {
 	// This tests what happens with no branches enabled
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(BranchingQuestJson);
-
-	Progression->QuestDataTables.Add(QuestTable);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching"));
 	auto Q = Progression->GetQuest("Q_Branching");
@@ -75,12 +66,7 @@ bool FTestQuestBranchB::RunTest(const FString& Parameters)
 {
 	// This tests what happens with no branches enabled
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(BranchingQuestJson);
-
-	Progression->QuestDataTables.Add(QuestTable);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching"));
 	auto Q = Progression->GetQuest("Q_Branching");
@@ -108,12 +94,8 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestDynamicBranchChange, "SUQSTest.QuestD
 bool FTestQuestDynamicBranchChange::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(BranchingQuestJson);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
 
-	Progression->QuestDataTables.Add(QuestTable);
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Branching"));
 	auto Q = Progression->GetQuest("Q_Branching");
@@ -145,7 +127,6 @@ bool FTestQuestDynamicBranchChange::RunTest(const FString& Parameters)
 // Create 2 more quests - they're basically the same but that doesn't matter, we're just testing global branch changes
 const FString BranchingQuest2Json = R"RAWJSON([
     {
-        "Name": "Q_Branching2",
         "Identifier": "Q_Branching2",
         "bPlayerVisible": true,
         "Title": "NSLOCTEXT(\"[TestQuests]\", \"Branching2QuestTitle\", \"Branching Quest 2\")",
@@ -209,7 +190,6 @@ const FString BranchingQuest2Json = R"RAWJSON([
         ]
     },
     {
-        "Name": "Q_Branching3",
         "Identifier": "Q_Branching3",
         "bPlayerVisible": true,
         "Title": "NSLOCTEXT(\"[TestQuests]\", \"Branching2QuestTitle\", \"Branching Quest 2\")",
@@ -281,17 +261,8 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestGlobalBranch, "SUQSTest.QuestGlobalBr
 bool FTestQuestGlobalBranch::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable1 = NewObject<UDataTable>();
-	QuestTable1->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable1->bIgnoreMissingFields = true;
-	QuestTable1->CreateTableFromJSONString(BranchingQuestJson);
-	UDataTable* QuestTable2 = NewObject<UDataTable>();
-	QuestTable2->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable2->bIgnoreMissingFields = true;
-	QuestTable2->CreateTableFromJSONString(BranchingQuest2Json);
-
-	Progression->QuestDataTables.Add(QuestTable1);
-	Progression->QuestDataTables.Add(QuestTable2);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson));
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuest2Json));
 
 	TArray<USuqsObjectiveState*> ActiveObjectives;
 

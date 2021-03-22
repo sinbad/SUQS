@@ -7,7 +7,6 @@
 
 const FString SimpleMainQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_Main1",
 		"Identifier": "Q_Main1",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"MainQuest1Title\", \"Main Quest 1\")",
@@ -101,7 +100,6 @@ const FString SimpleMainQuestJson = R"RAWJSON([
 	},
 	
 	{
-		"Name": "Q_Main2",
 		"Identifier": "Q_Main2",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"MainQuest2Title\", \"Main Quest 2\")",
@@ -135,7 +133,6 @@ const FString SimpleMainQuestJson = R"RAWJSON([
 
 const FString SimpleSideQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_Side1",
 		"Identifier": "Q_Side1",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"SideQuest1Title\", \"Side Quest 1\")",
@@ -213,7 +210,6 @@ const FString SimpleSideQuestJson = R"RAWJSON([
 
 const FString SmallestPossibleQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_Smol",
 		"Identifier": "Q_Smol",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"SmolQuestTitle\", \"Smol Quest\")",
@@ -246,7 +242,6 @@ const FString SmallestPossibleQuestJson = R"RAWJSON([
 
 const FString OrderedTasksQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_Ordered",
 		"Identifier": "Q_Ordered",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"OrderedQuestTitle\", \"Ordered Quest\")",
@@ -317,7 +312,6 @@ const FString OrderedTasksQuestJson = R"RAWJSON([
 
 const FString UnorderedTasksQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_Unordered",
 		"Identifier": "Q_Unordered",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedQuestTitle\", \"Unordered Quest\")",
@@ -365,7 +359,6 @@ const FString UnorderedTasksQuestJson = R"RAWJSON([
 
 const FString AnyOfTasksQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_Any2Of",
 		"Identifier": "Q_Any2Of",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"AnyOfQuestTitle\", \"AnyOf Quest\")",
@@ -420,7 +413,6 @@ const FString AnyOfTasksQuestJson = R"RAWJSON([
 
 const FString TargetNumberQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_TargetNumbers",
 		"Identifier": "Q_TargetNumbers",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"TargetNumberQuestTitle\", \"TargetNumber Quest\")",
@@ -467,7 +459,6 @@ const FString TargetNumberQuestJson = R"RAWJSON([
 
 const FString BranchingQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_Branching",
 		"Identifier": "Q_Branching",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"BranchineQuestTitle\", \"Branching Quest\")",
@@ -569,7 +560,6 @@ const FString BranchingQuestJson = R"RAWJSON([
 
 const FString TimeLimitQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_TimeLimits",
 		"Identifier": "Q_TimeLimits",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestTitle\", \"Quest With Time Limit\")",

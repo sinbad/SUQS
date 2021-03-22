@@ -1,12 +1,10 @@
 #include "Misc/AutomationTest.h"
 #include "Engine.h"
 #include "SuqsProgression.h"
-#include "SuqsTaskState.h"
 
 
 const FString TriggerQuestsJson = R"RAWJSON([
 	{
-		"Name": "Q_TriggerQuest1",
 		"Identifier": "Q_TriggerQuest1",
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"TriggerQuestTitle\", \"Quest which triggers others\")",
 		"Objectives": [
@@ -22,7 +20,6 @@ const FString TriggerQuestsJson = R"RAWJSON([
 		]
 	},
 	{
-		"Name": "Q_TriggerQuest2",
 		"Identifier": "Q_TriggerQuest2",
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"TriggerQuestTitle\", \"Quest which triggers others\")",
 		"Objectives": [
@@ -41,7 +38,6 @@ const FString TriggerQuestsJson = R"RAWJSON([
 
 const FString SuccessDependentQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_SuccessDeps",
 		"Identifier": "Q_SuccessDeps",
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"SuccessDepQuestTitle\", \"SuccessDep Quest\")",
 		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SuccessDepQuestDesc\", \"The smallest possible quest\")",
@@ -79,17 +75,8 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestSuccessDependencies, "SUQSTest.QuestS
 bool FTestQuestSuccessDependencies::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(TriggerQuestsJson);
-	Progression->QuestDataTables.Add(QuestTable);
-
-	UDataTable* QuestTable2 = NewObject<UDataTable>();
-	QuestTable2->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable2->bIgnoreMissingFields = true;
-	QuestTable2->CreateTableFromJSONString(SuccessDependentQuestJson);
-	Progression->QuestDataTables.Add(QuestTable2);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TriggerQuestsJson));
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SuccessDependentQuestJson));
 
 	// Accept the 2 trigger quests
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TriggerQuest1"));
@@ -114,7 +101,6 @@ bool FTestQuestSuccessDependencies::RunTest(const FString& Parameters)
 
 const FString FailureDependentQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_FailureDeps",
 		"Identifier": "Q_FailureDeps",
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"FailureDepQuestTitle\", \"FailureDep Quest\")",
 		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"FailureDepQuestDesc\", \"The smallest possible quest\")",
@@ -152,17 +138,8 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestFailureDependencies, "SUQSTest.QuestF
 bool FTestQuestFailureDependencies::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(TriggerQuestsJson);
-	Progression->QuestDataTables.Add(QuestTable);
-
-	UDataTable* QuestTable2 = NewObject<UDataTable>();
-	QuestTable2->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable2->bIgnoreMissingFields = true;
-	QuestTable2->CreateTableFromJSONString(FailureDependentQuestJson);
-	Progression->QuestDataTables.Add(QuestTable2);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TriggerQuestsJson));
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(FailureDependentQuestJson));
 
 	// Accept the 2 trigger quests
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TriggerQuest1"));
@@ -187,7 +164,6 @@ bool FTestQuestFailureDependencies::RunTest(const FString& Parameters)
 
 const FString MixedDependentQuestJson = R"RAWJSON([
 	{
-		"Name": "Q_MixedDeps",
 		"Identifier": "Q_MixedDeps",
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"MixedDepQuestTitle\", \"MixedDep Quest\")",
 		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"MixedDepQuestDesc\", \"The smallest possible quest\")",
@@ -225,17 +201,8 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestMixedDependencies, "SUQSTest.QuestMix
 bool FTestQuestMixedDependencies::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(TriggerQuestsJson);
-	Progression->QuestDataTables.Add(QuestTable);
-
-	UDataTable* QuestTable2 = NewObject<UDataTable>();
-	QuestTable2->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable2->bIgnoreMissingFields = true;
-	QuestTable2->CreateTableFromJSONString(MixedDependentQuestJson);
-	Progression->QuestDataTables.Add(QuestTable2);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TriggerQuestsJson));
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(MixedDependentQuestJson));
 
 	// Accept the 2 trigger quests
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TriggerQuest1"));

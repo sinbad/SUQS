@@ -1,6 +1,5 @@
 [
 	{
-		"Name": "Q_Main1",
 		"Identifier": "Q_Main1",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"MainQuest1Title\", \"Main Quest 1\")",
@@ -95,7 +94,6 @@
 	},
 	
 	{
-		"Name": "Q_Main2",
 		"Identifier": "Q_Main2",
 		"bPlayerVisible": true,
 		"Title": "NSLOCTEXT(\"[TestQuests]\", \"MainQuest2Title\", \"Main Quest 2\")",

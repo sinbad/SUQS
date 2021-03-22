@@ -32,11 +32,7 @@ bool FTestQuestSerialize::RunTest(const FString& Parameters)
 
 	for (int i = 0; i < NumQuestTables; ++i)
 	{
-		UDataTable* QuestTable = NewObject<UDataTable>();
-		QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-		QuestTable->bIgnoreMissingFields = true;
-		QuestTable->CreateTableFromJSONString(JsonStrings[i]);
-		Progression->QuestDataTables.Add(QuestTable);
+		Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(JsonStrings[i]));
 	}
 
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Main1"));
@@ -92,11 +88,7 @@ bool FTestQuestSerialize::RunTest(const FString& Parameters)
 	// Need to set up the quest definitions separately, those aren't loaded
 	for (int i = 0; i < NumQuestTables; ++i)
 	{
-		UDataTable* QuestTable = NewObject<UDataTable>();
-		QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-		QuestTable->bIgnoreMissingFields = true;
-		QuestTable->CreateTableFromJSONString(JsonStrings[i]);
-		LoadedProgression->QuestDataTables.Add(QuestTable);
+		LoadedProgression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(JsonStrings[i]));				
 	}
 
 	// register listeners to confirm we don't get events during loading

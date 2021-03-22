@@ -11,11 +11,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestCreateQuestDefinitions, "SUQSTest.CreateQu
 
 bool FTestCreateQuestDefinitions::RunTest(const FString& Parameters)
 {
-	UDataTable* QuestTable = NewObject<UDataTable>();
-
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(SimpleMainQuestJson);
+	UDataTable* QuestTable = USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson);
 
 	if (!TestEqual("Should have 2 quests in table", QuestTable->GetRowMap().Num(), 2))
 		return false;

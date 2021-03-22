@@ -8,10 +8,6 @@
       "description": "Quest object",
       "type": "object",
       "properties": {
-        "Name": {
-          "description": "Row Name: this is only needed for Unreal Datatables, and can be anything unique per quest. Not used in the quest API",
-          "type": "string"
-        },
         "Identifier": {
           "description": "Identifier of this quest. Must be globally unique across all quests in all data files",
           "type": "string"
@@ -139,7 +135,6 @@
         }
       },
       "required": [
-        "Name",
         "Identifier",
         "Title",
         "Objectives"

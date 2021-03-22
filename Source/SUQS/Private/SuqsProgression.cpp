@@ -48,6 +48,18 @@ void USuqsProgression::EnsureQuestDefinitionsBuilt()
 	}
 }
 
+const TMap<FName, FSuqsQuest>& USuqsProgression::GetQuestDefinitions(bool bForceRebuild)
+{
+	if (bForceRebuild)
+	{
+		QuestDefinitions.Empty();
+		QuestCompletionDeps.Empty();
+		QuestFailureDeps.Empty();
+	}
+	EnsureQuestDefinitionsBuilt();
+	return QuestDefinitions;
+}
+
 ESuqsQuestStatus USuqsProgression::GetQuestStatus(FName QuestID) const
 {
 	// Could make a lookup for this, but we'd need to post-load call to re-populate it, leave for now
@@ -567,6 +579,18 @@ TStatId USuqsProgression::GetStatId() const
 {
 	RETURN_QUICK_DECLARE_CYCLE_STAT(USuqsStatus, STATGROUP_Tickables);
 }
+
+UDataTable* USuqsProgression::MakeQuestDataTableFromJSON(const FString& JsonString)
+{
+	UDataTable* QuestTable = NewObject<UDataTable>();
+	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
+	QuestTable->bIgnoreMissingFields = true;
+	QuestTable->ImportKeyField = "Identifier";
+	QuestTable->CreateTableFromJSONString(JsonString);
+
+	return QuestTable;
+}
+
 // FTickableGameObject end
 
 void USuqsProgression::Serialize(FArchive& Ar)

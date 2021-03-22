@@ -14,11 +14,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTopLevelEvents, "SUQSTest.QuestTopLev
 bool FTestQuestTopLevelEvents::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(SimpleMainQuestJson);
-	Progression->QuestDataTables.Add(QuestTable);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson));
 
 	UCallbackCatcher* CallbackObj = NewObject<UCallbackCatcher>();
 	CallbackObj->Subscribe(Progression);
@@ -58,11 +54,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestDetailEvents, "SUQSTest.QuestDetailEv
 bool FTestQuestDetailEvents::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(SimpleMainQuestJson);
-	Progression->QuestDataTables.Add(QuestTable);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson));
 
 	UCallbackCatcher* CallbackObj = NewObject<UCallbackCatcher>();
 	CallbackObj->Subscribe(Progression);

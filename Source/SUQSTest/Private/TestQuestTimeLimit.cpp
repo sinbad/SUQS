@@ -5,6 +5,7 @@
 #include "TestQuestData.h"
 
 
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitSimple, "SUQSTest.QuestTimeLimitSimple",
                                  EAutomationTestFlags::EditorContext |
                                  EAutomationTestFlags::ClientContext |
@@ -13,12 +14,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitSimple, "SUQSTest.QuestTimeL
 bool FTestQuestTimeLimitSimple::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(TimeLimitQuestJson);
-
-	Progression->QuestDataTables.Add(QuestTable);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitQuestJson));
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TimeLimits"));
 	TestTrue("Quest should be incomplete", Progression->IsQuestIncomplete("Q_TimeLimits"));
@@ -48,12 +44,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitNotFirstTask, "SUQSTest.Ques
 bool FTestQuestTimeLimitNotFirstTask::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(TimeLimitQuestJson);
-
-	Progression->QuestDataTables.Add(QuestTable);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitQuestJson));
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TimeLimits"));
 	auto T = Progression->GetTaskState("Q_TimeLimits", "T_SecondTimeLimited");
@@ -97,7 +88,6 @@ bool FTestQuestTimeLimitNotFirstTask::RunTest(const FString& Parameters)
 
 const FString TimeLimitMultipleTasksQuestJson = R"RAWJSON([
     {
-        "Name": "Q_TimeLimitsMulti",
         "Identifier": "Q_TimeLimitsMulti",
         "bPlayerVisible": true,
         "Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestTitle\", \"Quest With Time Limit\")",
@@ -150,12 +140,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitMultipleSimultaneousTasks, "
 bool FTestQuestTimeLimitMultipleSimultaneousTasks::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
-	UDataTable* QuestTable = NewObject<UDataTable>();
-	QuestTable->RowStruct = FSuqsQuest::StaticStruct();
-	QuestTable->bIgnoreMissingFields = true;
-	QuestTable->CreateTableFromJSONString(TimeLimitMultipleTasksQuestJson);
-
-	Progression->QuestDataTables.Add(QuestTable);
+	Progression->QuestDataTables.Add(USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitMultipleTasksQuestJson));
 
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_TimeLimitsMulti"));
 	TestTrue("Quest should be incomplete", Progression->IsQuestIncomplete("Q_TimeLimitsMulti"));
