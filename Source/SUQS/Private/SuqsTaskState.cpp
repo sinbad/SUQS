@@ -32,13 +32,15 @@ void USuqsTaskState::SetTimeRemaining(float T)
 	// Clamp to 0, but allow higher than taskdef time limit if desired
     TimeRemaining = std::max(0.f, T);
 		
-    Progression->RaiseTaskUpdated(this);
-    if (TimeRemaining <= 0)
-    {
-        TimeRemaining = 0;
-        Fail();
-    }		
-	
+	if (IsTimeLimited())
+	{
+		Progression->RaiseTaskUpdated(this);
+		if (TimeRemaining <= 0)
+		{
+			TimeRemaining = 0;
+			Fail();
+		}
+	}	
 }
 
 void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus)
