@@ -249,6 +249,9 @@ bool FTestQuestAny2OfTasks::RunTest(const FString& Parameters)
 	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_Any2Of"));	
 
 	TestTrue("Task 3 should complete OK", Progression->CompleteTask("Q_Any2Of", "T_3"));
+	// Failing one of the tasks should NOT fail everything, because it's still possible to complete it (2 others)
+	Progression->FailTask("Q_Any2Of", "T_2");
+	TestFalse("Quest should NOT fail after failing one task", Progression->IsQuestFailed("Q_Any2Of"));
 	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_Any2Of", "T_1"));
 	TestTrue("Quest should be complete after any 2 tasks complete", Progression->IsQuestCompleted("Q_Any2Of"));
 
@@ -259,6 +262,15 @@ bool FTestQuestAny2OfTasks::RunTest(const FString& Parameters)
 	TestTrue("Task 1 should complete OK", Progression->CompleteTask("Q_Any2Of", "T_1"));
 	TestTrue("Optional task should complete OK", Progression->CompleteTask("Q_Any2Of", "T_Optional"));
 	TestFalse("Quest should remain incomplete after 2 tasks if one is optional", Progression->IsQuestCompleted("Q_Any2Of"));
+
+	// Failing 2 tasks should fail the quest since not enough left
+	Progression->ResetQuest("Q_Any2Of");
+	TestFalse("Quest should be incomplete after reset", Progression->IsQuestCompleted("Q_Any2Of"));
+	Progression->FailTask("Q_Any2Of", "T_2");
+	TestFalse("Quest should NOT fail after failing one task", Progression->IsQuestFailed("Q_Any2Of"));
+	Progression->FailTask("Q_Any2Of", "T_1");
+	TestTrue("Quest should fail after failing 2 tasks", Progression->IsQuestFailed("Q_Any2Of"));
+
 
 	return true;
 }

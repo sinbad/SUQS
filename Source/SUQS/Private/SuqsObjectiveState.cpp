@@ -167,7 +167,8 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 		}
 	}
 	
-	if (MandatoryTasksFailed > 0)
+	if (MandatoryTasksFailed > 0 &&
+		(IncompleteMandatoryTasks + MandatoryTasksComplete) < MandatoryTasksNeededToComplete)
 	{
 		ChangeStatus(ESuqsObjectiveStatus::Failed);
 	}
