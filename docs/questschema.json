@@ -48,6 +48,13 @@
             "type": "string"
           }
         },
+        "DefaultActiveBranches": {
+          "description": "List of branch names which should be active by default on accepting the quest.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "Objectives": {
           "description": "List of sequential objectives which carry the quest forward. Can branch but always in order. Groups nested Tasks which are more flexible.",
           "type": "array",

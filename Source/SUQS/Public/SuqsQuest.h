@@ -145,6 +145,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	TArray<FName> PrerequisiteQuestFailures;	
 
+	/// List of quest branches which are active by default when the quest is accepted
+	/// This is equivalent to calling SetBranchActive on the quest immediately after accepting it
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
+	TArray<FName> DefaultActiveBranches;
+
 	/// List of objectives involved in the quest. They are all sequential, and mandatory, but may be hidden to provide some branching
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	TArray<FSuqsObjective> Objectives;

@@ -161,7 +161,7 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsTaskFailed(const FName& TaskID) const;
 
-	/// Reset all the progress on this quest back to the initial state
+	/// Reset all the progress on this quest back to the initial state. Also resets active branches.
 	UFUNCTION(BlueprintCallable)
 	void Reset();
 

@@ -29,6 +29,7 @@ void USuqsQuestState::Initialise(const FSuqsQuest* Def, USuqsProgression* Root)
 			FastTaskLookup.Add(Task->GetIdentifier(), Task);
 		}
 	}
+	ResetBranches();
 	
 	NotifyObjectiveStatusChanged();
 }
@@ -73,9 +74,9 @@ void USuqsQuestState::SetBranchActive(FName Branch, bool bActive)
 
 void USuqsQuestState::ResetBranches()
 {
-	if (ActiveBranches.Num() > 0)
+	if (ActiveBranches != QuestDefinition->DefaultActiveBranches)
 	{
-		ActiveBranches.Empty();
+		ActiveBranches = QuestDefinition->DefaultActiveBranches;
 		NotifyObjectiveStatusChanged();
 	}
 }
@@ -213,6 +214,9 @@ void USuqsQuestState::Reset()
 		// This will trigger notifications on change
 		Obj->Reset();
 	}
+
+	ResetBranches();
+	
 }
 
 void USuqsQuestState::ResetBranch(FName Branch)
