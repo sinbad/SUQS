@@ -145,8 +145,8 @@ const FString BranchingQuest2Json = R"RAWJSON([
     {
         "Identifier": "Q_Branching2",
         "bPlayerVisible": true,
-        "Title": "NSLOCTEXT(\"[TestQuests]\", \"Branching2QuestTitle\", \"Branching Quest 2\")",
-        "DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"BranchingQuestDesc\", \"Another branching quest\")",
+        "Title": "NSLOCTEXT(\"TestQuests\", \"Branching2QuestTitle\", \"Branching Quest 2\")",
+        "DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"BranchingQuestDesc\", \"Another branching quest\")",
         "DescriptionWhenCompleted": "",
         "AutoAccept": false,
         "PrerequisiteQuests": [],
@@ -154,7 +154,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
         "Objectives": [
             {
                 "Identifier": "O1",
-                "Title": "NSLOCTEXT(\"[TestQuests]\", \"BObj1Title\", \"A common objective (all branches)\")",
+                "Title": "NSLOCTEXT(\"TestQuests\", \"BObj1Title\", \"A common objective (all branches)\")",
                 "DescriptionWhenActive": "",
                 "DescriptionWhenCompleted": "",
                 "bSequentialTasks": true,
@@ -162,7 +162,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
                 "Tasks": [
                     {
                         "Identifier": "T_1",
-                        "Title": "NSLOCTEXT(\"[TestQuests]\", \"BQT1Desc\", \"It's a common task\")",
+                        "Title": "NSLOCTEXT(\"TestQuests\", \"BQT1Desc\", \"It's a common task\")",
                         "bMandatory": true,
                         "TargetNumber": 1,
                         "TimeLimit": 0
@@ -171,7 +171,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
             },
             {
                 "Identifier": "O_BranchA_Q2",
-                "Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBA1Title\", \"First objective on branch A\")",
+                "Title": "NSLOCTEXT(\"TestQuests\", \"BObjBA1Title\", \"First objective on branch A\")",
                 "DescriptionWhenActive": "",
                 "DescriptionWhenCompleted": "",
                 "bSequentialTasks": true,
@@ -179,7 +179,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
                 "Tasks": [
                     {
                         "Identifier": "T_BA_1",
-                        "Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBA1Desc\", \"This is the only task on BranchA\")",
+                        "Title": "NSLOCTEXT(\"TestQuests\", \"BQTBA1Desc\", \"This is the only task on BranchA\")",
                         "bMandatory": true,
                         "TargetNumber": 1,
                         "TimeLimit": 0
@@ -188,7 +188,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
             },
 			{
 				"Identifier": "O_BranchB_Q2",
-				"Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBB1Title\", \"First objective on branch B\")",
+				"Title": "NSLOCTEXT(\"TestQuests\", \"BObjBB1Title\", \"First objective on branch B\")",
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
@@ -196,7 +196,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
 				"Tasks": [
 					{
 						"Identifier": "T_BB_1",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBB1Desc\", \"This is task 1 on BranchB\")",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"BQTBB1Desc\", \"This is task 1 on BranchB\")",
 						"bMandatory": true,
 						"TargetNumber": 1,
 						"TimeLimit": 0
@@ -208,8 +208,8 @@ const FString BranchingQuest2Json = R"RAWJSON([
     {
         "Identifier": "Q_Branching3",
         "bPlayerVisible": true,
-        "Title": "NSLOCTEXT(\"[TestQuests]\", \"Branching2QuestTitle\", \"Branching Quest 2\")",
-        "DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"BranchingQuestDesc\", \"Another branching quest\")",
+        "Title": "NSLOCTEXT(\"TestQuests\", \"Branching2QuestTitle\", \"Branching Quest 2\")",
+        "DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"BranchingQuestDesc\", \"Another branching quest\")",
         "DescriptionWhenCompleted": "",
         "AutoAccept": false,
         "PrerequisiteQuests": [],
@@ -217,7 +217,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
         "Objectives": [
             {
                 "Identifier": "O1",
-                "Title": "NSLOCTEXT(\"[TestQuests]\", \"BObj1Title\", \"A common objective (all branches)\")",
+                "Title": "NSLOCTEXT(\"TestQuests\", \"BObj1Title\", \"A common objective (all branches)\")",
                 "DescriptionWhenActive": "",
                 "DescriptionWhenCompleted": "",
                 "bSequentialTasks": true,
@@ -225,7 +225,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
                 "Tasks": [
                     {
                         "Identifier": "T_1",
-                        "Title": "NSLOCTEXT(\"[TestQuests]\", \"BQT1Desc\", \"It's a common task\")",
+                        "Title": "NSLOCTEXT(\"TestQuests\", \"BQT1Desc\", \"It's a common task\")",
                         "bMandatory": true,
                         "TargetNumber": 1,
                         "TimeLimit": 0
@@ -234,7 +234,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
             },
             {
                 "Identifier": "O_BranchA_Q3",
-                "Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBA1Title\", \"First objective on branch A\")",
+                "Title": "NSLOCTEXT(\"TestQuests\", \"BObjBA1Title\", \"First objective on branch A\")",
                 "DescriptionWhenActive": "",
                 "DescriptionWhenCompleted": "",
                 "bSequentialTasks": true,
@@ -242,7 +242,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
                 "Tasks": [
                     {
                         "Identifier": "T_BA_1",
-                        "Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBA1Desc\", \"This is the only task on BranchA\")",
+                        "Title": "NSLOCTEXT(\"TestQuests\", \"BQTBA1Desc\", \"This is the only task on BranchA\")",
                         "bMandatory": true,
                         "TargetNumber": 1,
                         "TimeLimit": 0
@@ -251,7 +251,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
             },
 			{
 				"Identifier": "O_BranchB_Q3",
-				"Title": "NSLOCTEXT(\"[TestQuests]\", \"BObjBB1Title\", \"First objective on branch B\")",
+				"Title": "NSLOCTEXT(\"TestQuests\", \"BObjBB1Title\", \"First objective on branch B\")",
 				"DescriptionWhenActive": "",
 				"DescriptionWhenCompleted": "",
 				"bSequentialTasks": true,
@@ -259,7 +259,7 @@ const FString BranchingQuest2Json = R"RAWJSON([
 				"Tasks": [
 					{
 						"Identifier": "T_BB_1",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"BQTBB1Desc\", \"This is task 1 on BranchB\")",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"BQTBB1Desc\", \"This is task 1 on BranchB\")",
 						"bMandatory": true,
 						"TargetNumber": 1,
 						"TimeLimit": 0

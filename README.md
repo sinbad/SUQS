@@ -32,15 +32,14 @@ configure your editor to autocomplete. Here is the simplest possible quest:
 [
   {
     "Identifier": "Q_Smol",
-    "Title": "NSLOCTEXT(\"[TestQuests]\", \"SmolQuestTitle\", \"Smol Quest\")",
-    "DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SmolQuestDesc\", \"The smallest possible quest\")",
+    "Title": "NSLOCTEXT(\"TestQuests\", \"SmolQuestTitle\", \"Smol Quest\")",
+    "DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"SmolQuestDesc\", \"The smallest possible quest\")",
     "Objectives": [
       {
-        "Identifier": "O1",
         "Tasks": [
           {
             "Identifier": "T_Smol",
-            "Title": "NSLOCTEXT(\"[TestQuests]\", \"SmolQuestTaskTitle\", \"Easiest possible thing\")"
+            "Title": "NSLOCTEXT(\"TestQuests\", \"SmolQuestTaskTitle\", \"Easiest possible thing\")"
           }
         ]
       }

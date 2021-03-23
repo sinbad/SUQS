@@ -98,8 +98,8 @@ const FString TimeLimitMultipleTasksQuestJson = R"RAWJSON([
     {
         "Identifier": "Q_TimeLimitsMulti",
         "bPlayerVisible": true,
-        "Title": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestTitle\", \"Quest With Time Limit\")",
-        "DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"TimeLimitQuestDesc\", \"A quest with a time limit\")",
+        "Title": "NSLOCTEXT(\"TestQuests\", \"TimeLimitQuestTitle\", \"Quest With Time Limit\")",
+        "DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"TimeLimitQuestDesc\", \"A quest with a time limit\")",
         "DescriptionWhenCompleted": "",
         "AutoAccept": false,
         "PrerequisiteQuests": [],
@@ -107,7 +107,7 @@ const FString TimeLimitMultipleTasksQuestJson = R"RAWJSON([
         "Objectives": [
 			{
 				"Identifier": "O_MultipleTimeLimitsNonSequential",
-			    "Title": "NSLOCTEXT(\"[TestQuests]\", \"DummyTitle\", \"Ignore this for test\")",
+			    "Title": "NSLOCTEXT(\"TestQuests\", \"DummyTitle\", \"Ignore this for test\")",
 			    "DescriptionWhenActive": "",
 			    "DescriptionWhenCompleted": "",
 			    "bSequentialTasks": false,
@@ -115,21 +115,21 @@ const FString TimeLimitMultipleTasksQuestJson = R"RAWJSON([
 			    "Tasks": [
 			        {
 			            "Identifier": "T_NonSequential1",
-			            "Title": "NSLOCTEXT(\"[TestQuests]\", \"TNonSeqNonMandTitle\", \"Non-sequential time limited task, not mandatory\")",
+			            "Title": "NSLOCTEXT(\"TestQuests\", \"TNonSeqNonMandTitle\", \"Non-sequential time limited task, not mandatory\")",
 			            "bMandatory": true,
 			            "TargetNumber": 1,
 			            "TimeLimit": 50
 			        },
 			        {
 			            "Identifier": "T_NonSequential2",
-			            "Title": "NSLOCTEXT(\"[TestQuests]\", \"TNonSeqNonMandTitle\", \"Non-sequential time limited task, not mandatory\")",
+			            "Title": "NSLOCTEXT(\"TestQuests\", \"TNonSeqNonMandTitle\", \"Non-sequential time limited task, not mandatory\")",
 			            "bMandatory": false,
 			            "TargetNumber": 1,
 			            "TimeLimit": 20
 			        },
 			        {
 			            "Identifier": "T_NonSequential3",
-			            "Title": "NSLOCTEXT(\"[TestQuests]\", \"TNonSeqMandTitle\", \"Non-sequential time limited task, the only mandatory\")",
+			            "Title": "NSLOCTEXT(\"TestQuests\", \"TNonSeqMandTitle\", \"Non-sequential time limited task, the only mandatory\")",
 			            "bMandatory": true,
 			            "TargetNumber": 1,
 			            "TimeLimit": 30
