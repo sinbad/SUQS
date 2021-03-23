@@ -36,8 +36,18 @@ It's up to you how large or small quests are. There is no limit on the number of
 quests that can be accepted at once, or how many objectives / tasks make up
 those quests.
 
-Furthermore, quests can depend on each other, so that later quests can be automatically
-accepted when others succeed or fail.
+## Quest Completion
+
+Quests are considered complete when there are no more incomplete Objectives outstanding,
+based on the [branches](Branching.md) which are enabled.
+
+Quests can depend on each other, so that later quests can be automatically
+accepted when others succeed (or fail).
+
+## Quest Failure
+
+A quest fails if any active objective fails. Objectives are made up of [Tasks](Tasks.md)
+which can add nuance to what is actually considered an Objective failure.
 
 ## Defining the Quest Library
 
@@ -192,5 +202,45 @@ The Key has to be unique in that namespace. You can make a key up, in which case
 you need to ensure it's unique, if it's not you'll end up with the same text as
 the other place you used that key. You can also generate some unique string,
 such as a GUID from your editor.
+
+### Description When Active
+
+This is the description of the quest when it's not completed. Localisable text.
+The description of a quest can change as it progresses by using the description 
+attributes on [Objectives](Objectives.md).
+
+### Description When Completed
+
+This is the description of the quest when it's completed. Localisable text.
+If blank, use the active description.
+
+### Auto-Accept
+
+By default quests are only accepted by calling the `AcceptQuest` function on
+the [Progression](Progression.md) object. However if you enable this option, 
+a quest can automatically be accepted when other quests are completed, or fail.
+
+See the prerequisites attributes below. 
+
+### Prerequisite Quests
+
+If the Auto-Accept option is enabled, then this quest will be automatically accepted
+when ALL of the quests identified in this list complete successfully. Can be
+combined with Prerequisite Quest Failures (both conditions must be fulfilled).
+
+### Prerequisite Quest Failures
+
+If the Auto-Accept option is enabled, then this quest will be automatically accepted
+when ALL of the quests identified in this list fail. Can be
+combined with Prerequisite Quests (both conditions must be fulfilled).
+
+### Objectives
+
+The list of [Objectives](Objectives.md) which make up this quest.
+
+## More Info
+
+* [Objectives](Objectives.md)
+* [Tasks](Tasks.md)
 
 
