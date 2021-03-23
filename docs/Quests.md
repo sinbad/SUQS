@@ -234,6 +234,12 @@ If the Auto-Accept option is enabled, then this quest will be automatically acce
 when ALL of the quests identified in this list fail. Can be
 combined with Prerequisite Quests (both conditions must be fulfilled).
 
+### Default Active Branches
+
+When you're making [branching quests](Branching.md) with mutually exclusive paths, you'll
+want to set certain branches active by default so that, if you don't change anything, the
+quest always has a default path to go down. 
+
 ### Objectives
 
 The list of [Objectives](Objectives.md) which make up this quest.
