@@ -1,0 +1,196 @@
+# Quests
+
+The linchpin of any quest system is...the quests! These are the individual stories
+your game is telling; even if you're not making an RPG, it's useful to track the
+state of your story explicitly. That way, it's easy to know where you are in the
+story, whether there's just one or many, and to trigger dependent changes in your
+world based on that.
+
+Quests are self-contained story chunks. All the possible quests in the game are known as
+the "Quest Library". Quests are only active after being accepted,
+which you do through the [quest progression instance](Progression.md):
+
+![Accept Quest](img/acceptquest.png)
+
+Once a quest is accepted, its state will be tracked. Once completed or failed, 
+the quest will become part of the quest archive.
+
+## Quest Structure
+
+Quests are structured something like this:
+
+* Quest
+  * Objective
+    * Task
+    * Task
+  * Objective
+    * Task
+
+
+Quests are made up of a series of one or more [Objectives](Objectives.md).
+Objectives are groupings of one or more [Tasks](Tasks.md) which must be completed 
+to progress. Objectives are sequential, although not all of them may be active 
+(see [Quest Branching](Branching.md)), while Tasks may be sequential or flexibly ordered.
+
+It's up to you how large or small quests are. There is no limit on the number of 
+quests that can be accepted at once, or how many objectives / tasks make up
+those quests.
+
+Furthermore, quests can depend on each other, so that later quests can be automatically
+accepted when others succeed or fail.
+
+## Defining the Quest Library
+
+Quests are defined in [datatable
+assets](https://docs.unrealengine.com/en-US/InteractiveExperiences/DataDriven/#datatables).
+You can have as many quests as you like, defined in as many separate assets as
+you like; the "quest library" is the combination of all the assets you decide
+to reference in the [quest progression instance](Progression.md). 
+
+You can either define quest datatables in the editor, or import JSON: I recommend
+the JSON route, because if you store JSON alongside your datatable assets in 
+version control, it's much easier to track the history of your quest changes. 
+
+### Using JSON
+
+> Any editor which supports JSON Schema can provide autocomplete and tooltip 
+> documentation for the quest JSON format. See the [Editor Setup](EditorSetup.md) 
+> section for instructions on how to set that up.
+
+Here's a mid-size quest definition as an example. This doesn't actually include
+all the options, since you can omit things and leave them to the defaults. 
+
+```json
+[
+	{
+		"Identifier": "Q_Side1",
+		"Title": "NSLOCTEXT(\"[TestQuests]\", \"SideQuest1Title\", \"Side Quest 1\")",
+		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SideQuest1DescActive\", \"This is one of those side quests you really play the game for\")",
+		"Objectives": [
+			{
+				"Identifier": "O_MeetWizard",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"MeetTheWizard\", \"Meet The Wizard\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"MeetTheWizardDesc\", \"So this is where you go meet the wizard\")",
+				"bSequentialTasks": true,
+				"Tasks": [
+					{
+						"Identifier": "T_ReachWizardLand",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"ArriveAtWizardshire\", \"Arrive At Wizardshire\")",
+						"bMandatory": true
+					},
+					{
+						"Identifier": "T_EnterTower",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"EnterTheTower\", \"Enter the tower\")",
+						"bMandatory": true
+					},
+					{
+						"Identifier": "T_TalkToWizard",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TalkToDerekTheWizard\", \"Talk to Derek the Wizard\")",
+						"bMandatory": false
+					}
+				]
+			},
+			{
+				"Identifier": "O_KillWizard",
+				"Title": "NSLOCTEXT(\"[TestQuests]\", \"KillDerek\", \"Kill Derek The Asshole Wizard\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"KillDerekDesc\", \"Turns out Derek is an asshole. Sort him out.\")",
+				"bSequentialTasks": true,
+				"Tasks": [
+					{
+						"Identifier": "T_DropShield",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"DropDereksShield\", \"Make Derek Drop His Shields\")",
+						"bMandatory": true
+					},
+					{
+						"Identifier": "T_MercDerek",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"MercDerek\", \"Merc Derek\")",
+						"bMandatory": true
+					},
+					{
+						"Identifier": "T_InsultDerek",
+						"Title": "NSLOCTEXT(\"[TestQuests]\", \"InsultDerek\", \"Call Derek's Lineage Into Question\")",
+						"bMandatory": false
+					}
+				]
+			}
+		]
+	},
+]
+```
+
+We'll talk more about the attributes contained in the JSON below. 
+
+To import this JSON file as quest data in the Unreal Editor, simply import it 
+with these options:
+
+* Import As: DataTable
+* Row Type: SuqsQuest
+* Ignore Missing Fields: true
+* Import Key Field: Identifier
+
+![Quest JSON Import](img/quest_json_import.png)
+
+
+The "Import Key Field" option is there because UE requires that every row in 
+a datatable has a Row Name; to avoid you having to add that, this tells UE to 
+use the existing Identifier for that as well.
+
+You can also create blank DataTables based on the SuqsQuest row type, and create
+data directly in the editor instead. However, I strongly recommend using JSON
+and storing both the JSON and the imported datatable in source control.
+
+## Quest attributes
+
+Here's a bit more information about the attributes at the top layer of every quest.
+
+### Identifier
+
+All quests must have a unique identifier. This is what you'll use to accept quests, 
+and to refer to them throughout the system. I suggest a naming convention of "Q_Something",
+but really it's up to you.
+
+Identifiers are `FName`s which are kind of like entries in a constant table of strings,
+making them faster to use as lookups than regular strings. If you're using C++,
+ it's beneficial to define them as constants rather than directly embedding them 
+ as literals in code, e.g. 
+ 
+```c++
+// Define constant names somewhere globally
+const FName Q_MainQuest("Q_MainQuest");
+```
+```c++
+// Use the pre-made FNames instead of constructing FNames at the call site (implicitly or explicitly)
+Progression->AcceptQuest(Q_MainQuest);
+```
+
+In Blueprints UE4 uses FNames optimally for you. But, it can still be useful to 
+predefine the names somewhere, so that if you rename something it's easier to fix
+everywhere.
+
+### Player Visible
+
+This is a hint to any quest UI that this quest should or should not be displayed
+to the player. You might want to use internal quests to track the internal state
+of a story sequence, without necessarily exposing that to the player.
+
+### Title
+
+This is the player-visible title of the quest. To make this text localisable, 
+it's a good idea to use the NSLOCTEXT macro, which works the same way as in C++
+except you have to use backslash to escape the embedded quotes:
+
+```json
+"Title": "NSLOCTEXT(\"Namespace\", \"Key\", \"Default Text\")",
+```
+
+The namespace is anything you like, it's used to separate localisation data into
+groups, so you could just use your project name if you don't need to split 
+things up. Or you could use something like "QuestsText" to keep all the quest
+text together in the localisation data, separate to other data. Up to you.
+
+The Key has to be unique in that namespace. You can make a key up, in which case
+you need to ensure it's unique, if it's not you'll end up with the same text as
+the other place you used that key. You can also generate some unique string,
+such as a GUID from your editor.
+
+
