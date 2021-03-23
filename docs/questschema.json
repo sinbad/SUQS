@@ -9,7 +9,7 @@
       "type": "object",
       "properties": {
         "Identifier": {
-          "description": "Identifier of this quest. Must be globally unique across all quests in all data files",
+          "description": "Identifier of this quest. Required. Must be globally unique across all quests in all data files",
           "type": "string"
         },
         "bPlayerVisible": {
@@ -57,7 +57,7 @@
               "type": "object",
               "properties": {
                 "Identifier": {
-                  "description": "Identifier for the objective. Must be unique within the Quest.",
+                  "description": "Optional identifier for the objective. If supplied, must be unique within the Quest.",
                   "type": "string"
                 },
                 "Title": {
@@ -95,7 +95,7 @@
                       "type": "object",
                       "properties": {
                         "Identifier": {
-                          "description": "Identifier for the task. Must be unique within the Quest (not just the objective)",
+                          "description": "Identifier for the task. Required. Must be unique within the Quest (not just the objective)",
                           "type": "string"
                         },
                         "Title": {
@@ -126,7 +126,6 @@
                 }
               },
               "required": [
-                "Identifier",
                 "Tasks"
               ]
             }

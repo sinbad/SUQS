@@ -58,6 +58,7 @@ public:
 	ESuqsObjectiveStatus GetStatus() const { return Status; }
 	const TArray<USuqsTaskState*>& GetTasks() { return Tasks; }
 
+	/// Objective identifier, which may be blank
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FName& GetIdentifier() const { return ObjectiveDefinition->Identifier; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)

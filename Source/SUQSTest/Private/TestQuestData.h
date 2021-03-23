@@ -220,7 +220,6 @@ const FString SmallestPossibleQuestJson = R"RAWJSON([
 		"PrerequisiteQuestFailures": [],
 		"Objectives": [
 			{
-				"Identifier": "O1",
 				"Title": "NSLOCTEXT(\"[TestQuests]\", \"SmolObjTitle\", \"Small Objective\")",
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SmolObjDesc\", \"This is super easy\")",
 				"DescriptionWhenCompleted": "",
@@ -322,7 +321,6 @@ const FString UnorderedTasksQuestJson = R"RAWJSON([
 		"PrerequisiteQuestFailures": [],
 		"Objectives": [
 			{
-				"Identifier": "O1",
 				"Title": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedObjTitle\", \"Unordered Objective\")",
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"UnorderedObjDesc\", \"These can be done in any order, but still all of them\")",
 				"DescriptionWhenCompleted": "",
@@ -369,7 +367,6 @@ const FString AnyOfTasksQuestJson = R"RAWJSON([
 		"PrerequisiteQuestFailures": [],
 		"Objectives": [
 			{
-				"Identifier": "O1",
 				"Title": "NSLOCTEXT(\"[TestQuests]\", \"Any2OfObjTitle\", \"Any2Of Objective\")",
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"Any2OfObjDesc\", \"2 tasks need to be done\")",
 				"DescriptionWhenCompleted": "",
@@ -423,7 +420,6 @@ const FString TargetNumberQuestJson = R"RAWJSON([
 		"PrerequisiteQuestFailures": [],
 		"Objectives": [
 			{
-				"Identifier": "O1",
 				"Title": "NSLOCTEXT(\"[TestQuests]\", \"TargetNumberObjTitle\", \"TargetNumber Objective\")",
 				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"TargetNumberObjDesc\", \"These have to be done in order\")",
 				"DescriptionWhenCompleted": "",

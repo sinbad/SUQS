@@ -20,7 +20,7 @@ In order to enable these features in your editor, you need to set up a JSON Sche
         "fileMatch": [
             "*.suqs.json"
         ],
-        "url": "https://raw.githubusercontent.com/sinbad/SUQS/schema_v2/docs/questschema.json"
+        "url": "https://raw.githubusercontent.com/sinbad/SUQS/schema_v3/docs/questschema.json"
     }
 ]
 ```
@@ -34,7 +34,7 @@ as well, but this URL format means you're not dependent on that.
 1. Open Settings 
 1. Go to Languages & Frameworks > Schemas and DTDs > JSON Schema Mappings
 1. Add a new entry, name it however you like
-1. Set the URL to "https://raw.githubusercontent.com/sinbad/SUQS/schema_v2/docs/questschema.json"
+1. Set the URL to "https://raw.githubusercontent.com/sinbad/SUQS/schema_v3/docs/questschema.json"
 1. Set the Schema Version to 7
 1. Add a file pattern of *.suqs.json
 1. Save

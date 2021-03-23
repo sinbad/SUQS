@@ -47,7 +47,7 @@ struct SUQS_API FSuqsObjective
 {
 	GENERATED_BODY()
 public:
-	/// Identifier for this objective. Must be unique within the quest it belongs to.
+	/// Identifier for this objective. Optional. If provided, must be unique within the quest it belongs to.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	FName Identifier;
 
@@ -108,7 +108,7 @@ struct SUQS_API FSuqsQuest : public FTableRowBase
 
 public:
 
-	/// The unique Identifier of the quest
+	/// The unique Identifier of the quest, mandatory
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	FName Identifier;
 

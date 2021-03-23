@@ -69,6 +69,7 @@ protected:
 	
 public:
 	ESuqsQuestStatus GetStatus() const { return Status; }
+	/// Return the list of ALL objectives. If you only want active objectives (branching), use GetActiveObjectives
 	const TArray<USuqsObjectiveState*>& GetObjectives() const { return Objectives; }
 	const TArray<FName>& GetActiveBranches() const { return ActiveBranches; }
 
@@ -110,7 +111,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsObjectiveState* GetCurrentObjective() const;
 
-	/// Find a given objective
+	/// Find a given objective by its identifier. Remember, Objective identifiers are optional so if you haven't
+	/// given it an identifier, it won't show up here.
 	UFUNCTION(BlueprintCallable)
 	USuqsObjectiveState* GetObjective(const FName& ObjectiveID) const;
 
