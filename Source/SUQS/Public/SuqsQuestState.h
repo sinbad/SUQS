@@ -143,6 +143,10 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsObjectiveFailed(const FName& ObjectiveID) const;
 
+	/// Reset a single objective in the quest, rather than the entire quest
+	UFUNCTION(BlueprintCallable)
+    void ResetObjective(FName ObjectiveID);
+
 	/// Get the next mandatory task for this quest
 	/// If the objective for this quest only requires ONE of a number of tasks to be completed, this will be the first one.
 	/// Check the current objective for more details.
@@ -161,6 +165,10 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsTaskFailed(const FName& TaskID) const;
 
+	/// Reset a single task in the quest
+	UFUNCTION(BlueprintCallable)
+    void ResetTask(FName TaskID);
+	
 	/// Reset all the progress on this quest back to the initial state. Also resets active branches.
 	UFUNCTION(BlueprintCallable)
 	void Reset();
@@ -186,5 +194,4 @@ public:
 	void NotifyObjectiveStatusChanged();
 
 	void OverrideStatus(ESuqsQuestStatus OverrideStatus);
-	
 };

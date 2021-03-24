@@ -387,6 +387,14 @@ bool USuqsProgression::IsObjectiveFailed(FName QuestID, FName ObjectiveID) const
 	return false;
 }
 
+void USuqsProgression::ResetObjective(FName QuestID, FName ObjectiveID)
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		Q->ResetObjective(ObjectiveID);
+	}	
+}
+
 USuqsTaskState* USuqsProgression::GetNextMandatoryTask(FName QuestID) const
 {
 	if (auto Q = FindQuestState(QuestID))
@@ -433,6 +441,14 @@ USuqsTaskState* USuqsProgression::GetTaskState(FName QuestID, FName TaskID) cons
 	}
 	return nullptr;
 	
+}
+
+void USuqsProgression::ResetTask(FName QuestID, FName TaskID)
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		Q->ResetTask(TaskID);
+	}
 }
 
 void USuqsProgression::SetQuestBranchActive(FName QuestID, FName Branch, bool bActive)

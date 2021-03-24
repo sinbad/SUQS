@@ -248,6 +248,10 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsObjectiveFailed(FName QuestID, FName ObjectiveID) const;
 
+	/// Reset a single objective in the quest, rather than the entire quest
+	UFUNCTION(BlueprintCallable)
+	void ResetObjective(FName QuestID, FName ObjectiveID);
+
 	/// Get the next mandatory task for a given quest.
 	/// If the objective for this quest only requires ONE of a number of tasks to be completed, this will be the first one.
 	/// Check the current objective for more details.
@@ -269,6 +273,10 @@ public:
 	/// Shortcut to getting the whole task state for a specific quest
 	UFUNCTION(BlueprintCallable)
 	USuqsTaskState* GetTaskState(FName QuestID, FName TaskID) const;
+
+	/// Reset a single task in the quest
+	UFUNCTION(BlueprintCallable)
+    void ResetTask(FName QuestID, FName TaskID);
 
 	/// Set a branch to be active in a specific quest. Objectives in this quest that are associated with this
 	/// branch will then be allowed to activate.

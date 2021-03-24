@@ -170,6 +170,14 @@ bool USuqsQuestState::IsObjectiveFailed(const FName& Identifier) const
 	return false;
 }
 
+void USuqsQuestState::ResetObjective(FName Identifier)
+{
+	if (auto O = GetObjective(Identifier))
+	{
+		O->Reset();
+	}
+}
+
 USuqsTaskState* USuqsQuestState::GetNextMandatoryTask() const
 {
 	if (auto O = GetCurrentObjective())
@@ -205,6 +213,14 @@ bool USuqsQuestState::IsTaskFailed(const FName& TaskID) const
 		return T->IsFailed();
 	}
 	return false;
+}
+
+void USuqsQuestState::ResetTask(FName TaskID)
+{
+	if (auto T = GetTask(TaskID))
+	{
+		T->Reset();
+	}	
 }
 
 void USuqsQuestState::Reset()
