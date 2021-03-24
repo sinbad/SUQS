@@ -128,21 +128,25 @@ all the options, since you can omit things and leave them to the defaults.
 ]
 ```
 
-We'll talk more about the attributes contained in the JSON below. 
+We'll talk more about the attributes contained in the JSON below. There are many
+defaults so you you don't need to specify everything, the example above includes
+some attributes which could be omitted as defaults, but there are several more 
+attributes it doesn't show. They will be covered in more detail below and in 
+the [Objective](Objectives.md) and [Task](Tasks.md) sections.
 
-To import this JSON file as quest data in the Unreal Editor, simply import it 
-with these options:
+To import this JSON file as quest data in the Unreal Editor, simply place it in
+your content folder and confirm the import with these options:
 
 * Import As: DataTable
 * Row Type: SuqsQuest
-* Ignore Missing Fields: true
+* Ignore Missing Fields: true (this means you can omit things to get the defaults)
 * Import Key Field: Identifier
 
 ![Quest JSON Import](img/quest_json_import.png)
 
 
 The "Import Key Field" option is there because UE requires that every row in 
-a datatable has a Row Name; to avoid you having to add that, this tells UE to 
+a DataTable has a Row Name; to avoid you having to add that, this tells UE to 
 use the existing Identifier for that as well.
 
 You can also create blank DataTables based on the SuqsQuest row type, and create
@@ -250,5 +254,6 @@ The list of [Objectives](Objectives.md) which make up this quest.
 * [Tasks](Tasks.md)
 * [Quest Progression](Progression.md)
 * [Saving Data](Saving.md)
+* [Changing Quest Definitions](ChangingQuestDefinitions.md)
 
 
