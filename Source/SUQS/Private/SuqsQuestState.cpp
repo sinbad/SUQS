@@ -99,6 +99,23 @@ bool USuqsQuestState::CompleteTask(FName TaskID)
 	return false;
 }
 
+void USuqsQuestState::FailTask(const FName& TaskID)
+{
+	if (auto T = GetTask(TaskID))
+	{
+		T->Fail();
+	}	
+}
+
+int USuqsQuestState::ProgressTask(FName TaskID, int Delta)
+{
+	if (auto T = GetTask(TaskID))
+	{
+		return T->Progress(Delta);
+	}
+	return 0;
+}
+
 const FText& USuqsQuestState::GetDescription() const
 {
 	switch (Status)

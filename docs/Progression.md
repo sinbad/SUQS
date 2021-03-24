@@ -70,6 +70,14 @@ If there are conditions that can fail a task, you can trigger it using this call
 
 ![Fail Task](img/failtask.png)
 
+## Completing / Progressing / Failing tasks on ANY compatible quest
+
+If you need to, you can omit the Quest ID from the complete / progress / fail calls
+above, providing "None" instead. In that case, all active quests will be scanned
+and sent the same request. Any that contain a task which matches that Task Identifier
+(remember, Task Identifiers only have to be unique within the quest) will respond
+as if you named them explicitly with their Quest ID.
+
 ## Completed Tasks
 
 Completing a task may complete the parent [objective](Objectives.md), if:

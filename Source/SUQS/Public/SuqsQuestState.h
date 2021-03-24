@@ -95,7 +95,6 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsBranchActive(FName Branch);
 
-	/// Complete a task with the given TaskID
 	/**
 	 * Fully complete a task. If this is the last mandatory task in an objective, also completes the objective, and
 	 * cascades upwards to the quest if that's the last mandatory objective.
@@ -104,6 +103,23 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	bool CompleteTask(FName TaskID);
+
+	/**
+	 * Fail a task if it exists. 
+	 * @param TaskID The identifier of the task within the quest
+	 */
+	UFUNCTION(BlueprintCallable)
+	void FailTask(const FName& TaskID);
+
+	/**
+	 * Increment task progress, if it exists. Increases the number value on a task, clamping it to the min/max numbers in the quest
+	 * definition. If this increment takes the task number to the target, it completes the task as per CompleteTask.
+	 * @param TaskID The identifier of the task within the quest
+	 * @param Delta The change to make to the number on the task
+	 * @returns The number of "things" outstanding on the task after progress was applied (0 if not found)
+	 */
+	UFUNCTION(BlueprintCallable)
+	int ProgressTask(FName TaskID, int Delta);
 
 	/// Get the current objective on this quest. Will return null if quest is complete.
 	UFUNCTION(BlueprintCallable, BlueprintPure)

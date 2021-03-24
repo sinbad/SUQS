@@ -205,7 +205,7 @@ public:
 	/**
 	 * Mark a task as failed. If this is a mandatory task, it will fail the objective the task is attached to.
 	   If the objective is mandatory, it will fail the quest. 
-	 * @param QuestID The ID of the quest
+	 * @param QuestID The ID of the quest. If None, will scan all active quests and fail any task with TaskIdentifier
 	 * @param TaskIdentifier The identifier of the task within the quest
 	 */
 	UFUNCTION(BlueprintCallable)
@@ -214,8 +214,8 @@ public:
 	/**
 	 * Fully complete a task. If this is the last mandatory task in an objective, also completes the objective, and
 	 * cascades upwards to the quest if that's the last mandatory objective.
-	 * @param QuestID The ID of the quest
-	 * @param TaskIdentifier The identifier of the task within the quest
+	 * @param QuestID The ID of the quest. If None, will scan all active quests and complete any task with TaskIdentifier
+	 * @param TaskIdentifier The identifier of the task within the quest (required)
 	 * @returns Whether the task was successfully completed
 	 */
 	UFUNCTION(BlueprintCallable)
@@ -224,7 +224,7 @@ public:
 	/**
 	 * Increment task progress. Increases the number value on a task, clamping it to the min/max numbers in the quest
 	 * definition. If this increment takes the task number to the target, it completes the task as per CompleteTask.
-	 * @param QuestID The ID of the quest
+	 * @param QuestID The ID of the quest. If None, will scan all active quests and progress any task with TaskIdentifier
 	 * @param TaskIdentifier The identifier of the task within the quest
 	 * @param Delta The change to make to the number on the task
 	 * @returns The number of "things" outstanding on the task after progress was applied

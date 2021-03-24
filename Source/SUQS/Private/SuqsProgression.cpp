@@ -1,5 +1,8 @@
 #include "SuqsProgression.h"
 
+#include <algorithm>
+
+
 #include "EngineUtils.h"
 #include "Suqs.h"
 #include "SuqsObjectiveState.h"
@@ -285,32 +288,66 @@ void USuqsProgression::CompleteQuest(FName QuestID)
 
 void USuqsProgression::FailTask(FName QuestID, FName TaskIdentifier)
 {
-	auto T = FindTaskStatus(QuestID, TaskIdentifier);
-	if (T)
+	if (QuestID.IsNone())
 	{
-		T->Fail();
+		for (auto Pair : ActiveQuests)
+		{
+			Pair.Value->FailTask(TaskIdentifier);
+		}
+	}
+	else
+	{
+		auto T = FindTaskStatus(QuestID, TaskIdentifier);
+		if (T)
+		{
+			T->Fail();
+		}
 	}
 }
 
 
 bool USuqsProgression::CompleteTask(FName QuestID, FName TaskIdentifier)
 {
-	auto T = FindTaskStatus(QuestID, TaskIdentifier);
-	if (T)
+	if (QuestID.IsNone())
 	{
-		return T->Complete();
+		bool bCompleted = false;
+		for (auto Pair : ActiveQuests)
+		{
+			bCompleted = Pair.Value->CompleteTask(TaskIdentifier) || bCompleted;
+		}
+		return bCompleted;
+	}
+	else
+	{
+		auto T = FindTaskStatus(QuestID, TaskIdentifier);
+		if (T)
+		{
+			return T->Complete();
+		}
 	}
 	return false;
 }
 
 int USuqsProgression::ProgressTask(FName QuestID, FName TaskIdentifier, int Delta)
 {
-	auto T = FindTaskStatus(QuestID, TaskIdentifier);
-	if (T)
+	if (QuestID.IsNone())
 	{
-		return T->Progress(Delta);
+		int MaxLeft = 0;
+		for (auto Pair : ActiveQuests)
+		{
+			MaxLeft = std::max(Pair.Value->ProgressTask(TaskIdentifier, Delta), MaxLeft);
+		}
+		return MaxLeft;
 	}
-	return 0;
+	else
+	{
+		auto T = FindTaskStatus(QuestID, TaskIdentifier);
+		if (T)
+		{
+			return T->Progress(Delta);
+		}
+		return 0;
+	}
 }
 
 USuqsObjectiveState* USuqsProgression::GetCurrentObjective(FName QuestID) const
