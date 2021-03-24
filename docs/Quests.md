@@ -74,51 +74,51 @@ all the options, since you can omit things and leave them to the defaults.
 [
 	{
 		"Identifier": "Q_Side1",
-		"Title": "NSLOCTEXT(\"[TestQuests]\", \"SideQuest1Title\", \"Side Quest 1\")",
-		"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"SideQuest1DescActive\", \"This is one of those side quests you really play the game for\")",
+		"Title": "NSLOCTEXT(\"TestQuests\", \"SideQuest1Title\", \"Side Quest 1\")",
+		"DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"SideQuest1DescActive\", \"This is one of those side quests you really play the game for\")",
 		"Objectives": [
 			{
 				"Identifier": "O_MeetWizard",
-				"Title": "NSLOCTEXT(\"[TestQuests]\", \"MeetTheWizard\", \"Meet The Wizard\")",
-				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"MeetTheWizardDesc\", \"So this is where you go meet the wizard\")",
+				"Title": "NSLOCTEXT(\"TestQuests\", \"MeetTheWizard\", \"Meet The Wizard\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"MeetTheWizardDesc\", \"So this is where you go meet the wizard\")",
 				"bSequentialTasks": true,
 				"Tasks": [
 					{
 						"Identifier": "T_ReachWizardLand",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"ArriveAtWizardshire\", \"Arrive At Wizardshire\")",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"ArriveAtWizardshire\", \"Arrive At Wizardshire\")",
 						"bMandatory": true
 					},
 					{
 						"Identifier": "T_EnterTower",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"EnterTheTower\", \"Enter the tower\")",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"EnterTheTower\", \"Enter the tower\")",
 						"bMandatory": true
 					},
 					{
 						"Identifier": "T_TalkToWizard",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"TalkToDerekTheWizard\", \"Talk to Derek the Wizard\")",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"TalkToDerekTheWizard\", \"Talk to Derek the Wizard\")",
 						"bMandatory": false
 					}
 				]
 			},
 			{
 				"Identifier": "O_KillWizard",
-				"Title": "NSLOCTEXT(\"[TestQuests]\", \"KillDerek\", \"Kill Derek The Asshole Wizard\")",
-				"DescriptionWhenActive": "NSLOCTEXT(\"[TestQuests]\", \"KillDerekDesc\", \"Turns out Derek is an asshole. Sort him out.\")",
+				"Title": "NSLOCTEXT(\"TestQuests\", \"KillDerek\", \"Kill Derek The Asshole Wizard\")",
+				"DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"KillDerekDesc\", \"Turns out Derek is an asshole. Sort him out.\")",
 				"bSequentialTasks": true,
 				"Tasks": [
 					{
 						"Identifier": "T_DropShield",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"DropDereksShield\", \"Make Derek Drop His Shields\")",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"DropDereksShield\", \"Make Derek Drop His Shields\")",
 						"bMandatory": true
 					},
 					{
 						"Identifier": "T_MercDerek",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"MercDerek\", \"Merc Derek\")",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"MercDerek\", \"Merc Derek\")",
 						"bMandatory": true
 					},
 					{
 						"Identifier": "T_InsultDerek",
-						"Title": "NSLOCTEXT(\"[TestQuests]\", \"InsultDerek\", \"Call Derek's Lineage Into Question\")",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"InsultDerek\", \"Call Derek's Lineage Into Question\")",
 						"bMandatory": false
 					}
 				]
