@@ -375,7 +375,7 @@ bool USuqsProgression::IsQuestIncomplete(FName QuestID) const
 	{
 		return Q->IsIncomplete();
 	}
-	return false;
+	return true;
 }
 
 bool USuqsProgression::IsQuestCompleted(FName QuestID) const
@@ -449,7 +449,8 @@ bool USuqsProgression::IsTaskIncomplete(FName QuestID, FName TaskID) const
 	{
 		return Q->IsTaskIncomplete(TaskID);
 	}
-	return false;
+	// Should default to TRUE not false if missing (assume incomplete if never accepted)
+	return true;
 }
 
 bool USuqsProgression::IsTaskCompleted(FName QuestID, FName TaskID) const

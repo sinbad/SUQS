@@ -21,8 +21,12 @@ bool FTestQuestAcceptSimple::RunTest(const FString& Parameters)
         }
     );
 
-
 	TestEqual("Main quest should be unavailable", Progression->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Unavailable);
+	TestTrue("Main quest should be incomplete", Progression->IsQuestIncomplete("Q_Main1"));
+	TestFalse("Main quest should not be complete", Progression->IsQuestCompleted("Q_Main1"));
+	TestTrue("Main quest task should be incomplete", Progression->IsTaskIncomplete("Q_Main1", "T_ReachThePlace"));
+	TestFalse("Main quest task should not be complete", Progression->IsTaskCompleted("Q_Main1", "T_ReachThePlace"));
+	
 	TestEqual("Side quest should be unavailable", Progression->GetQuestStatus("Q_Side1"), ESuqsQuestStatus::Unavailable);
 	TestTrue("Should be able to accept main quest", Progression->AcceptQuest("Q_Main1"));
 	TestEqual("Main quest should be incomplete", Progression->GetQuestStatus("Q_Main1"), ESuqsQuestStatus::Incomplete);
