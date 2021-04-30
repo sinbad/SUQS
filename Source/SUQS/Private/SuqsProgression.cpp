@@ -315,7 +315,8 @@ bool USuqsProgression::CompleteTask(FName QuestID, FName TaskIdentifier)
 		{
 			bCompleted = Pair.Value->CompleteTask(TaskIdentifier) || bCompleted;
 		}
-		return bCompleted;
+		if (bCompleted)
+			return true;
 	}
 	else
 	{
@@ -325,6 +326,8 @@ bool USuqsProgression::CompleteTask(FName QuestID, FName TaskIdentifier)
 			return T->Complete();
 		}
 	}
+	UE_LOG(LogSUQS, Warning, TEXT("Attempted to complete task %s/%s but it was not found in the active quests"),
+		*QuestID.ToString(), *TaskIdentifier.ToString());
 	return false;
 }
 
