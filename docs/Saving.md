@@ -125,7 +125,7 @@ class YOUR_API UYourGameInstance : public UGameInstance
 
 protected:
 	
-	UPROPERTY(BlueprintReadOnly, SaveGame)
+	UPROPERTY(BlueprintReadOnly)
 	USuqsProgression* QuestProgression;
 
 	UPROPERTY()
