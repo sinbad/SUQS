@@ -14,15 +14,6 @@ increment progress etc. As tasks are completed they trigger progression based on
 and a query API let you reflect those changes in your world.
 
 
-## Support This Work!!
-
-I've decided to open source this work because I think it's likely to be genuinely 
-useful to people. I like sharing my work with others, and that also generally 
-makes it better. But, it all takes extra effort over keeping it private!
-
-If you appreciate me doing this, please consider :heart::heart: **[Supporting my work on Patreon!](https://www.patreon.com/stevestreeting)** :heart::heart:
-Thanks!
-
 ## Installing
 
 ### Cloning
