@@ -38,6 +38,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category="Objective Status")
 	TArray<USuqsTaskState*> Tasks;
 
+	/// A barrier is set when status changes but parent hasn't been notified yet
+	UPROPERTY(BlueprintReadOnly, Category="Objective Status")
+	FSuqsProgressionBarrier ProgressionBarrier;
+	
 	const FSuqsObjective* ObjectiveDefinition;
 	TWeakObjectPtr<USuqsQuestState> ParentQuest;
 	TWeakObjectPtr<USuqsProgression> Progression;
@@ -49,6 +53,9 @@ protected:
 	void Tick(float DeltaTime);
 	// Private fail/complete since users should only ever call task fail/complete
 	void ChangeStatus(ESuqsObjectiveStatus NewStatus);
+	void QueueParentStatusChangeNotification();
+	bool IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const;
+	void MaybeNotifyParentStatusChange();
 
 public:
 	// C++ access

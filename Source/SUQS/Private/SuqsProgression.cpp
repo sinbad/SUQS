@@ -231,7 +231,10 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 		}
 
 		if (!bSuppressEvents)
+		{
 			OnQuestAccepted.Broadcast(Quest);
+			OnActiveQuestsListChanged.Broadcast();
+		}
 		return true;
 	}
 	else
@@ -646,36 +649,51 @@ void USuqsProgression::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
 
 void USuqsProgression::RaiseQuestCompleted(USuqsQuestState* Quest)
 {
-	// Move quest to the correct list
-	ActiveQuests.Remove(Quest->GetIdentifier());
-	QuestArchive.Add(Quest->GetIdentifier(), Quest);
-
 	if (!bSuppressEvents)
 		OnQuestCompleted.Broadcast(Quest);
 
-	AutoAcceptQuests(Quest->GetIdentifier(), false);
+	// We don't process changes caused by complete / fail until barriers resolved (see ProcessQuestStatusChange)
+	
 }
 
 void USuqsProgression::RaiseQuestFailed(USuqsQuestState* Quest)
 {
-	// Move quest to the correct list
-	ActiveQuests.Remove(Quest->GetIdentifier());
-	QuestArchive.Add(Quest->GetIdentifier(), Quest);
-
 	if (!bSuppressEvents)
 		OnQuestFailed.Broadcast(Quest);
 
-	AutoAcceptQuests(Quest->GetIdentifier(), true);
+	// We don't process changes caused by complete / fail until barriers resolved (see ProcessQuestStatusChange)
+	
 }
 
 void USuqsProgression::RaiseQuestReset(USuqsQuestState* Quest)
 {
-	// Move quest to the correct list
-	QuestArchive.Remove(Quest->GetIdentifier());
+	// Move quest to the correct list immediately, unlike complete / fail
+	const int NumRemoved = QuestArchive.Remove(Quest->GetIdentifier());
 	ActiveQuests.Add(Quest->GetIdentifier(), Quest);
 	
 	if (!bSuppressEvents)
+	{
 		OnQuestAccepted.Broadcast(Quest);
+		if (NumRemoved > 0)
+			OnActiveQuestsListChanged.Broadcast();
+	}
+}
+
+void USuqsProgression::ProcessQuestStatusChange(USuqsQuestState* Quest)
+{
+	// Quest list and dependent quest acceptance is potentially delayed for completion / failed
+	const ESuqsQuestStatus Status = Quest->GetStatus();
+	if (Status == ESuqsQuestStatus::Completed ||
+		Status == ESuqsQuestStatus::Failed)
+	{
+		// Move quest to the correct list
+		ActiveQuests.Remove(Quest->GetIdentifier());
+		QuestArchive.Add(Quest->GetIdentifier(), Quest);
+		AutoAcceptQuests(Quest->GetIdentifier(), Status == ESuqsQuestStatus::Failed);
+		if (!bSuppressEvents)
+			OnActiveQuestsListChanged.Broadcast();
+		
+	}
 }
 
 const FSuqsQuest* USuqsProgression::GetQuestDefinition(const FName& QuestID)
@@ -700,8 +718,8 @@ FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForTask(const FSu
 
 	// TODO: determine barriers from task definition if set
 
-	// Always unprocessed
-	Barrier.bProcessed = false;
+	// Always pending, even if no condition, since need to raise event once
+	Barrier.bPending = true;
 	return Barrier;
 }
 
@@ -722,8 +740,8 @@ FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForObjective(cons
 
 	// TODO: determine barriers from objective definition if set
 
-	// Always unprocessed
-	Barrier.bProcessed = false;
+	// Always pending, even if no condition, since need to raise event once
+	Barrier.bPending = true;
 	return Barrier;
 }
 
@@ -742,8 +760,8 @@ FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForQuest(const FS
 	}
 	// TODO: determine barriers from quest definition if set
 
-	// Always unprocessed
-	Barrier.bProcessed = false;
+	// Always pending, even if no condition, since need to raise event once
+	Barrier.bPending = true;
 	return Barrier;
 }
 

@@ -55,23 +55,23 @@ struct FSuqsProgressionBarrier
 	UPROPERTY(BlueprintReadOnly)
 	FName Gate;
 
-	/// Flag indicating whether this barrier has been processed following being fulfilled
+	/// Flag indicating whether this barrier is still pending resolution
 	UPROPERTY(BlueprintReadOnly)
-	bool bProcessed;
+	bool bPending;
 
 	FSuqsProgressionBarrier() :
 		Conditions(0),
 		TimeRemaining(0),
 		Gate(FName()),
-		bProcessed(false)
+		bPending(false)
 	{
 	}
 
-	FSuqsProgressionBarrier(int32 Barriers, float TimeRemaining, const FName& Gate, bool bProcessed)
+	FSuqsProgressionBarrier(int32 Barriers, float TimeRemaining, const FName& Gate, bool bPending)
 		: Conditions(Barriers),
 		  TimeRemaining(TimeRemaining),
 		  Gate(Gate),
-		  bProcessed(bProcessed)
+		  bPending(bPending)
 	{
 	}
 };
@@ -103,6 +103,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
 	int CurrentObjectiveIndex = -1;
 
+	/// A barrier is set when status changes but parent hasn't been notified yet
+	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
+	FSuqsProgressionBarrier ProgressionBarrier;
 
 	UPROPERTY()
 	TMap<FName, USuqsTaskState*> FastTaskLookup;
@@ -114,6 +117,9 @@ protected:
 	void Initialise(const FSuqsQuest* Def, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsQuestStatus NewStatus);
+	void QueueStatusChangeNotification();
+	bool IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const;
+	void MaybeNotifyStatusChange();
 	
 public:
 	ESuqsQuestStatus GetStatus() const { return Status; }

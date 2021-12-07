@@ -15,6 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskFailed, USuqsTaskState*, Task
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveCompleted, USuqsObjectiveState*, Objective);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveFailed, USuqsObjectiveState*, Objective);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnActiveQuestsListChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestCompleted, USuqsQuestState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestFailed, USuqsQuestState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, Quest);
@@ -128,6 +129,9 @@ public:
 	/// Fired when a quest has been accepted for the first time
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestAccepted OnQuestAccepted;
+	/// Fired whenever the active quest list changes
+	UPROPERTY(BlueprintAssignable)
+	FOnActiveQuestsListChanged OnActiveQuestsListChanged;
 
 	/// Use this from C++ to receive access to the loaded quest data before it's applied to this progression
 	/// You can therefore change the quest data if you need to adapt it due to quest changes
@@ -352,6 +356,8 @@ public:
 	void RaiseQuestCompleted(USuqsQuestState* Quest);
 	void RaiseQuestFailed(USuqsQuestState* Quest);
 	void RaiseQuestReset(USuqsQuestState* Quest);
+
+	void ProcessQuestStatusChange(USuqsQuestState* Quest);
 
 	const FSuqsQuest* GetQuestDefinition(const FName& QuestID);
 

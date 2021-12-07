@@ -353,5 +353,54 @@ void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
 			break;
 		default: break;
 		}
+
+		QueueStatusChangeNotification();
+	}
+}
+
+void USuqsQuestState::QueueStatusChangeNotification()
+{
+	ProgressionBarrier = Progression->GetProgressionBarrierForQuest(QuestDefinition, Status);
+
+	// May immediately be satisfied
+	MaybeNotifyStatusChange();
+	
+}
+
+bool USuqsQuestState::IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const
+{
+	return ProgressionBarrier.bPending &&
+	   (ProgressionBarrier.Conditions & static_cast<uint32>(Barrier)) > 0;
+}
+
+void USuqsQuestState::MaybeNotifyStatusChange()
+{
+	// Early-out if barrier has already been processed so we only do this once per status change
+	if (!ProgressionBarrier.bPending)
+		return;
+
+	// Assume cleared
+	bool bCleared = true;
+
+	// All conditions have to be fulfilled
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
+	{
+		if (ProgressionBarrier.TimeRemaining > 0)
+		{
+			bCleared = false;
+		}
+	}
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate))
+	{
+		if (!Progression->IsGateOpen(ProgressionBarrier.Gate))
+		{
+			bCleared = false;
+		}
+	}
+	
+	if (bCleared)
+	{
+		Progression->ProcessQuestStatusChange(this);
+		ProgressionBarrier.bPending = false;
 	}
 }

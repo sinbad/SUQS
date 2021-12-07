@@ -84,14 +84,14 @@ void USuqsTaskState::QueueParentStatusChangeNotification()
 
 bool USuqsTaskState::IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const
 {
-	return ProgressionBarrier.bProcessed == false &&
+	return ProgressionBarrier.bPending &&
 	   (ProgressionBarrier.Conditions & static_cast<uint32>(Barrier)) > 0;
 }
 
 void USuqsTaskState::MaybeNotifyParentStatusChange()
 {
 	// Early-out if barrier has already been processed so we only do this once per status change
-	if (ProgressionBarrier.bProcessed)
+	if (!ProgressionBarrier.bPending)
 		return;
 
 	// Assume cleared
@@ -116,7 +116,7 @@ void USuqsTaskState::MaybeNotifyParentStatusChange()
 	if (bCleared)
 	{
 		ParentObjective->NotifyTaskStatusChanged();
-		ProgressionBarrier.bProcessed = true;
+		ProgressionBarrier.bPending = false;
 	}
 }
 

@@ -200,7 +200,54 @@ void USuqsObjectiveState::ChangeStatus(ESuqsObjectiveStatus NewStatus)
 		default: break;
 		}
 
-		ParentQuest->NotifyObjectiveStatusChanged();
+		QueueParentStatusChangeNotification();
 		
+	}
+}
+
+void USuqsObjectiveState::QueueParentStatusChangeNotification()
+{
+	ProgressionBarrier = Progression->GetProgressionBarrierForObjective(ObjectiveDefinition, Status);
+
+	// May immediately be satisfied
+	MaybeNotifyParentStatusChange();
+	
+}
+
+bool USuqsObjectiveState::IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const
+{
+	return ProgressionBarrier.bPending &&
+	   (ProgressionBarrier.Conditions & static_cast<uint32>(Barrier)) > 0;
+}
+
+void USuqsObjectiveState::MaybeNotifyParentStatusChange()
+{
+	// Early-out if barrier has already been processed so we only do this once per status change
+	if (!ProgressionBarrier.bPending)
+		return;
+
+	// Assume cleared
+	bool bCleared = true;
+
+	// All conditions have to be fulfilled
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
+	{
+		if (ProgressionBarrier.TimeRemaining > 0)
+		{
+			bCleared = false;
+		}
+	}
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate))
+	{
+		if (!Progression->IsGateOpen(ProgressionBarrier.Gate))
+		{
+			bCleared = false;
+		}
+	}
+	
+	if (bCleared)
+	{
+		ParentQuest->NotifyObjectiveStatusChanged();
+		ProgressionBarrier.bPending = false;
 	}
 }
