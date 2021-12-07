@@ -57,9 +57,9 @@ protected:
 	TMultiMap<FName, FName> QuestFailureDeps;
 
 	bool bSuppressEvents = false;
-	float DefaultQuestProgressionTimeDelay = 2;
+	float DefaultQuestProgressionTimeDelay = 0;
 	float DefaultObjectiveProgressionTimeDelay = 0;
-	float DefaultTaskProgressionTimeDelay = 2;
+	float DefaultTaskProgressionTimeDelay = 0;
 	
 
 	USuqsQuestState* FindQuestState(const FName& QuestID);
