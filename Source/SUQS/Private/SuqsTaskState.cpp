@@ -187,3 +187,9 @@ void USuqsTaskState::Reset()
 	TimeRemaining = TaskDefinition->TimeLimit;
 	ChangeStatus(ESuqsTaskStatus::NotStarted);
 }
+
+void USuqsTaskState::NotifyGateOpened(const FName& GateName)
+{
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate) && ProgressionBarrier.Gate == GateName)
+		MaybeNotifyParentStatusChange();
+}

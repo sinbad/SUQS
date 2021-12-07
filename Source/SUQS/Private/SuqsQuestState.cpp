@@ -341,6 +341,19 @@ void USuqsQuestState::OverrideStatus(ESuqsQuestStatus OverrideStatus)
 	ChangeStatus(OverrideStatus);
 }
 
+void USuqsQuestState::NotifyGateOpened(const FName& GateName)
+{
+	// This one proceeds downards to children
+	// Cascade first so that objectives & tasks are finished first
+	for (auto Obj : Objectives)
+	{
+		Obj->NotifyGateOpened(GateName);
+	}
+
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate) && ProgressionBarrier.Gate == GateName)
+		MaybeNotifyStatusChange();
+}
+
 void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
 {
 	if (Status != NewStatus)

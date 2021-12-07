@@ -132,4 +132,6 @@ public:
 	/// Reset the progress on this task back to the initial state
 	UFUNCTION(BlueprintCallable)
     void Reset();
+	
+	void NotifyGateOpened(const FName& GateName);
 };

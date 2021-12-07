@@ -267,4 +267,5 @@ public:
 	void NotifyObjectiveStatusChanged();
 
 	void OverrideStatus(ESuqsQuestStatus OverrideStatus);
+	void NotifyGateOpened(const FName& GateName);
 };

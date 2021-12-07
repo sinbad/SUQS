@@ -580,8 +580,22 @@ const TArray<FName>& USuqsProgression::GetGlobalActiveQuestBranches() const
 
 void USuqsProgression::SetGateOpen(FName GateName, bool bOpen)
 {
+	// Ignore nonsense
+	if (GateName.IsNone())
+		return;
+	
 	if (bOpen)
-		OpenGates.Add(GateName);
+	{
+		bool bWasNew;
+		OpenGates.Add(GateName, &bWasNew);
+		if (bWasNew)
+		{
+			for (auto Pair : ActiveQuests)
+			{
+				Pair.Value->NotifyGateOpened(GateName);
+			}
+		}
+	}
 	else
 		OpenGates.Remove(GateName);
 }

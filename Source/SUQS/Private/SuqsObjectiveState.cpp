@@ -188,6 +188,20 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 
 }
 
+void USuqsObjectiveState::NotifyGateOpened(const FName& GateName)
+{
+	// This one proceeds downards to children
+	// Cascade first so that tasks are finished first
+	for (auto Task : Tasks)
+	{
+		Task->NotifyGateOpened(GateName);
+	}
+
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate) && ProgressionBarrier.Gate == GateName)
+		MaybeNotifyParentStatusChange();
+	
+}
+
 void USuqsObjectiveState::ChangeStatus(ESuqsObjectiveStatus NewStatus)
 {
 	if (Status != NewStatus)

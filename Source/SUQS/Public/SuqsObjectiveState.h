@@ -125,4 +125,5 @@ public:
 
 	
 	void NotifyTaskStatusChanged();
+	void NotifyGateOpened(const FName& GateName);
 };
