@@ -112,6 +112,10 @@ public:
 	UFUNCTION(BlueprintCallable)
     void SetTimeRemaining(float T);
 
+	/// Directly change the barrier state
+	UFUNCTION(BlueprintCallable)
+	void SetProgressionBarrier(const FSuqsProgressionBarrier& Barrier);
+
 	/// Get the number of "things" still left to do, will only be > 1 if TargetNumber on the task was > 1
 	UFUNCTION(BlueprintCallable)
     int GetNumberOutstanding() const;

@@ -1,15 +1,46 @@
 #include "SuqsSaveData.h"
 
+#include "SuqsQuestState.h"
+
 constexpr int CurrentFileVersion = 2;
 
 constexpr int FileVersion_AddedOpenGates = 2;
+constexpr int FileVersion_AddedBarrierState = 2;
 
+
+void FSuqsProgressionBarrierStateData::SaveToArchive(FArchive& Ar)
+{
+	Ar << Conditions;
+	Ar << TimeRemaining;
+	Ar << Gate;
+	Ar << bPending;
+}
+
+void FSuqsProgressionBarrierStateData::LoadFromArchive(FArchive& Ar, int FileVersion)
+{
+	Ar << Conditions;
+	Ar << TimeRemaining;
+	Ar << Gate;
+	Ar << bPending;
+}
+
+FSuqsProgressionBarrierStateData& FSuqsProgressionBarrierStateData::operator=(
+	const FSuqsProgressionBarrier& PB)
+{
+	Conditions = PB.Conditions;
+	TimeRemaining = PB.TimeRemaining;
+	Gate = PB.Gate.IsNone() ? "" : PB.Gate.ToString();
+	bPending = PB.bPending;
+	return *this;
+}
 
 void FSuqsTaskStateData::SaveToArchive(FArchive& Ar)
 {
 	Ar << Identifier;
 	Ar << Number;
 	Ar << TimeRemaining;
+	ProgressionBarrier.SaveToArchive(Ar);
+	
 }
 
 void FSuqsTaskStateData::LoadFromArchive(FArchive& Ar, int FileVersion)
@@ -22,6 +53,11 @@ void FSuqsTaskStateData::LoadFromArchive(FArchive& Ar, int FileVersion)
 	Ar << Identifier;
 	Ar << Number;
 	Ar << TimeRemaining;
+
+	if (FileVersion >= FileVersion_AddedBarrierState)
+	{
+		ProgressionBarrier.LoadFromArchive(Ar, FileVersion);
+	}
 	
 }
 
@@ -32,6 +68,8 @@ void FSuqsQuestStateData::SaveToArchive(FArchive& Ar)
 	Ar << IntStatus;
 
 	Ar << ActiveBranches;
+
+	ProgressionBarrier.SaveToArchive(Ar);
 
 	int NumTasks = TaskData.Num();
 	Ar << NumTasks;
@@ -56,6 +94,11 @@ void FSuqsQuestStateData::LoadFromArchive(FArchive& Ar, int FileVersion)
 	Status = static_cast<ESuqsQuestDataStatus>(IntStatus);
 
 	Ar << ActiveBranches;
+
+	if (FileVersion >= FileVersion_AddedBarrierState)
+	{
+		ProgressionBarrier.LoadFromArchive(Ar, FileVersion);
+	}
 
 	int NumTasks;
 	Ar << NumTasks;

@@ -49,6 +49,13 @@ void USuqsTaskState::SetTimeRemaining(float T)
 	}	
 }
 
+void USuqsTaskState::SetProgressionBarrier(const FSuqsProgressionBarrier& Barrier)
+{
+	ProgressionBarrier = Barrier;
+	// In case manually changing to free up
+	MaybeNotifyParentStatusChange();
+}
+
 void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus)
 {
 	if (Status != NewStatus)

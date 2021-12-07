@@ -74,6 +74,22 @@ struct FSuqsProgressionBarrier
 		  bPending(bPending)
 	{
 	}
+
+	::FSuqsProgressionBarrier& operator=(const FSuqsProgressionBarrierStateData& B)
+	{
+		Conditions = B.Conditions;
+		TimeRemaining = B.TimeRemaining;
+		Gate = FName(B.Gate);
+		bPending = B.bPending;
+		return *this;
+	}
+
+	FSuqsProgressionBarrier(const FSuqsProgressionBarrierStateData& B)
+	{
+		*this = B;
+	}
+
+	
 };
 
 /**

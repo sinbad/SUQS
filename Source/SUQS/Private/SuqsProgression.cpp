@@ -843,6 +843,8 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 			// This will re-create the quest structure, including objectives and tasks, based on *current* definition
 			Q->Initialise(QDef, this);
 
+			Q->ProgressionBarrier = QData.ProgressionBarrier;
+			
 			for (FString Branch : QData.ActiveBranches)
 			{
 				Q->SetBranchActive(FName(Branch), true);
@@ -853,6 +855,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 				// Discard task state which isn't in the quest any more
 				if (auto T = Q->GetTask(FName(TData.Identifier)))
 				{
+					T->SetProgressionBarrier(TData.ProgressionBarrier);
 					T->SetNumber(TData.Number);
 					T->SetTimeRemaining(TData.TimeRemaining);
 				}		
@@ -935,6 +938,8 @@ void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSav
 		{
 			QData.ActiveBranches.Add(Branch.ToString());
 		}
+
+		QData.ProgressionBarrier = Q->ProgressionBarrier;
 
 		for (auto O : Q->Objectives)
 		{
