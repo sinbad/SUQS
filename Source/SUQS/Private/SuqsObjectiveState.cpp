@@ -32,7 +32,12 @@ void USuqsObjectiveState::Tick(float DeltaTime)
 	{
 		Task->Tick(DeltaTime);
 	}
-	
+
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
+	{
+		ProgressionBarrier.TimeRemaining = FMath::Max(ProgressionBarrier.TimeRemaining - DeltaTime, 0.f);
+		MaybeNotifyParentStatusChange();
+	}
 }
 
 

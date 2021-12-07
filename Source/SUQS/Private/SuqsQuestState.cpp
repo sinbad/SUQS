@@ -41,7 +41,14 @@ void USuqsQuestState::Tick(float DeltaTime)
 	if (Obj)
 	{
 		Obj->Tick(DeltaTime);
-	}	
+	}
+	
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
+	{
+		ProgressionBarrier.TimeRemaining = FMath::Max(ProgressionBarrier.TimeRemaining - DeltaTime, 0.f);
+		MaybeNotifyStatusChange();
+	}
+	
 }
 
 
