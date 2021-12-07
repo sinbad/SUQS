@@ -65,6 +65,24 @@ tasks, this will be when the task becomes the next in the list, or for non-seque
 tasks it will be when the parent Objective becomes current. You can reset the
 timer by resetting the task.
 
+### Progression Delay
+
+When this objective completes or fails, a time delay can be added before the knock-on effects
+of this are resolved, such as activating the next objective, or completing/failing the quest.
+
+It defaults to -1 which means to not add a specific delay to this quest, and to use whatever
+defaults are set in [Progression](Progression.md).
+
+### Progression Gate
+
+Much like Progression Delay, this adds a delay between completing/failing the objective, and
+the knock-on effects; except this time the delay is user-controlled, and will only be
+activated when the named "Gate" is opened on [Progression](Progression.md).
+
+This lets you precisely control when the next steps in the quest line are activated, instead
+of happening immediately on completion/failure, which can be useful for narrative pacing.
+
+
 ## Task Progression
 
 This covers how tasks are defined, see [Progression](Progression.md) for more 

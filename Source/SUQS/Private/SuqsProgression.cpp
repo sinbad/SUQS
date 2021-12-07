@@ -714,10 +714,19 @@ FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForTask(const FSu
 			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
 			Barrier.TimeRemaining = DefaultTaskProgressionTimeDelay;
 		}
+
+		if (Task->ProgressionDelay >= 0) // >= because default is -1, so that 0 can override >0 default
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
+			Barrier.TimeRemaining = Task->ProgressionDelay;
+		}
+		if (!Task->ProgressionGate.IsNone())
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Gate);
+			Barrier.Gate = Task->ProgressionGate;
+		}
 	}
-
-	// TODO: determine barriers from task definition if set
-
+	
 	// Always pending, even if no condition, since need to raise event once
 	Barrier.bPending = true;
 	return Barrier;
@@ -736,16 +745,25 @@ FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForObjective(cons
 			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
 			Barrier.TimeRemaining = DefaultObjectiveProgressionTimeDelay;
 		}
+		if (Obj->ProgressionDelay >= 0) // >= because default is -1, so that 0 can override >0 default
+			{
+			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
+			Barrier.TimeRemaining = Obj->ProgressionDelay;
+			}
+		if (!Obj->ProgressionGate.IsNone())
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Gate);
+			Barrier.Gate = Obj->ProgressionGate;
+		}
 	}
 
-	// TODO: determine barriers from objective definition if set
 
 	// Always pending, even if no condition, since need to raise event once
 	Barrier.bPending = true;
 	return Barrier;
 }
 
-FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForQuest(const FSuqsQuest* Q, ESuqsQuestStatus Status) const
+FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForQuest(const FSuqsQuest* Quest, ESuqsQuestStatus Status) const
 {
 	FSuqsProgressionBarrier Barrier;
 
@@ -757,8 +775,17 @@ FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForQuest(const FS
 			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
 			Barrier.TimeRemaining = DefaultQuestProgressionTimeDelay;
 		}
+		if (Quest->ProgressionDelay >= 0) // >= because default is -1, so that 0 can override >0 default
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
+			Barrier.TimeRemaining = Quest->ProgressionDelay;
+		}
+		if (!Quest->ProgressionGate.IsNone())
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Gate);
+			Barrier.Gate = Quest->ProgressionGate;
+		}
 	}
-	// TODO: determine barriers from quest definition if set
 
 	// Always pending, even if no condition, since need to raise event once
 	Barrier.bPending = true;

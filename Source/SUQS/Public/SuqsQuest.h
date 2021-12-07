@@ -35,6 +35,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	float TimeLimit = 0;
 
+	/// An optional time delay so that after this task is completed / failed, this much time must pass before the
+	/// knock-on effects of that are resolved (activating next task etc)
+	/// If set to >= 0 this will override any defaults set via USuqsProgression::SetDefaultProgressionTimeDelays
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
+	float ProgressionDelay = -1;
+
+	/// If set, when this task is completed or failed, the knock-on effects of this will not be resolved until
+	/// the Gate of this name is opened on USuqsProgression. This allows you to control precisely when the next task
+	/// after this one is activated.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
+	FName ProgressionGate;
+
 };
 
 /// A sub-objective of a quest. These objectives are always sequential, but branching can be supported by association with quest branches
@@ -79,6 +91,18 @@ public:
 	/// Objectives are always still sequential but essentially depend on the previous active objective (taking into account branches)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	FName Branch;
+	
+	/// An optional time delay so that after this objective is completed / failed, this much time must pass before the
+	/// knock-on effects of that are resolved (activating next objective, completing/failing the quest etc)
+	/// If set to >= 0 this will override any defaults set via USuqsProgression::SetDefaultProgressionTimeDelays
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
+	float ProgressionDelay = -1;
+
+	/// If set, when this objective is completed or failed, the knock-on effects of this will not be resolved until
+	/// the Gate of this name is opened on USuqsProgression. This allows you to control precisely when the next steps
+	/// after completion / failure happen
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
+	FName ProgressionGate;
 	
 	/// List of actual tasks that must be performed to complete this objective. 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
@@ -150,6 +174,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	TArray<FName> DefaultActiveBranches;
 
+	/// An optional time delay so that after this quest is completed / failed, this much time must pass before the
+	/// knock-on effects of that are resolved (activating a dependent quest, removing it from the active quests)
+	/// If set to >= 0 this will override any defaults set via USuqsProgression::SetDefaultProgressionTimeDelays
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
+	float ProgressionDelay = -1;
+
+	/// If set, when this quest is completed or failed, the knock-on effects of this will not be resolved until
+	/// the Gate of this name is opened on USuqsProgression. This allows you to control precisely when the quest disappears
+	/// from the active list, or when quests that come after it are accepted, instead of immediately
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
+	FName ProgressionGate;
+	
 	/// List of objectives involved in the quest. They are all sequential, and mandatory, but may be hidden to provide some branching
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	TArray<FSuqsObjective> Objectives;

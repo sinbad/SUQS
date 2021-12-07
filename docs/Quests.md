@@ -244,6 +244,22 @@ When you're making [branching quests](Branching.md) with mutually exclusive path
 want to set certain branches active by default so that, if you don't change anything, the
 quest always has a default path to go down. 
 
+### Progression Delay
+
+When this quest completes or fails, a time delay can be added before the knock-on effects 
+of this are resolved, such as updating the quest lists, and activating dependent quests.
+It defaults to -1 which means to not add a specific delay to this quest, and to use whatever
+defaults are set in [Progression](Progression.md).
+
+### Progression Gate
+
+Much like Progression Delay, this adds a delay between completing/failing the quest, and
+the knock-on effects; except this time the delay is user-controlled, and will only be
+activated when the named "Gate" is opened on [Progression](Progression.md).
+
+This lets you precisely control when the next steps in the quest line are activated, instead
+of happening immediately on completion/failure, which can be useful for narrative pacing.
+
 ### Objectives
 
 The list of [Objectives](Objectives.md) which make up this quest.

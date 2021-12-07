@@ -109,3 +109,13 @@ The "Accept Quest" function actually resets failed quests by default. Any other
 quests you can restart using the `Reset` function. You can also reset specific
 objectives or tasks if you just want to re-do a particular part of a quest.
 
+## Default Progression Time Delays
+
+While you can specify time delays between when quests/objectives/tasks are completed/failed
+and the knock-on effects of that change in the quest definitions, if you just want a 
+default time delay - e.g. for your UI to do a little "completed" animation & for the player
+to have time to see it - you can set this using `USuqsProgression::SetDefaultProgressionTimeDelays`.
+
+Time delays for quests, objectives and tasks can potentially all chain together, e.g. completing a task
+completes its parent objective, which can also complete the quest. All 3 delays will occur in
+that scenario, one after the other.
