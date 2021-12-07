@@ -27,7 +27,7 @@ enum class ESuqsQuestStatus : uint8
 };
 
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
-enum class ESuqsProgressionBarrierType : uint8
+enum class ESuqsProgressionBarrierCondition : uint8
 {
 	None       = 0 UMETA(Hidden),
 	/// Progression won't occur until time passes
@@ -36,16 +36,16 @@ enum class ESuqsProgressionBarrierType : uint8
 	Gate       = 1 << 1,
 
 };
-ENUM_CLASS_FLAGS(ESuqsProgressionBarrierType);
+ENUM_CLASS_FLAGS(ESuqsProgressionBarrierCondition);
 
 USTRUCT(BlueprintType)
 struct FSuqsProgressionBarrier
 {
 	GENERATED_BODY()
 
-	/// Bitflags identifying the barrier(s) to progression
-	UPROPERTY(BlueprintReadOnly, meta = (Bitmask, BitmaskEnum = ESuqsProgressionBarrierType))
-	int32 Barrier;
+	/// Bitflags identifying the conditional barriers to progression
+	UPROPERTY(BlueprintReadOnly, meta = (Bitmask, BitmaskEnum = ESuqsProgressionBarrierCondition))
+	int32 Conditions;
 
 	/// The time remaining if the barrier includes time
 	UPROPERTY(BlueprintReadOnly)
@@ -60,7 +60,7 @@ struct FSuqsProgressionBarrier
 	bool bProcessed;
 
 	FSuqsProgressionBarrier() :
-		Barrier(0),
+		Conditions(0),
 		TimeRemaining(0),
 		Gate(FName()),
 		bProcessed(false)
@@ -68,7 +68,7 @@ struct FSuqsProgressionBarrier
 	}
 
 	FSuqsProgressionBarrier(int32 Barriers, float TimeRemaining, const FName& Gate, bool bProcessed)
-		: Barrier(Barriers),
+		: Conditions(Barriers),
 		  TimeRemaining(TimeRemaining),
 		  Gate(Gate),
 		  bProcessed(bProcessed)

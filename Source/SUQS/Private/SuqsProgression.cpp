@@ -43,6 +43,13 @@ void USuqsProgression::InitWithQuestDataTablesInPaths(const TArray<FString>& Pat
 	InitWithQuestDataTables(DataTables);
 }
 
+void USuqsProgression::SetDefaultProgressionTimeDelays(float QuestDelay, float ObjectiveDelay, float TaskDelay)
+{
+	DefaultQuestProgressionTimeDelay = QuestDelay;
+	DefaultObjectiveProgressionTimeDelay = ObjectiveDelay;
+	DefaultTaskProgressionTimeDelay = TaskDelay;
+}
+
 
 void USuqsProgression::RebuildAllQuestData()
 {
@@ -677,38 +684,67 @@ const FSuqsQuest* USuqsProgression::GetQuestDefinition(const FName& QuestID)
 }
 
 FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForTask(const FSuqsTask* Task,
-	ESuqsTaskStatus Status)
+	ESuqsTaskStatus Status) const
 {
-	// TODO: determine barrier for completion / failed
-	return FSuqsProgressionBarrier(
-		0,
-		0.f,
-		FName(),
-		false
-	);
+	FSuqsProgressionBarrier Barrier;
+
+	if (Status == ESuqsTaskStatus::Completed ||
+		Status == ESuqsTaskStatus::Failed)
+	{
+		if (DefaultTaskProgressionTimeDelay > 0)
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
+			Barrier.TimeRemaining = DefaultTaskProgressionTimeDelay;
+		}
+	}
+
+	// TODO: determine barriers from task definition if set
+
+	// Always unprocessed
+	Barrier.bProcessed = false;
+	return Barrier;
 }
 
 FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForObjective(const FSuqsObjective* Obj,
-	ESuqsTaskStatus Status)
+	ESuqsObjectiveStatus Status) const
 {
-	// TODO: determine barrier for completion / failed
-	return FSuqsProgressionBarrier(
-		0,
-		0.f,
-		FName(),
-		false
-	);
+	FSuqsProgressionBarrier Barrier;
+
+	if (Status == ESuqsObjectiveStatus::Completed ||
+		Status == ESuqsObjectiveStatus::Failed)
+	{
+		if (DefaultObjectiveProgressionTimeDelay > 0)
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
+			Barrier.TimeRemaining = DefaultObjectiveProgressionTimeDelay;
+		}
+	}
+
+	// TODO: determine barriers from objective definition if set
+
+	// Always unprocessed
+	Barrier.bProcessed = false;
+	return Barrier;
 }
 
-FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForQuest(const FSuqsQuest* Q, ESuqsTaskStatus Status)
+FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForQuest(const FSuqsQuest* Q, ESuqsQuestStatus Status) const
 {
-	// TODO: determine barrier for completion / failed
-	return FSuqsProgressionBarrier(
-		0,
-		0.f,
-		FName(),
-		false
-	);
+	FSuqsProgressionBarrier Barrier;
+
+	if (Status == ESuqsQuestStatus::Completed ||
+		Status == ESuqsQuestStatus::Failed)
+	{
+		if (DefaultQuestProgressionTimeDelay > 0)
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
+			Barrier.TimeRemaining = DefaultQuestProgressionTimeDelay;
+		}
+	}
+	// TODO: determine barriers from quest definition if set
+
+	// Always unprocessed
+	Barrier.bProcessed = false;
+	return Barrier;
 }
 
 // FTickableGameObject start

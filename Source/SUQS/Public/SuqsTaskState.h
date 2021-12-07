@@ -58,7 +58,7 @@ protected:
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsTaskStatus NewStatus);
 	void QueueParentStatusChangeNotification();
-	bool IsProgressionBarrier(ESuqsProgressionBarrierType Barrier) const;
+	bool IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const;
 	void MaybeNotifyParentStatusChange();
 public:
 	// expose BP properties for C++ 

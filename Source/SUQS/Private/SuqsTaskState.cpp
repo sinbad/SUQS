@@ -23,7 +23,13 @@ void USuqsTaskState::Tick(float DeltaTime)
 		TimeRemaining > 0)
 	{
 		SetTimeRemaining(TimeRemaining - DeltaTime);
-	}	
+	}
+
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
+	{
+		ProgressionBarrier.TimeRemaining = FMath::Max(ProgressionBarrier.TimeRemaining - DeltaTime, 0.f);
+		MaybeNotifyParentStatusChange();
+	}
 }
 
 
@@ -76,9 +82,10 @@ void USuqsTaskState::QueueParentStatusChangeNotification()
 	
 }
 
-bool USuqsTaskState::IsProgressionBarrier(ESuqsProgressionBarrierType Barrier) const
+bool USuqsTaskState::IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const
 {
-	return (ProgressionBarrier.Barrier & static_cast<uint32>(Barrier)) > 0;
+	return ProgressionBarrier.bProcessed == false &&
+	   (ProgressionBarrier.Conditions & static_cast<uint32>(Barrier)) > 0;
 }
 
 void USuqsTaskState::MaybeNotifyParentStatusChange()
@@ -91,14 +98,14 @@ void USuqsTaskState::MaybeNotifyParentStatusChange()
 	bool bCleared = true;
 
 	// All conditions have to be fulfilled
-	if (IsProgressionBarrier(ESuqsProgressionBarrierType::Time))
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
 	{
 		if (ProgressionBarrier.TimeRemaining > 0)
 		{
 			bCleared = false;
 		}
 	}
-	if (IsProgressionBarrier(ESuqsProgressionBarrierType::Gate))
+	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate))
 	{
 		if (!Progression->IsGateOpen(ProgressionBarrier.Gate))
 		{
