@@ -222,6 +222,7 @@ public:
 	/// Get the next mandatory task for this quest
 	/// If the objective for this quest only requires ONE of a number of tasks to be completed, this will be the first one.
 	/// Check the current objective for more details.
+	/// May return nullptr if there is nothing to do next right now (may occur due to e.g. barriers)
 	UFUNCTION(BlueprintCallable)
 	USuqsTaskState* GetNextMandatoryTask() const;
 
