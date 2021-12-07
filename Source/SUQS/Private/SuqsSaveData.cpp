@@ -1,6 +1,8 @@
 #include "SuqsSaveData.h"
 
-constexpr int CurrentFileVersion = 1;
+constexpr int CurrentFileVersion = 2;
+
+constexpr int FileVersion_AddedOpenGates = 2;
 
 
 void FSuqsTaskStateData::SaveToArchive(FArchive& Ar)
@@ -74,6 +76,8 @@ void FSuqsSaveData::SaveToArchive(FArchive& Ar)
 
 	// Global branches
 	Ar << GlobalActiveBranches;
+	// Open gates
+	Ar << OpenGates;
 	
 	// Quests
 	int NumQuests = QuestData.Num();
@@ -97,6 +101,14 @@ void FSuqsSaveData::LoadFromArchive(FArchive& Ar)
 
 	// Global branches
 	Ar << GlobalActiveBranches;
+	if (FileVersion >= FileVersion_AddedOpenGates)
+	{
+		Ar << OpenGates;
+	}
+	else
+	{
+		OpenGates.Empty();
+	}
 
 	// Active & archived quests go together
 	int NumQuests = QuestData.Num();

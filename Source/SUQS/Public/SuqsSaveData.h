@@ -69,6 +69,7 @@ public:
 	int Version;
 	TArray<FSuqsQuestStateData> QuestData;
 	TArray<FString> GlobalActiveBranches;
+	TArray<FString> OpenGates;
 
 	void SaveToArchive(FArchive& Ar);
 	void LoadFromArchive(FArchive& Ar);

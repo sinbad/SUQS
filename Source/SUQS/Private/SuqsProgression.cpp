@@ -863,6 +863,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 	ActiveQuests.Empty();
 	QuestArchive.Empty();
 	GlobalActiveBranches.Empty();
+	OpenGates.Empty();
 
 	bSuppressEvents = true;
 	
@@ -912,6 +913,10 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 	{
 		SetGlobalQuestBranchActive(FName(Branch), true);
 	}
+	for (FString Gate : Data.OpenGates)
+	{
+		SetGateOpen(FName(Gate), true);
+	}
 	
 
 	bSuppressEvents = false;
@@ -921,9 +926,15 @@ void USuqsProgression::SaveToData(FSuqsSaveData& Data) const
 {
 	Data.QuestData.Empty();
 	Data.GlobalActiveBranches.Empty();
+	Data.OpenGates.Empty();
+	
 	for (FName Branch : GlobalActiveBranches)
 	{
 		Data.GlobalActiveBranches.Add(Branch.ToString());		
+	}
+	for (FName Gate : OpenGates)
+	{
+		Data.OpenGates.Add(Gate.ToString());		
 	}
 	SaveToData(ActiveQuests, Data);
 	SaveToData(QuestArchive, Data);
