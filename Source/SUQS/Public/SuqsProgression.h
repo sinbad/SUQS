@@ -58,7 +58,6 @@ protected:
 
 	bool bSuppressEvents = false;
 	float DefaultQuestProgressionTimeDelay = 0;
-	float DefaultObjectiveProgressionTimeDelay = 0;
 	float DefaultTaskProgressionTimeDelay = 0;
 	
 
@@ -94,16 +93,16 @@ public:
 	 * Change the default time delays between completing / failing a quest item, and the knock-on effects of that
 	 * (the next task/objective/quest being activated).
 	 * Where one completion rolls into another, the time delays are in serial. Therefore when completing the last
-	 * task in an objective, the task delay will tick by before the objective is completed, then the objective delay
-	 * will need to tick before the quest state is updated. Finally if that completes the whole quest, the quest delay
-	 * will have to tick before any dependent quests are activated.
+	 * task in a quest, the task delay will tick by before the objective is completed, which will complete the quest
+	 * and then there can be another delay before any dependent quests are activated.
+	 *
+	 * Objectives don't have a delay of their own since they're just groupings of tasks.
 	 * 
 	 * @param QuestDelay The time between a quest being completed/failed, and the effects on dependent quests (default 2)
-	 * @param ObjectiveDelay The time between an objective being completed/failed, and the effect on the parent quest and following objectives (default 0)
 	 * @param TaskDelay The time between a task being completed/failed, and dependent effects (next task, objective complete etc) (default 2)
 	 */
 	UFUNCTION(BlueprintCallable)
-	void SetDefaultProgressionTimeDelays(float QuestDelay, float ObjectiveDelay, float TaskDelay);
+	void SetDefaultProgressionTimeDelays(float QuestDelay, float TaskDelay);
 
 	/// Fired when a task is completed
 	UPROPERTY(BlueprintAssignable)
@@ -363,8 +362,6 @@ public:
 
 	/// Given a task definition and status, return progression barrier information
 	FSuqsProgressionBarrier GetProgressionBarrierForTask(const FSuqsTask* Task, ESuqsTaskStatus Status) const;
-	/// Given a task definition and status, return progression barrier information
-	FSuqsProgressionBarrier GetProgressionBarrierForObjective(const FSuqsObjective* Obj, ESuqsObjectiveStatus Status) const;
 	/// Given a task definition and status, return progression barrier information
 	FSuqsProgressionBarrier GetProgressionBarrierForQuest(const FSuqsQuest* Q, ESuqsQuestStatus Status) const;
 

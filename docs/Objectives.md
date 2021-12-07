@@ -73,24 +73,6 @@ display the collective name of the Objective to the player, or have it add extra
 the quest description, then you can supply these in the JSON. They're only used
 by any quest UI you build.
 
-### Progression Delay
-
-When this objective completes or fails, a time delay can be added before the knock-on effects
-of this are resolved, such as activating the next objective, or completing/failing the quest.
-
-It defaults to -1 which means to not add a specific delay to this quest, and to use whatever
-defaults are set in [Progression](Progression.md).
-
-### Progression Gate
-
-Much like Progression Delay, this adds a delay between completing/failing the objective, and
-the knock-on effects; except this time the delay is user-controlled, and will only be
-activated when the named "Gate" is opened on [Progression](Progression.md).
-
-This lets you precisely control when the next steps in the quest line are activated, instead
-of happening immediately on completion/failure, which can be useful for narrative pacing.
-
-
 ## More info
 
 * [Tasks](Tasks.md)

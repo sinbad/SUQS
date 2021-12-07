@@ -43,10 +43,9 @@ void USuqsProgression::InitWithQuestDataTablesInPaths(const TArray<FString>& Pat
 	InitWithQuestDataTables(DataTables);
 }
 
-void USuqsProgression::SetDefaultProgressionTimeDelays(float QuestDelay, float ObjectiveDelay, float TaskDelay)
+void USuqsProgression::SetDefaultProgressionTimeDelays(float QuestDelay, float TaskDelay)
 {
 	DefaultQuestProgressionTimeDelay = QuestDelay;
-	DefaultObjectiveProgressionTimeDelay = ObjectiveDelay;
 	DefaultTaskProgressionTimeDelay = TaskDelay;
 }
 
@@ -741,37 +740,6 @@ FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForTask(const FSu
 		}
 	}
 	
-	// Always pending, even if no condition, since need to raise event once
-	Barrier.bPending = true;
-	return Barrier;
-}
-
-FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForObjective(const FSuqsObjective* Obj,
-	ESuqsObjectiveStatus Status) const
-{
-	FSuqsProgressionBarrier Barrier;
-
-	if (Status == ESuqsObjectiveStatus::Completed ||
-		Status == ESuqsObjectiveStatus::Failed)
-	{
-		if (DefaultObjectiveProgressionTimeDelay > 0)
-		{
-			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
-			Barrier.TimeRemaining = DefaultObjectiveProgressionTimeDelay;
-		}
-		if (Obj->ProgressionDelay >= 0) // >= because default is -1, so that 0 can override >0 default
-			{
-			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
-			Barrier.TimeRemaining = Obj->ProgressionDelay;
-			}
-		if (!Obj->ProgressionGate.IsNone())
-		{
-			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Gate);
-			Barrier.Gate = Obj->ProgressionGate;
-		}
-	}
-
-
 	// Always pending, even if no condition, since need to raise event once
 	Barrier.bPending = true;
 	return Barrier;

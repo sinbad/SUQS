@@ -33,11 +33,6 @@ void USuqsObjectiveState::Tick(float DeltaTime)
 		Task->Tick(DeltaTime);
 	}
 
-	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
-	{
-		ProgressionBarrier.TimeRemaining = FMath::Max(ProgressionBarrier.TimeRemaining - DeltaTime, 0.f);
-		MaybeNotifyParentStatusChange();
-	}
 }
 
 
@@ -191,14 +186,10 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 void USuqsObjectiveState::NotifyGateOpened(const FName& GateName)
 {
 	// This one proceeds downards to children
-	// Cascade first so that tasks are finished first
 	for (auto Task : Tasks)
 	{
 		Task->NotifyGateOpened(GateName);
 	}
-
-	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate) && ProgressionBarrier.Gate == GateName)
-		MaybeNotifyParentStatusChange();
 	
 }
 
@@ -219,54 +210,9 @@ void USuqsObjectiveState::ChangeStatus(ESuqsObjectiveStatus NewStatus)
 		default: break;
 		}
 
-		QueueParentStatusChangeNotification();
-		
-	}
-}
-
-void USuqsObjectiveState::QueueParentStatusChangeNotification()
-{
-	ProgressionBarrier = Progression->GetProgressionBarrierForObjective(ObjectiveDefinition, Status);
-
-	// May immediately be satisfied
-	MaybeNotifyParentStatusChange();
-	
-}
-
-bool USuqsObjectiveState::IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const
-{
-	return ProgressionBarrier.bPending &&
-	   (ProgressionBarrier.Conditions & static_cast<uint32>(Barrier)) > 0;
-}
-
-void USuqsObjectiveState::MaybeNotifyParentStatusChange()
-{
-	// Early-out if barrier has already been processed so we only do this once per status change
-	if (!ProgressionBarrier.bPending)
-		return;
-
-	// Assume cleared
-	bool bCleared = true;
-
-	// All conditions have to be fulfilled
-	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
-	{
-		if (ProgressionBarrier.TimeRemaining > 0)
-		{
-			bCleared = false;
-		}
-	}
-	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate))
-	{
-		if (!Progression->IsGateOpen(ProgressionBarrier.Gate))
-		{
-			bCleared = false;
-		}
-	}
-	
-	if (bCleared)
-	{
+		// No barriers on objectives, just tasks and quests
+		// Objectives are just groupings and inherit their behaviour from task
 		ParentQuest->NotifyObjectiveStatusChanged();
-		ProgressionBarrier.bPending = false;
+		
 	}
 }

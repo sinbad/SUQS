@@ -102,15 +102,6 @@
                   "description": "The quest branch this objective is on. If blank, objective is always included. If you specify a branch, this objective will be ignored unless the Quest has that branch enabled.",
                   "type": "string"
                 },
-                "ProgressionDelay": {
-                  "description": "Optional time delay after completion / failure of this objective, before knock-on effects occur (activating next objective, completing/failing quest)",
-                  "type": "number",
-                  "default": -1
-                },
-                "ProgressionGate": {
-                  "description": "Optional Gate name; after completion / failure of this objective, knock-on effects won't occur until the Gate of this name is opened on the Progression instance (activating next objective, completing/failing quest)",
-                  "type": "string"
-                },
                 "Tasks": {
                   "description": "A list of tasks that make up the objective. The list can be sequential or not, can have mandatory or optional tasks",
                   "type": "array",
