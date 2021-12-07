@@ -58,13 +58,60 @@ void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus)
 		case ESuqsTaskStatus::Failed:
 			Progression->RaiseTaskFailed(this);
 			break;
-		default: break;
+		default:
+			break;
 		}
 
-		ParentObjective->NotifyTaskStatusChanged();		
+		QueueParentStatusChangeNotification();
+
 	}
 }
 
+void USuqsTaskState::QueueParentStatusChangeNotification()
+{
+	ProgressionBarrier = Progression->GetProgressionBarrierForTask(TaskDefinition, Status);
+
+	// May immediately be satisfied
+	MaybeNotifyParentStatusChange();
+	
+}
+
+bool USuqsTaskState::IsProgressionBarrier(ESuqsProgressionBarrierType Barrier) const
+{
+	return (ProgressionBarrier.Barrier & static_cast<uint32>(Barrier)) > 0;
+}
+
+void USuqsTaskState::MaybeNotifyParentStatusChange()
+{
+	// Early-out if barrier has already been processed so we only do this once per status change
+	if (ProgressionBarrier.bProcessed)
+		return;
+
+	// Assume cleared
+	bool bCleared = true;
+
+	// All conditions have to be fulfilled
+	if (IsProgressionBarrier(ESuqsProgressionBarrierType::Time))
+	{
+		if (ProgressionBarrier.TimeRemaining > 0)
+		{
+			bCleared = false;
+		}
+	}
+	if (IsProgressionBarrier(ESuqsProgressionBarrierType::Gate))
+	{
+		if (!Progression->IsGateOpen(ProgressionBarrier.Gate))
+		{
+			bCleared = false;
+		}
+	}
+	
+	if (bCleared)
+	{
+		ParentObjective->NotifyTaskStatusChanged();
+		ProgressionBarrier.bProcessed = true;
+	}
+}
 
 void USuqsTaskState::Fail()
 {

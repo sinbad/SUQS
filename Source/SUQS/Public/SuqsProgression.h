@@ -6,6 +6,7 @@
 #include "Engine/DataTable.h"
 #include "UObject/Object.h"
 #include "SuqsSaveData.h"
+#include "SuqsTaskState.h"
 #include "SuqsProgression.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskUpdated, USuqsTaskState*, Task);
@@ -48,6 +49,7 @@ protected:
 	TMap<FName, USuqsQuestState*> QuestArchive;
 
 	TArray<FName> GlobalActiveBranches;
+	TSet<FName> OpenGates;
 	// Name of quest completed -> names of other quests that depend on its completion
 	TMultiMap<FName, FName> QuestCompletionDeps;
 	// Name of quest completed -> names of other quests that depend on its failure
@@ -305,6 +307,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const TArray<FName>& GetGlobalActiveQuestBranches() const;
 
+
+	/// Set a whether a given progression gate is open. Gates are unique names which prevent automatic progression on
+	/// completion / failure of an item until that gate is set open (all gates are closed by default). This can
+	/// help you manually control when a task / objective / quest rolls over to the next on completion / failure, so
+	/// you can tick off items but not have things move forward until you're ready.
+	UFUNCTION(BlueprintCallable)
+	void SetGateOpen(FName GateName, bool bOpen = true);
+	
+	/// Return whether a gate to progression is open.
+	UFUNCTION(BlueprintCallable)
+	bool IsGateOpen(FName GateName);
+	
 	/// Return whether the dependencies for a given quest have been met
 	/// You don't usually need to call this yourself, if auto-accept is enabled on your quests. But if you
 	/// want to determine it manually you can.
@@ -321,6 +335,13 @@ public:
 	void RaiseQuestReset(USuqsQuestState* Quest);
 
 	const FSuqsQuest* GetQuestDefinition(const FName& QuestID);
+
+	/// Given a task definition and status, return progression barrier information
+	FSuqsProgressionBarrier GetProgressionBarrierForTask(const FSuqsTask* Task, ESuqsTaskStatus Status);
+	/// Given a task definition and status, return progression barrier information
+	FSuqsProgressionBarrier GetProgressionBarrierForObjective(const FSuqsObjective* Obj, ESuqsTaskStatus Status);
+	/// Given a task definition and status, return progression barrier information
+	FSuqsProgressionBarrier GetProgressionBarrierForQuest(const FSuqsQuest* Q, ESuqsTaskStatus Status);
 
 	/// Standard serialisation support
 	virtual void Serialize(FArchive& Ar) override;

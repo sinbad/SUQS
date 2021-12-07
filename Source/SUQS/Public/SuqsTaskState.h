@@ -45,6 +45,10 @@ protected:
 	bool bHidden;
 
 
+	/// A barrier is set when status changes but parent hasn't been notified yet
+	UPROPERTY(BlueprintReadOnly, Category="Task State")
+	FSuqsProgressionBarrier ProgressionBarrier;
+	
 	const FSuqsTask* TaskDefinition;
 	TWeakObjectPtr<USuqsObjectiveState> ParentObjective;
 	TWeakObjectPtr<USuqsProgression> Progression;
@@ -53,6 +57,9 @@ protected:
 	void Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsTaskStatus NewStatus);
+	void QueueParentStatusChangeNotification();
+	bool IsProgressionBarrier(ESuqsProgressionBarrierType Barrier) const;
+	void MaybeNotifyParentStatusChange();
 public:
 	// expose BP properties for C++ 
 	

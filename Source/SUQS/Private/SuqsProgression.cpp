@@ -568,6 +568,23 @@ const TArray<FName>& USuqsProgression::GetGlobalActiveQuestBranches() const
 	return GlobalActiveBranches;
 }
 
+void USuqsProgression::SetGateOpen(FName GateName, bool bOpen)
+{
+	if (bOpen)
+		OpenGates.Add(GateName);
+	else
+		OpenGates.Remove(GateName);
+}
+
+bool USuqsProgression::IsGateOpen(FName GateName)
+{
+	// No gate is always OK
+	if (GateName.IsNone())
+		return true;
+
+	return OpenGates.Contains(GateName);
+}
+
 bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
 {
 	if (auto QuestDef = QuestDefinitions.Find(QuestID))
@@ -657,6 +674,41 @@ void USuqsProgression::RaiseQuestReset(USuqsQuestState* Quest)
 const FSuqsQuest* USuqsProgression::GetQuestDefinition(const FName& QuestID)
 {
 	return QuestDefinitions.Find(QuestID);
+}
+
+FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForTask(const FSuqsTask* Task,
+	ESuqsTaskStatus Status)
+{
+	// TODO: determine barrier for completion / failed
+	return FSuqsProgressionBarrier(
+		0,
+		0.f,
+		FName(),
+		false
+	);
+}
+
+FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForObjective(const FSuqsObjective* Obj,
+	ESuqsTaskStatus Status)
+{
+	// TODO: determine barrier for completion / failed
+	return FSuqsProgressionBarrier(
+		0,
+		0.f,
+		FName(),
+		false
+	);
+}
+
+FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForQuest(const FSuqsQuest* Q, ESuqsTaskStatus Status)
+{
+	// TODO: determine barrier for completion / failed
+	return FSuqsProgressionBarrier(
+		0,
+		0.f,
+		FName(),
+		false
+	);
 }
 
 // FTickableGameObject start
