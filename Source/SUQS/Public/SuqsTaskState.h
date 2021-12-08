@@ -94,7 +94,17 @@ public:
 	/// Complete this task (setting number to target number automatically)
 	UFUNCTION(BlueprintCallable)
 	bool Complete();
-	
+
+	/**
+	 * Resolve the outcome of a completed/failed task; activate the next task, or complete/fail the quest if it's the last.
+	 * You do not normally need to call this, tasks resolve automatically on completion/failure by default. However if
+	 * the task definition sets "ResolveAutomatically" to false then you have to call this to resolve it.
+	 * Has no effect on tasks which are incomplete.
+	 * @returns Whether the task was successfully resolved
+	 */
+	UFUNCTION(BlueprintCallable)
+	void Resolve();
+
 	/**
 	 * Advance the number associated with progress on this quest. If it reaches the target number or more, it will automatically complete
 	 * @param Delta The number to change the progress by

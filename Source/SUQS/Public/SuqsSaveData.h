@@ -14,6 +14,7 @@ public:
 	int32 Conditions;
 	float TimeRemaining;
 	FString Gate;
+	bool bGrantedExplicitly;
 	bool bPending;
 	::FSuqsResolveBarrierStateData& operator=(const FSuqsResolveBarrier& Barrier);
 	void SaveToArchive(FArchive& Ar);

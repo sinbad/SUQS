@@ -13,6 +13,7 @@ void FSuqsResolveBarrierStateData::SaveToArchive(FArchive& Ar)
 	Ar << Conditions;
 	Ar << TimeRemaining;
 	Ar << Gate;
+	Ar << bGrantedExplicitly;
 	Ar << bPending;
 }
 
@@ -21,6 +22,7 @@ void FSuqsResolveBarrierStateData::LoadFromArchive(FArchive& Ar, int FileVersion
 	Ar << Conditions;
 	Ar << TimeRemaining;
 	Ar << Gate;
+	Ar << bGrantedExplicitly;
 	Ar << bPending;
 }
 
@@ -30,6 +32,7 @@ FSuqsResolveBarrierStateData& FSuqsResolveBarrierStateData::operator=(
 	Conditions = B.Conditions;
 	TimeRemaining = B.TimeRemaining;
 	Gate = B.Gate.IsNone() ? "" : B.Gate.ToString();
+	bGrantedExplicitly = B.bGrantedExplicitly;
 	bPending = B.bPending;
 	return *this;
 }

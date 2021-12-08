@@ -295,6 +295,14 @@ void USuqsProgression::CompleteQuest(FName QuestID)
 	
 }
 
+void USuqsProgression::ResolveQuest(FName QuestID)
+{
+	auto Q = FindQuestState(QuestID);
+	if (Q)
+		Q->Resolve();
+	
+}
+
 void USuqsProgression::FailTask(FName QuestID, FName TaskIdentifier)
 {
 	if (QuestID.IsNone())
@@ -359,6 +367,25 @@ int USuqsProgression::ProgressTask(FName QuestID, FName TaskIdentifier, int Delt
 			return T->Progress(Delta);
 		}
 		return 0;
+	}
+}
+
+void USuqsProgression::ResolveTask(FName QuestID, FName TaskIdentifier)
+{
+	if (QuestID.IsNone())
+	{
+		for (auto Pair : ActiveQuests)
+		{
+			Pair.Value->ResolveTask(TaskIdentifier);
+		}
+	}
+	else
+	{
+		auto T = FindTaskStatus(QuestID, TaskIdentifier);
+		if (T)
+		{
+			T->Resolve();
+		}
 	}
 }
 
@@ -738,6 +765,10 @@ FSuqsResolveBarrier USuqsProgression::GetResolveBarrierForTask(const FSuqsTask* 
 			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
 			Barrier.Gate = Task->ResolveGate;
 		}
+		if (!Task->ResolveAutomatically)
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Explicit);
+		}
 	}
 	
 	// Always pending, even if no condition, since need to raise event once
@@ -766,6 +797,10 @@ FSuqsResolveBarrier USuqsProgression::GetResolveBarrierForQuest(const FSuqsQuest
 		{
 			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
 			Barrier.Gate = Quest->ResolveGate;
+		}
+		if (!Quest->ResolveAutomatically)
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Explicit);
 		}
 	}
 
@@ -843,7 +878,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 			// This will re-create the quest structure, including objectives and tasks, based on *current* definition
 			Q->Initialise(QDef, this);
 
-			Q->ProgressionBarrier = QData.ResolveBarrier;
+			Q->ResolveBarrier = QData.ResolveBarrier;
 			
 			for (FString Branch : QData.ActiveBranches)
 			{
@@ -939,7 +974,7 @@ void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSav
 			QData.ActiveBranches.Add(Branch.ToString());
 		}
 
-		QData.ResolveBarrier = Q->ProgressionBarrier;
+		QData.ResolveBarrier = Q->ResolveBarrier;
 
 		for (auto O : Q->Objectives)
 		{

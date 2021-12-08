@@ -35,6 +35,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	float TimeLimit = 0;
 
+	/// If true (default), after this task is completed / failed, the knock-on effects such as activating the next task etc
+	/// will happen automatically. If set to false, the knock-on effects will only happen when explicitly requested
+	/// via ResolveTask
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
+	float ResolveAutomatically = true;
+	
 	/// An optional time delay so that after this task is completed / failed, this much time must pass before the
 	/// knock-on effects of that are resolved (activating next task etc)
 	/// If set to >= 0 this will override any defaults set via USuqsProgression::SetDefaultProgressionTimeDelays
@@ -162,6 +168,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	TArray<FName> DefaultActiveBranches;
 
+	/// If true (default), after this quest is completed / failed, the knock-on effects such as activating a dependent quest,
+	/// removing this from the active quests, will happen automatically. If set to false, the knock-on effects will only
+	/// happen when explicitly requested via ResolveQuest
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
+	float ResolveAutomatically = true;
+	
 	/// An optional time delay so that after this quest is completed / failed, this much time must pass before the
 	/// knock-on effects of that are resolved (activating a dependent quest, removing it from the active quests)
 	/// If set to >= 0 this will override any defaults set via USuqsProgression::SetDefaultProgressionTimeDelays

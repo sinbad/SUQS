@@ -106,6 +106,14 @@ bool USuqsQuestState::CompleteTask(FName TaskID)
 	return false;
 }
 
+void USuqsQuestState::ResolveTask(FName TaskID)
+{
+	if (auto T = GetTask(TaskID))
+	{
+		T->Resolve();
+	}
+}
+
 void USuqsQuestState::FailTask(const FName& TaskID)
 {
 	if (auto T = GetTask(TaskID))
@@ -289,6 +297,13 @@ void USuqsQuestState::Complete()
 	}
 }
 
+void USuqsQuestState::Resolve()
+{
+	ResolveBarrier.bGrantedExplicitly = true;
+	
+	MaybeNotifyStatusChange();
+}
+
 void USuqsQuestState::NotifyObjectiveStatusChanged()
 {
 	// Re-scan the objectives from top to bottom (this allows ANY change to have been made, including backtracking)
@@ -395,8 +410,12 @@ bool USuqsQuestState::IsResolveBlockedOn(ESuqsResolveBarrierCondition Barrier) c
 
 void USuqsQuestState::MaybeNotifyStatusChange()
 {
-	// Early-out if barrier has already been processed so we only do this once per status change
+	// Early-out if incomplete or barrier has already been processed so we only do this once per status change
 	if (!ResolveBarrier.bPending)
+		return;
+
+	// Can't resolve unless completed/failed
+	if (!IsCompleted() && !IsFailed())
 		return;
 
 	// Assume cleared
@@ -416,6 +435,10 @@ void USuqsQuestState::MaybeNotifyStatusChange()
 		{
 			bCleared = false;
 		}
+	}
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Explicit))
+	{
+		bCleared = ResolveBarrier.bGrantedExplicitly;
 	}
 	
 	if (bCleared)

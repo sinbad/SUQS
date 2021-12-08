@@ -34,6 +34,8 @@ enum class ESuqsResolveBarrierCondition : uint8
 	Time       = 1 << 0,
 	/// Resolve won't occur until a gate is opened (on Quest)
 	Gate       = 1 << 1,
+	/// Resolve won't occur until Resolve[Quest/Task] is called
+	Explicit   = 1 << 2,
 
 };
 ENUM_CLASS_FLAGS(ESuqsResolveBarrierCondition);
@@ -55,6 +57,10 @@ struct FSuqsResolveBarrier
 	UPROPERTY(BlueprintReadOnly)
 	FName Gate;
 
+	/// Whether explicit permission has been given to resolve
+	UPROPERTY(BlueprintReadOnly)
+	bool bGrantedExplicitly = false;
+	
 	/// Flag indicating whether this barrier is still pending resolution
 	UPROPERTY(BlueprintReadOnly)
 	bool bPending;
@@ -80,6 +86,7 @@ struct FSuqsResolveBarrier
 		Conditions = B.Conditions;
 		TimeRemaining = B.TimeRemaining;
 		Gate = FName(B.Gate);
+		bGrantedExplicitly = B.bGrantedExplicitly;
 		bPending = B.bPending;
 		return *this;
 	}
@@ -176,6 +183,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CompleteTask(FName TaskID);
 
+	/**
+	 * Resolve the outcome of a completed/failed task; activate the next task, or complete/fail the quest if it's the last.
+	 * You do not normally need to call this, tasks resolve automatically on completion/failure by default. However if
+	 * the task definition sets "ResolveAutomatically" to false then you have to call this to resolve it.
+	 * Has no effect on tasks which are incomplete.
+	 * @param TaskID The identifier of the task within the quest (required)
+	 */
+	UFUNCTION(BlueprintCallable)
+	void ResolveTask(FName TaskID);
+	
 	/**
 	 * Fail a task if it exists. 
 	 * @param TaskID The identifier of the task within the quest
@@ -275,6 +292,14 @@ public:
 	/// instead of calling this, but if you need it, this bypasses that marks all mandatory tasks as complete
 	UFUNCTION(BlueprintCallable)
 	void Complete();
+
+	/// Resolve the outcome of a completed/failed quest; move it to the quest archive and process the knock-on
+	/// effects such as activating dependent quests.
+	/// You do not normally need to call this, quests resolve automatically on completion/failure by default. However if
+	/// the quest definition sets "ResolveAutomatically" to false then you have to call this to resolve it.
+	/// Has no effect on quests which are incomplete.
+	UFUNCTION(BlueprintCallable)
+	void Resolve();
 
 	/// Find a task with the given identifier in this quest
 	UFUNCTION(BlueprintCallable)

@@ -84,7 +84,6 @@ void USuqsTaskState::QueueParentStatusChangeNotification()
 {
 	ResolveBarrier = Progression->GetResolveBarrierForTask(TaskDefinition, Status);
 
-	// May immediately be satisfied
 	MaybeNotifyParentStatusChange();
 	
 }
@@ -118,6 +117,10 @@ void USuqsTaskState::MaybeNotifyParentStatusChange()
 		{
 			bCleared = false;
 		}
+	}
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Explicit))
+	{
+		bCleared = ResolveBarrier.bGrantedExplicitly;
 	}
 	
 	if (bCleared)
@@ -158,6 +161,12 @@ bool USuqsTaskState::Complete()
 	}
 	// Already completed
 	return true;
+}
+
+void USuqsTaskState::Resolve()
+{
+	ResolveBarrier.bGrantedExplicitly = true;
+	MaybeNotifyParentStatusChange();
 }
 
 int USuqsTaskState::Progress(int Delta)

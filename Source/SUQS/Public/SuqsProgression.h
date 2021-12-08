@@ -226,6 +226,14 @@ public:
 	UFUNCTION(BlueprintCallable)
     void CompleteQuest(FName QuestID);
 
+	/// Resolve the outcome of a completed/failed quest; move it to the quest archive and process the knock-on
+	/// effects such as activating dependent quests.
+	/// You do not normally need to call this, quests resolve automatically on completion/failure by default. However if
+	/// the quest definition sets "ResolveAutomatically" to false then you have to call this to resolve it.
+	/// Has no effect on quests which are incomplete.
+	UFUNCTION(BlueprintCallable)
+	void ResolveQuest(FName QuestID);
+	
 	/**
 	 * Mark a task as failed. If this is a mandatory task, it will fail the objective the task is attached to.
 	   If the objective is mandatory, it will fail the quest. 
@@ -255,6 +263,17 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	int ProgressTask(FName QuestID, FName TaskIdentifier, int Delta);
+
+	/**
+	 * Resolve the outcome of a completed/failed task; activate the next task, or complete/fail the quest if it's the last.
+	 * You do not normally need to call this, tasks resolve automatically on completion/failure by default. However if
+	 * the task definition sets "ResolveAutomatically" to false then you have to call this to resolve it.
+	 * Has no effect on tasks which are incomplete.
+	 * @param QuestID The ID of the quest. If None, will scan all active quests and resolve any task with TaskIdentifier
+	 * @param TaskIdentifier The identifier of the task within the quest (required)
+	 */
+	UFUNCTION(BlueprintCallable)
+	void ResolveTask(FName QuestID, FName TaskIdentifier);
 
 	/// Get the current objective for a given quest
 	UFUNCTION(BlueprintCallable)
