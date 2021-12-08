@@ -39,7 +39,7 @@ public:
 	/// will happen automatically. If set to false, the knock-on effects will only happen when explicitly requested
 	/// via ResolveTask
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
-	float ResolveAutomatically = true;
+	bool bResolveAutomatically = true;
 	
 	/// An optional time delay so that after this task is completed / failed, this much time must pass before the
 	/// knock-on effects of that are resolved (activating next task etc)
@@ -172,7 +172,7 @@ public:
 	/// removing this from the active quests, will happen automatically. If set to false, the knock-on effects will only
 	/// happen when explicitly requested via ResolveQuest
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
-	float ResolveAutomatically = true;
+	bool bResolveAutomatically = true;
 	
 	/// An optional time delay so that after this quest is completed / failed, this much time must pass before the
 	/// knock-on effects of that are resolved (activating a dependent quest, removing it from the active quests)

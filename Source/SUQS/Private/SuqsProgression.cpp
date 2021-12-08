@@ -765,7 +765,7 @@ FSuqsResolveBarrier USuqsProgression::GetResolveBarrierForTask(const FSuqsTask* 
 			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
 			Barrier.Gate = Task->ResolveGate;
 		}
-		if (!Task->ResolveAutomatically)
+		if (!Task->bResolveAutomatically)
 		{
 			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Explicit);
 		}
@@ -798,7 +798,7 @@ FSuqsResolveBarrier USuqsProgression::GetResolveBarrierForQuest(const FSuqsQuest
 			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
 			Barrier.Gate = Quest->ResolveGate;
 		}
-		if (!Quest->ResolveAutomatically)
+		if (!Quest->bResolveAutomatically)
 		{
 			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Explicit);
 		}
