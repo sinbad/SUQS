@@ -47,7 +47,7 @@ protected:
 
 	/// A barrier is set when status changes but parent hasn't been notified yet
 	UPROPERTY(BlueprintReadOnly, Category="Task State")
-	FSuqsResolveBarrier ProgressionBarrier;
+	FSuqsResolveBarrier ResolveBarrier;
 	
 	const FSuqsTask* TaskDefinition;
 	TWeakObjectPtr<USuqsObjectiveState> ParentObjective;

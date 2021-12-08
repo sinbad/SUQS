@@ -27,7 +27,7 @@ void USuqsTaskState::Tick(float DeltaTime)
 
 	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Time))
 	{
-		ProgressionBarrier.TimeRemaining = FMath::Max(ProgressionBarrier.TimeRemaining - DeltaTime, 0.f);
+		ResolveBarrier.TimeRemaining = FMath::Max(ResolveBarrier.TimeRemaining - DeltaTime, 0.f);
 		MaybeNotifyParentStatusChange();
 	}
 }
@@ -51,7 +51,7 @@ void USuqsTaskState::SetTimeRemaining(float T)
 
 void USuqsTaskState::SetResolveBarrier(const FSuqsResolveBarrier& Barrier)
 {
-	ProgressionBarrier = Barrier;
+	ResolveBarrier = Barrier;
 	// In case manually changing to free up
 	MaybeNotifyParentStatusChange();
 }
@@ -82,7 +82,7 @@ void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus)
 
 void USuqsTaskState::QueueParentStatusChangeNotification()
 {
-	ProgressionBarrier = Progression->GetResolveBarrierForTask(TaskDefinition, Status);
+	ResolveBarrier = Progression->GetResolveBarrierForTask(TaskDefinition, Status);
 
 	// May immediately be satisfied
 	MaybeNotifyParentStatusChange();
@@ -91,14 +91,14 @@ void USuqsTaskState::QueueParentStatusChangeNotification()
 
 bool USuqsTaskState::IsResolveBlockedOn(ESuqsResolveBarrierCondition Barrier) const
 {
-	return ProgressionBarrier.bPending &&
-	   (ProgressionBarrier.Conditions & static_cast<uint32>(Barrier)) > 0;
+	return ResolveBarrier.bPending &&
+	   (ResolveBarrier.Conditions & static_cast<uint32>(Barrier)) > 0;
 }
 
 void USuqsTaskState::MaybeNotifyParentStatusChange()
 {
 	// Early-out if barrier has already been processed so we only do this once per status change
-	if (!ProgressionBarrier.bPending)
+	if (!ResolveBarrier.bPending)
 		return;
 
 	// Assume cleared
@@ -107,14 +107,14 @@ void USuqsTaskState::MaybeNotifyParentStatusChange()
 	// All conditions have to be fulfilled
 	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Time))
 	{
-		if (ProgressionBarrier.TimeRemaining > 0)
+		if (ResolveBarrier.TimeRemaining > 0)
 		{
 			bCleared = false;
 		}
 	}
 	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Gate))
 	{
-		if (!Progression->IsGateOpen(ProgressionBarrier.Gate))
+		if (!Progression->IsGateOpen(ResolveBarrier.Gate))
 		{
 			bCleared = false;
 		}
@@ -123,7 +123,7 @@ void USuqsTaskState::MaybeNotifyParentStatusChange()
 	if (bCleared)
 	{
 		ParentObjective->NotifyTaskStatusChanged();
-		ProgressionBarrier.bPending = false;
+		ResolveBarrier.bPending = false;
 	}
 }
 
@@ -197,6 +197,6 @@ void USuqsTaskState::Reset()
 
 void USuqsTaskState::NotifyGateOpened(const FName& GateName)
 {
-	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Gate) && ProgressionBarrier.Gate == GateName)
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Gate) && ResolveBarrier.Gate == GateName)
 		MaybeNotifyParentStatusChange();
 }

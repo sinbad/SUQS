@@ -30,9 +30,9 @@ UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true
 enum class ESuqsResolveBarrierCondition : uint8
 {
 	None       = 0 UMETA(Hidden),
-	/// Progression won't occur until time passes
+	/// Resolve won't occur until time passes
 	Time       = 1 << 0,
-	/// Progression won't occur until a gate is opened (on Quest)
+	/// Resolve won't occur until a gate is opened (on Quest)
 	Gate       = 1 << 1,
 
 };
