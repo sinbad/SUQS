@@ -177,6 +177,13 @@ void USuqsQuestState::GetActiveObjectives(TArray<USuqsObjectiveState*>& ActiveOb
 	}	
 }
 
+bool USuqsQuestState::IsResolveBlocked() const
+{
+	return (IsCompleted() || IsFailed()) &&
+		ResolveBarrier.Conditions > 0 &&
+		ResolveBarrier.bPending;
+}
+
 bool USuqsQuestState::IsObjectiveIncomplete(const FName& Identifier) const
 {
 	if (auto O = GetObjective(Identifier))
@@ -305,6 +312,13 @@ void USuqsQuestState::Resolve()
 {
 	ResolveBarrier.bGrantedExplicitly = true;
 	
+	MaybeNotifyStatusChange();
+}
+
+void USuqsQuestState::SetResolveBarrier(const FSuqsResolveBarrierStateData& Barrier)
+{
+	ResolveBarrier = Barrier;
+	// In case this completes
 	MaybeNotifyStatusChange();
 }
 

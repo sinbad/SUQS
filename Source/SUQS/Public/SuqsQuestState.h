@@ -31,11 +31,11 @@ enum class ESuqsResolveBarrierCondition : uint8
 {
 	None       = 0 UMETA(Hidden),
 	/// Resolve won't occur until time passes
-	Time       = 1 << 0,
+	Time       = (1 << 0),
 	/// Resolve won't occur until a gate is opened (on Quest)
-	Gate       = 1 << 1,
+	Gate       = (1 << 1),
 	/// Resolve won't occur until Resolve[Quest/Task] is called
-	Explicit   = 1 << 2,
+	Explicit   = (1 << 2),
 
 };
 ENUM_CLASS_FLAGS(ESuqsResolveBarrierCondition);
@@ -91,6 +91,20 @@ struct FSuqsResolveBarrier
 		bGrantedExplicitly = B.bGrantedExplicitly;
 		bPending = B.bPending;
 		return *this;
+	}
+
+	friend bool operator==(const FSuqsResolveBarrier& A, const FSuqsResolveBarrier& B)
+	{
+		return A.Conditions == B.Conditions
+			&& A.TimeRemaining == B.TimeRemaining
+			&& A.Gate == B.Gate
+			&& A.bGrantedExplicitly == B.bGrantedExplicitly
+			&& A.bPending == B.bPending;
+	}
+
+	friend bool operator!=(const FSuqsResolveBarrier& A, const FSuqsResolveBarrier& B)
+	{
+		return !(A == B);
 	}
 
 	FSuqsResolveBarrier(const FSuqsResolveBarrierStateData& B)
@@ -151,6 +165,7 @@ public:
 	/// Return the list of ALL objectives. If you only want active objectives (branching), use GetActiveObjectives
 	const TArray<USuqsObjectiveState*>& GetObjectives() const { return Objectives; }
 	const TArray<FName>& GetActiveBranches() const { return ActiveBranches; }
+	const FSuqsResolveBarrier& GetResolveBarrier() const { return ResolveBarrier; }
 
 	/// Get the unique quest identifier
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -238,6 +253,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     bool IsFailed() const { return Status == ESuqsQuestStatus::Failed; }
 
+	/// Return whether this quest is completed/failed but is blocked from resolving because of an unfulfilled condition
+	UFUNCTION(BlueprintCallable)
+	bool IsResolveBlocked() const;
+	
 	/// Return whether a given objective is incomplete ie not failed or completed
 	UFUNCTION(BlueprintCallable)
 	bool IsObjectiveIncomplete(const FName& Identifier) const;
@@ -311,4 +330,6 @@ public:
 
 	void OverrideStatus(ESuqsQuestStatus OverrideStatus);
 	void NotifyGateOpened(const FName& GateName);
+	// Manually override the barrier data
+	void SetResolveBarrier(const FSuqsResolveBarrierStateData& Barrier);
 };

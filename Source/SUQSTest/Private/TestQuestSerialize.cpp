@@ -26,7 +26,8 @@ bool FTestQuestSerialize::RunTest(const FString& Parameters)
 		USuqsProgression::MakeQuestDataTableFromJSON(AnyOfTasksQuestJson),
 		USuqsProgression::MakeQuestDataTableFromJSON(TargetNumberQuestJson),
 		USuqsProgression::MakeQuestDataTableFromJSON(BranchingQuestJson),
-		USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitQuestJson)
+		USuqsProgression::MakeQuestDataTableFromJSON(TimeLimitQuestJson),
+		USuqsProgression::MakeQuestDataTableFromJSON(NonAutoResolveQuestsJson)
 	};
 
 	Progression->InitWithQuestDataTables(QuestTables);
@@ -41,7 +42,10 @@ bool FTestQuestSerialize::RunTest(const FString& Parameters)
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_TargetNumbers"));
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_Branching"));
 	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_TimeLimits"));
-	
+	// Add resolve quests to check state is saved
+	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_TimedResolve"));
+	TestTrue("Accept quest should work", Progression->AcceptQuest("Q_ManualResolve"));
+
 	// Complete simple quest
 	TestTrue("Complete smol task should work", Progression->CompleteTask("Q_Smol", "T_Smol"));
 	
@@ -71,6 +75,16 @@ bool FTestQuestSerialize::RunTest(const FString& Parameters)
 	Progression->SetGlobalQuestBranchActive("BranchNonExistent", true);
 	Progression->SetQuestBranchActive("Q_Branching", "BranchA", true);
 	Progression->SetQuestBranchActive("Q_Branching", "BranchDoesntExist", true);
+
+	// Complete tasks on quests that won't resolve automatically
+	TestTrue("Complete task", Progression->CompleteTask("Q_TimedResolve", "T_Single"));
+	TestTrue("Complete task", Progression->CompleteTask("Q_ManualResolve", "T_Single"));
+	// Tick a little more, but not enough to trigger resolve on timed quest
+	Progression->Tick(1.2);
+	// Confirm neither is completed because of resolve barrier
+	TestFalse("Quest shouldn't be complete yet", Progression->IsQuestCompleted("Q_TimedResolve"));
+	TestFalse("Quest shouldn't be complete yet", Progression->IsQuestCompleted("Q_ManualResolve"));
+
 
 	// OK save all this
 	TArray<uint8> Data;
@@ -122,6 +136,7 @@ bool FTestQuestSerialize::RunTest(const FString& Parameters)
 		{
 			TestEqual(QContext + " status should match", LoadedQ->GetStatus(), OrigQ->GetStatus());
 			TestEqual(QContext + " active branches should match", LoadedQ->GetActiveBranches(), OrigQ->GetActiveBranches());
+			TestEqual(QContext + " resolve barrier states should match", LoadedQ->GetResolveBarrier(), OrigQ->GetResolveBarrier());
 			
 			TestEqual(QContext + " objectives count wrong", LoadedQ->GetObjectives().Num(), OrigQ->GetObjectives().Num());
 			if (LoadedQ->GetObjectives().Num() == OrigQ->GetObjectives().Num())
@@ -150,6 +165,7 @@ bool FTestQuestSerialize::RunTest(const FString& Parameters)
 							TestEqual(TContext + " number wrong", LoadedT->GetNumber(), OrigT->GetNumber());
 							TestEqual(TContext + " number wrong", LoadedT->GetTimeRemaining(), OrigT->GetTimeRemaining());
 							TestEqual(TContext + " hidden wrong", LoadedT->GetHidden(), OrigT->GetHidden());
+							TestEqual(TContext + " resolve barrier wrong", LoadedT->GetResolveBarrier(), OrigT->GetResolveBarrier());
 
 						}
 					}

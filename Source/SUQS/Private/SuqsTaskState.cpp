@@ -204,6 +204,13 @@ void USuqsTaskState::Reset()
 	ChangeStatus(ESuqsTaskStatus::NotStarted);
 }
 
+bool USuqsTaskState::IsResolveBlocked() const
+{
+	return !IsIncomplete() &&
+		ResolveBarrier.Conditions > 0 &&
+		ResolveBarrier.bPending;
+}
+
 void USuqsTaskState::NotifyGateOpened(const FName& GateName)
 {
 	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Gate) && ResolveBarrier.Gate == GateName)

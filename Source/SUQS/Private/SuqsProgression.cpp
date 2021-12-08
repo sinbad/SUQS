@@ -886,8 +886,6 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 			// This will re-create the quest structure, including objectives and tasks, based on *current* definition
 			Q->Initialise(QDef, this);
 
-			Q->ResolveBarrier = QData.ResolveBarrier;
-			
 			for (FString Branch : QData.ActiveBranches)
 			{
 				Q->SetBranchActive(FName(Branch), true);
@@ -898,12 +896,17 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 				// Discard task state which isn't in the quest any more
 				if (auto T = Q->GetTask(FName(TData.Identifier)))
 				{
-					T->SetResolveBarrier(TData.ResolveBarrier);
 					T->SetNumber(TData.Number);
 					T->SetTimeRemaining(TData.TimeRemaining);
+					// It's important this is done LAST, because completion triggered from the above can generate
+					// a new barrier
+					T->SetResolveBarrier(TData.ResolveBarrier);
 				}		
 			}
-			
+
+			// Again, set the resolve barrier last to ensure we overwrite any new generated one
+			Q->SetResolveBarrier(QData.ResolveBarrier);
+
             if (QData.Status == ESuqsQuestDataStatus::Incomplete)
             	ActiveQuests.Add(QDef->Identifier, Q);
 			else

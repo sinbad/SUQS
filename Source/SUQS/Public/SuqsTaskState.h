@@ -70,6 +70,7 @@ public:
 	ESuqsTaskStatus GetStatus() const {  return Status; }
 	/// Return whether this task should be hidden, e.g. because tasks are sequential in this objective
 	bool GetHidden() const { return bHidden; }
+	const FSuqsResolveBarrier& GetResolveBarrier() const { return ResolveBarrier; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FName& GetIdentifier() const { return TaskDefinition->Identifier; }
@@ -146,6 +147,10 @@ public:
 	/// Reset the progress on this task back to the initial state
 	UFUNCTION(BlueprintCallable)
     void Reset();
+
+	/// Return whether this task is completed/failed but is blocked from resolving because of an unfulfilled condition
+	UFUNCTION(BlueprintCallable)
+	bool IsResolveBlocked() const;
 	
 	void NotifyGateOpened(const FName& GateName);
 };
