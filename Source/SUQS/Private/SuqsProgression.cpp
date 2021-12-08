@@ -617,9 +617,9 @@ void USuqsProgression::SetGateOpen(FName GateName, bool bOpen)
 	
 	if (bOpen)
 	{
-		bool bWasNew;
-		OpenGates.Add(GateName, &bWasNew);
-		if (bWasNew)
+		bool bWasAlreadyPresent;
+		OpenGates.Add(GateName, &bWasAlreadyPresent);
+		if (!bWasAlreadyPresent)
 		{
 			for (auto Pair : ActiveQuests)
 			{
