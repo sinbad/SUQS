@@ -408,6 +408,11 @@ bool USuqsProgression::IsQuestAccepted(FName QuestID) const
 	return false;
 }
 
+bool USuqsProgression::IsQuestActive(FName QuestID) const
+{
+	return ActiveQuests.Find(QuestID) != nullptr;
+}
+
 bool USuqsProgression::IsQuestIncomplete(FName QuestID) const
 {
 	if (auto Q = FindQuestState(QuestID))

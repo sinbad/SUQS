@@ -4,6 +4,8 @@
 #include "SuqsProgression.h"
 #include "SuqsTaskState.h"
 
+PRAGMA_DISABLE_OPTIMIZATION
+
 void USuqsQuestState::Initialise(const FSuqsQuest* Def, USuqsProgression* Root)
 {
 	// We always build quest state from the master quest definition
@@ -36,18 +38,20 @@ void USuqsQuestState::Initialise(const FSuqsQuest* Def, USuqsProgression* Root)
 
 void USuqsQuestState::Tick(float DeltaTime)
 {
+	// We tick our own conditions FIRST, otherwise ticking children could change our status and tick us simultaneously
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Time))
+	{
+		ResolveBarrier.TimeRemaining = FMath::Max(ResolveBarrier.TimeRemaining - DeltaTime, 0.f);
+	}
+	
 	// only tick the current objective
 	auto Obj = GetCurrentObjective();
 	if (Obj)
 	{
 		Obj->Tick(DeltaTime);
 	}
-	
-	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Time))
-	{
-		ResolveBarrier.TimeRemaining = FMath::Max(ResolveBarrier.TimeRemaining - DeltaTime, 0.f);
-		MaybeNotifyStatusChange();
-	}
+
+	MaybeNotifyStatusChange();
 	
 }
 
@@ -447,3 +451,5 @@ void USuqsQuestState::MaybeNotifyStatusChange()
 		ResolveBarrier.bPending = false;
 	}
 }
+
+PRAGMA_ENABLE_OPTIMIZATION

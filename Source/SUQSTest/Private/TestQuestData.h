@@ -616,3 +616,79 @@ const FString TimeLimitQuestJson = R"RAWJSON([
 		]
 	},
 ])RAWJSON";
+
+const FString NonAutoResolveQuestsJson = R"RAWJSON([
+{
+    "Identifier": "Q_TimedResolve",
+    "bPlayerVisible": true,
+    "Title": "NSLOCTEXT(\"TestQuests\", \"TimedResolveTitle\", \"Quest With Resolve Time\")",
+    "DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"TimedResolveDesc\", \"A quest with a resolve time\")",
+    "DescriptionWhenCompleted": "",
+    "AutoAccept": false,
+    "PrerequisiteQuests": [],
+    "PrerequisiteQuestFailures": [],
+    "ResolveDelay": 1,
+    "Objectives": [
+        {
+            "Identifier": "O_Single",
+            "Title": "NSLOCTEXT(\"TestQuests\", \"TimedResolveO1\", \"First objective, single task\")",
+            "Tasks": [
+                {
+                    "Identifier": "T_Single",
+                    "Title": "NSLOCTEXT(\"TestQuests\", \"TSingleDesc\", \"Timed resolve task\")",
+                    "bMandatory": true,
+                    "ResolveDelay": 3
+                }
+            ]
+        }
+    ]
+},
+{
+    "Identifier": "Q_GatedResolve",
+    "bPlayerVisible": true,
+    "Title": "NSLOCTEXT(\"TestQuests\", \"GatedResolveTitle\", \"Quest With Resolve Gate\")",
+    "DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"GatedResolveDesc\", \"A quest with a resolve gate\")",
+    "DescriptionWhenCompleted": "",
+    "AutoAccept": false,
+    "PrerequisiteQuests": [],
+    "PrerequisiteQuestFailures": [],
+    "Objectives": [
+        {
+            "Identifier": "O_Single",
+            "Title": "NSLOCTEXT(\"TestQuests\", \"GatedResolveO1\", \"First objective, single task\")",
+            "Tasks": [
+                {
+                    "Identifier": "T_Single",
+                    "Title": "NSLOCTEXT(\"TestQuests\", \"TSingleDesc\", \"Gated resolve task\")",
+                    "bMandatory": true,
+                    "ResolveGate": "TestGate"
+                }
+            ]
+        }
+    ]
+},
+{
+    "Identifier": "Q_ManualResolve",
+    "bPlayerVisible": true,
+    "Title": "NSLOCTEXT(\"TestQuests\", \"ManualResolveTitle\", \"Quest With Resolve Time\")",
+    "DescriptionWhenActive": "NSLOCTEXT(\"TestQuests\", \"ManualResolveDesc\", \"A quest with manual resolve\")",
+    "DescriptionWhenCompleted": "",
+    "AutoAccept": false,
+    "PrerequisiteQuests": [],
+    "PrerequisiteQuestFailures": [],
+    "Objectives": [
+        {
+            "Identifier": "O_Single",
+            "Title": "NSLOCTEXT(\"TestQuests\", \"ManualResolveO1\", \"First objective, single task\")",
+            "Tasks": [
+                {
+                    "Identifier": "T_Single",
+                    "Title": "NSLOCTEXT(\"TestQuests\", \"TSingleDesc\", \"Manual resolve task\")",
+                    "bMandatory": true,
+                    "bResolveAutomatically": false
+                }
+            ]
+        }
+    ]
+}
+])RAWJSON";

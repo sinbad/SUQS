@@ -155,6 +155,11 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsQuestAccepted(FName QuestID) const;
 
+	/// Return whether a quest is active, i.e. accepted and still in the active list. It may be completed / failed
+	/// but not resolved yet (resolve moves it to the archive potentially later)
+	UFUNCTION(BlueprintCallable)
+	bool IsQuestActive(FName QuestID) const;
+	
 	/// Return whether the quest is incomplete, i.e. accepted but not completed or failed. 
 	UFUNCTION(BlueprintCallable)
     bool IsQuestIncomplete(FName QuestID) const;

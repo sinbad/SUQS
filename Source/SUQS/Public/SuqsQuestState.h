@@ -59,7 +59,7 @@ struct FSuqsResolveBarrier
 
 	/// Whether explicit permission has been given to resolve
 	UPROPERTY(BlueprintReadOnly)
-	bool bGrantedExplicitly = false;
+	bool bGrantedExplicitly;
 	
 	/// Flag indicating whether this barrier is still pending resolution
 	UPROPERTY(BlueprintReadOnly)
@@ -69,15 +69,17 @@ struct FSuqsResolveBarrier
 		Conditions(0),
 		TimeRemaining(0),
 		Gate(FName()),
+		bGrantedExplicitly(false),
 		bPending(false)
 	{
 	}
 
-	FSuqsResolveBarrier(int32 Barriers, float TimeRemaining, const FName& Gate, bool bPending)
-		: Conditions(Barriers),
-		  TimeRemaining(TimeRemaining),
-		  Gate(Gate),
-		  bPending(bPending)
+	FSuqsResolveBarrier(int32 InBarriers, float InTimeRemaining, const FName& InGate, bool bInGrantedExplicitly, bool bInPending)
+		: Conditions(InBarriers),
+		  TimeRemaining(InTimeRemaining),
+		  Gate(InGate),
+		  bGrantedExplicitly(bInGrantedExplicitly),
+		  bPending(bInPending)
 	{
 	}
 
