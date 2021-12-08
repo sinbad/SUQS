@@ -652,6 +652,7 @@ const FString NonAutoResolveQuestsJson = R"RAWJSON([
     "AutoAccept": false,
     "PrerequisiteQuests": [],
     "PrerequisiteQuestFailures": [],
+    "ResolveGate": "TestGate",
     "Objectives": [
         {
             "Identifier": "O_Single",
@@ -676,6 +677,7 @@ const FString NonAutoResolveQuestsJson = R"RAWJSON([
     "AutoAccept": false,
     "PrerequisiteQuests": [],
     "PrerequisiteQuestFailures": [],
+    "bResolveAutomatically": false,
     "Objectives": [
         {
             "Identifier": "O_Single",
