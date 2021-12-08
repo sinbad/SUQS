@@ -92,18 +92,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	FName Branch;
 	
-	/// An optional time delay so that after this objective is completed / failed, this much time must pass before the
-	/// knock-on effects of that are resolved (activating next objective, completing/failing the quest etc)
-	/// If set to >= 0 this will override any defaults set via USuqsProgression::SetDefaultProgressionTimeDelays
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
-	float ResolveDelay = -1;
-
-	/// If set, when this objective is completed or failed, the knock-on effects of this will not be resolved until
-	/// the Gate of this name is opened on USuqsProgression. This allows you to control precisely when the next steps
-	/// after completion / failure happen
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
-	FName ResolveGate;
-	
 	/// List of actual tasks that must be performed to complete this objective. 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	TArray<FSuqsTask> Tasks;
