@@ -992,6 +992,7 @@ void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSav
 				TData.Identifier = T->GetIdentifier().ToString();
 				TData.Number = T->GetNumber();
 				TData.TimeRemaining = T->GetTimeRemaining();
+				TData.ResolveBarrier = T->GetResolveBarrier();
 			}
 		}
 	}
