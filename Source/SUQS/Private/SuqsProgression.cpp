@@ -621,9 +621,12 @@ void USuqsProgression::SetGateOpen(FName GateName, bool bOpen)
 		OpenGates.Add(GateName, &bWasAlreadyPresent);
 		if (!bWasAlreadyPresent)
 		{
-			for (auto Pair : ActiveQuests)
+			TArray<USuqsQuestState*> ActiveQuestList;
+			// Need to copy since this change may cascade to completing quests
+			ActiveQuests.GenerateValueArray(ActiveQuestList);
+			for (auto Quest : ActiveQuestList)
 			{
-				Pair.Value->NotifyGateOpened(GateName);
+				Quest->NotifyGateOpened(GateName);
 			}
 		}
 	}
