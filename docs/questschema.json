@@ -55,6 +55,11 @@
             "type": "string"
           }
         },
+        "bResolveAutomatically": {
+          "description": "Whether to resolve the outcomes of completion / failure automatically (default true) or to require explicit ResolveQuest call.",
+          "type": "boolean",
+          "default": true
+        },
         "ResolveDelay": {
           "description": "Optional time delay after completion / failure of this quest, before knock-on effects occur (updating quest list, activating dependent quests)",
           "type": "number",
@@ -132,6 +137,11 @@
                           "description": "Optional time limit to apply to this task, which starts as soon as it is the next mandatory task. 0 indicates no time limit",
                           "type": "number",
                           "default": 0
+                        },
+                        "bResolveAutomatically": {
+                          "description": "Whether to resolve the outcomes of completion / failure automatically (default true) or to require explicit ResolveTask call.",
+                          "type": "boolean",
+                          "default": true
                         },
                         "ResolveDelay": {
                           "description": "Optional time delay after completion / failure of this task, before knock-on effects occur (activating next task, completing/failing quest)",
