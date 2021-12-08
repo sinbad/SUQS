@@ -4,7 +4,7 @@
 #include "SuqsProgression.h"
 #include "SuqsTaskState.h"
 
-PRAGMA_DISABLE_OPTIMIZATION
+//PRAGMA_DISABLE_OPTIMIZATION
 
 void USuqsQuestState::Initialise(const FSuqsQuest* Def, USuqsProgression* Root)
 {
@@ -452,4 +452,4 @@ void USuqsQuestState::MaybeNotifyStatusChange()
 	}
 }
 
-PRAGMA_ENABLE_OPTIMIZATION
+//PRAGMA_ENABLE_OPTIMIZATION
