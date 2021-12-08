@@ -32,7 +32,7 @@ void USuqsObjectiveState::Tick(float DeltaTime)
 	{
 		Task->Tick(DeltaTime);
 	}
-	
+
 }
 
 
@@ -183,6 +183,16 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 
 }
 
+void USuqsObjectiveState::NotifyGateOpened(const FName& GateName)
+{
+	// This one proceeds downards to children
+	for (auto Task : Tasks)
+	{
+		Task->NotifyGateOpened(GateName);
+	}
+	
+}
+
 void USuqsObjectiveState::ChangeStatus(ESuqsObjectiveStatus NewStatus)
 {
 	if (Status != NewStatus)
@@ -200,6 +210,8 @@ void USuqsObjectiveState::ChangeStatus(ESuqsObjectiveStatus NewStatus)
 		default: break;
 		}
 
+		// No barriers on objectives, just tasks and quests
+		// Objectives are just groupings and inherit their behaviour from task
 		ParentQuest->NotifyObjectiveStatusChanged();
 		
 	}

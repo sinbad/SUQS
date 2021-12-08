@@ -6,6 +6,7 @@
 #include "Engine/DataTable.h"
 #include "UObject/Object.h"
 #include "SuqsSaveData.h"
+#include "SuqsTaskState.h"
 #include "SuqsProgression.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskUpdated, USuqsTaskState*, Task);
@@ -14,6 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskFailed, USuqsTaskState*, Task
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveCompleted, USuqsObjectiveState*, Objective);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnObjectiveFailed, USuqsObjectiveState*, Objective);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnActiveQuestsListChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestCompleted, USuqsQuestState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestFailed, USuqsQuestState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, Quest);
@@ -48,12 +50,16 @@ protected:
 	TMap<FName, USuqsQuestState*> QuestArchive;
 
 	TArray<FName> GlobalActiveBranches;
+	TSet<FName> OpenGates;
 	// Name of quest completed -> names of other quests that depend on its completion
 	TMultiMap<FName, FName> QuestCompletionDeps;
 	// Name of quest completed -> names of other quests that depend on its failure
 	TMultiMap<FName, FName> QuestFailureDeps;
 
 	bool bSuppressEvents = false;
+	float DefaultQuestResolveTimeDelay = 0;
+	float DefaultTaskResolveTimeDelay = 0;
+	
 
 	USuqsQuestState* FindQuestState(const FName& QuestID);
 	const USuqsQuestState* FindQuestState(const FName& QuestID) const;
@@ -83,6 +89,21 @@ public:
 	UFUNCTION(BlueprintCallable)
     void InitWithQuestDataTablesInPaths(const TArray<FString>& Paths);
 
+	/**
+	 * Change the default time delays between completing / failing a quest item, and the knock-on effects of that
+	 * (the next task/objective/quest being activated).
+	 * Where one completion rolls into another, the time delays are in serial. Therefore when completing the last
+	 * task in a quest, the task delay will tick by before the objective is completed, which will complete the quest
+	 * and then there can be another delay before any dependent quests are activated.
+	 *
+	 * Objectives don't have a delay of their own since they're just groupings of tasks.
+	 * 
+	 * @param QuestDelay The time between a quest being completed/failed, and the effects on dependent quests (default 2)
+	 * @param TaskDelay The time between a task being completed/failed, and dependent effects (next task, objective complete etc) (default 2)
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SetDefaultProgressionTimeDelays(float QuestDelay, float TaskDelay);
+
 	/// Fired when a task is completed
 	UPROPERTY(BlueprintAssignable)
 	FOnTaskCompleted OnTaskCompleted;
@@ -107,6 +128,9 @@ public:
 	/// Fired when a quest has been accepted for the first time
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestAccepted OnQuestAccepted;
+	/// Fired whenever the active quest list changes
+	UPROPERTY(BlueprintAssignable)
+	FOnActiveQuestsListChanged OnActiveQuestsListChanged;
 
 	/// Use this from C++ to receive access to the loaded quest data before it's applied to this progression
 	/// You can therefore change the quest data if you need to adapt it due to quest changes
@@ -131,6 +155,11 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsQuestAccepted(FName QuestID) const;
 
+	/// Return whether a quest is active, i.e. accepted and still in the active list. It may be completed / failed
+	/// but not resolved yet (resolve moves it to the archive potentially later)
+	UFUNCTION(BlueprintCallable)
+	bool IsQuestActive(FName QuestID) const;
+	
 	/// Return whether the quest is incomplete, i.e. accepted but not completed or failed. 
 	UFUNCTION(BlueprintCallable)
     bool IsQuestIncomplete(FName QuestID) const;
@@ -202,6 +231,14 @@ public:
 	UFUNCTION(BlueprintCallable)
     void CompleteQuest(FName QuestID);
 
+	/// Resolve the outcome of a completed/failed quest; move it to the quest archive and process the knock-on
+	/// effects such as activating dependent quests.
+	/// You do not normally need to call this, quests resolve automatically on completion/failure by default. However if
+	/// the quest definition sets "ResolveAutomatically" to false then you have to call this to resolve it.
+	/// Has no effect on quests which are incomplete.
+	UFUNCTION(BlueprintCallable)
+	void ResolveQuest(FName QuestID);
+	
 	/**
 	 * Mark a task as failed. If this is a mandatory task, it will fail the objective the task is attached to.
 	   If the objective is mandatory, it will fail the quest. 
@@ -231,6 +268,17 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	int ProgressTask(FName QuestID, FName TaskIdentifier, int Delta);
+
+	/**
+	 * Resolve the outcome of a completed/failed task; activate the next task, or complete/fail the quest if it's the last.
+	 * You do not normally need to call this, tasks resolve automatically on completion/failure by default. However if
+	 * the task definition sets "ResolveAutomatically" to false then you have to call this to resolve it.
+	 * Has no effect on tasks which are incomplete.
+	 * @param QuestID The ID of the quest. If None, will scan all active quests and resolve any task with TaskIdentifier
+	 * @param TaskIdentifier The identifier of the task within the quest (required)
+	 */
+	UFUNCTION(BlueprintCallable)
+	void ResolveTask(FName QuestID, FName TaskIdentifier);
 
 	/// Get the current objective for a given quest
 	UFUNCTION(BlueprintCallable)
@@ -305,6 +353,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const TArray<FName>& GetGlobalActiveQuestBranches() const;
 
+
+	/// Set a whether a given progression gate is open. Gates are unique names which prevent automatic progression on
+	/// completion / failure of an item until that gate is set open (all gates are closed by default). This can
+	/// help you manually control when a task / objective / quest rolls over to the next on completion / failure, so
+	/// you can tick off items but not have things move forward until you're ready.
+	UFUNCTION(BlueprintCallable)
+	void SetGateOpen(FName GateName, bool bOpen = true);
+	
+	/// Return whether a gate to progression is open.
+	UFUNCTION(BlueprintCallable)
+	bool IsGateOpen(FName GateName);
+	
 	/// Return whether the dependencies for a given quest have been met
 	/// You don't usually need to call this yourself, if auto-accept is enabled on your quests. But if you
 	/// want to determine it manually you can.
@@ -320,7 +380,14 @@ public:
 	void RaiseQuestFailed(USuqsQuestState* Quest);
 	void RaiseQuestReset(USuqsQuestState* Quest);
 
+	void ProcessQuestStatusChange(USuqsQuestState* Quest);
+
 	const FSuqsQuest* GetQuestDefinition(const FName& QuestID);
+
+	/// Given a task definition and status, return progression barrier information
+	FSuqsResolveBarrier GetResolveBarrierForTask(const FSuqsTask* Task, ESuqsTaskStatus Status) const;
+	/// Given a task definition and status, return progression barrier information
+	FSuqsResolveBarrier GetResolveBarrierForQuest(const FSuqsQuest* Q, ESuqsQuestStatus Status) const;
 
 	/// Standard serialisation support
 	virtual void Serialize(FArchive& Ar) override;

@@ -43,6 +43,12 @@ void USuqsProgression::InitWithQuestDataTablesInPaths(const TArray<FString>& Pat
 	InitWithQuestDataTables(DataTables);
 }
 
+void USuqsProgression::SetDefaultProgressionTimeDelays(float QuestDelay, float TaskDelay)
+{
+	DefaultQuestResolveTimeDelay = QuestDelay;
+	DefaultTaskResolveTimeDelay = TaskDelay;
+}
+
 
 void USuqsProgression::RebuildAllQuestData()
 {
@@ -224,7 +230,10 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 		}
 
 		if (!bSuppressEvents)
+		{
 			OnQuestAccepted.Broadcast(Quest);
+			OnActiveQuestsListChanged.Broadcast();
+		}
 		return true;
 	}
 	else
@@ -283,6 +292,14 @@ void USuqsProgression::CompleteQuest(FName QuestID)
 	auto Q = FindQuestState(QuestID);
 	if (Q)
 		Q->Complete();
+	
+}
+
+void USuqsProgression::ResolveQuest(FName QuestID)
+{
+	auto Q = FindQuestState(QuestID);
+	if (Q)
+		Q->Resolve();
 	
 }
 
@@ -353,6 +370,25 @@ int USuqsProgression::ProgressTask(FName QuestID, FName TaskIdentifier, int Delt
 	}
 }
 
+void USuqsProgression::ResolveTask(FName QuestID, FName TaskIdentifier)
+{
+	if (QuestID.IsNone())
+	{
+		for (auto Pair : ActiveQuests)
+		{
+			Pair.Value->ResolveTask(TaskIdentifier);
+		}
+	}
+	else
+	{
+		auto T = FindTaskStatus(QuestID, TaskIdentifier);
+		if (T)
+		{
+			T->Resolve();
+		}
+	}
+}
+
 USuqsObjectiveState* USuqsProgression::GetCurrentObjective(FName QuestID) const
 {
 	if (auto Q = FindQuestState(QuestID))
@@ -370,6 +406,11 @@ bool USuqsProgression::IsQuestAccepted(FName QuestID) const
 		return true;
 	}
 	return false;
+}
+
+bool USuqsProgression::IsQuestActive(FName QuestID) const
+{
+	return ActiveQuests.Find(QuestID) != nullptr;
 }
 
 bool USuqsProgression::IsQuestIncomplete(FName QuestID) const
@@ -568,6 +609,40 @@ const TArray<FName>& USuqsProgression::GetGlobalActiveQuestBranches() const
 	return GlobalActiveBranches;
 }
 
+void USuqsProgression::SetGateOpen(FName GateName, bool bOpen)
+{
+	// Ignore nonsense
+	if (GateName.IsNone())
+		return;
+	
+	if (bOpen)
+	{
+		bool bWasAlreadyPresent;
+		OpenGates.Add(GateName, &bWasAlreadyPresent);
+		if (!bWasAlreadyPresent)
+		{
+			TArray<USuqsQuestState*> ActiveQuestList;
+			// Need to copy since this change may cascade to completing quests
+			ActiveQuests.GenerateValueArray(ActiveQuestList);
+			for (auto Quest : ActiveQuestList)
+			{
+				Quest->NotifyGateOpened(GateName);
+			}
+		}
+	}
+	else
+		OpenGates.Remove(GateName);
+}
+
+bool USuqsProgression::IsGateOpen(FName GateName)
+{
+	// No gate is always OK
+	if (GateName.IsNone())
+		return true;
+
+	return OpenGates.Contains(GateName);
+}
+
 bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
 {
 	if (auto QuestDef = QuestDefinitions.Find(QuestID))
@@ -622,41 +697,124 @@ void USuqsProgression::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
 
 void USuqsProgression::RaiseQuestCompleted(USuqsQuestState* Quest)
 {
-	// Move quest to the correct list
-	ActiveQuests.Remove(Quest->GetIdentifier());
-	QuestArchive.Add(Quest->GetIdentifier(), Quest);
-
 	if (!bSuppressEvents)
 		OnQuestCompleted.Broadcast(Quest);
 
-	AutoAcceptQuests(Quest->GetIdentifier(), false);
+	// We don't process changes caused by complete / fail until barriers resolved (see ProcessQuestStatusChange)
+	
 }
 
 void USuqsProgression::RaiseQuestFailed(USuqsQuestState* Quest)
 {
-	// Move quest to the correct list
-	ActiveQuests.Remove(Quest->GetIdentifier());
-	QuestArchive.Add(Quest->GetIdentifier(), Quest);
-
 	if (!bSuppressEvents)
 		OnQuestFailed.Broadcast(Quest);
 
-	AutoAcceptQuests(Quest->GetIdentifier(), true);
+	// We don't process changes caused by complete / fail until barriers resolved (see ProcessQuestStatusChange)
+	
 }
 
 void USuqsProgression::RaiseQuestReset(USuqsQuestState* Quest)
 {
-	// Move quest to the correct list
-	QuestArchive.Remove(Quest->GetIdentifier());
+	// Move quest to the correct list immediately, unlike complete / fail
+	const int NumRemoved = QuestArchive.Remove(Quest->GetIdentifier());
 	ActiveQuests.Add(Quest->GetIdentifier(), Quest);
 	
 	if (!bSuppressEvents)
+	{
 		OnQuestAccepted.Broadcast(Quest);
+		if (NumRemoved > 0)
+			OnActiveQuestsListChanged.Broadcast();
+	}
+}
+
+void USuqsProgression::ProcessQuestStatusChange(USuqsQuestState* Quest)
+{
+	// Quest list and dependent quest acceptance is potentially delayed for completion / failed
+	const ESuqsQuestStatus Status = Quest->GetStatus();
+	if (Status == ESuqsQuestStatus::Completed ||
+		Status == ESuqsQuestStatus::Failed)
+	{
+		// Move quest to the correct list
+		ActiveQuests.Remove(Quest->GetIdentifier());
+		QuestArchive.Add(Quest->GetIdentifier(), Quest);
+		AutoAcceptQuests(Quest->GetIdentifier(), Status == ESuqsQuestStatus::Failed);
+		if (!bSuppressEvents)
+			OnActiveQuestsListChanged.Broadcast();
+		
+	}
 }
 
 const FSuqsQuest* USuqsProgression::GetQuestDefinition(const FName& QuestID)
 {
 	return QuestDefinitions.Find(QuestID);
+}
+
+FSuqsResolveBarrier USuqsProgression::GetResolveBarrierForTask(const FSuqsTask* Task,
+	ESuqsTaskStatus Status) const
+{
+	FSuqsResolveBarrier Barrier;
+
+	if (Status == ESuqsTaskStatus::Completed ||
+		Status == ESuqsTaskStatus::Failed)
+	{
+		if (DefaultTaskResolveTimeDelay > 0)
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+			Barrier.TimeRemaining = DefaultTaskResolveTimeDelay;
+		}
+
+		if (Task->ResolveDelay >= 0) // >= because default is -1, so that 0 can override >0 default
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+			Barrier.TimeRemaining = Task->ResolveDelay;
+		}
+		if (!Task->ResolveGate.IsNone())
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
+			Barrier.Gate = Task->ResolveGate;
+		}
+		if (!Task->bResolveAutomatically)
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Explicit);
+		}
+	}
+	
+	// Always pending, even if no condition, since need to raise event once
+	Barrier.bPending = true;
+	return Barrier;
+}
+
+FSuqsResolveBarrier USuqsProgression::GetResolveBarrierForQuest(const FSuqsQuest* Quest, ESuqsQuestStatus Status) const
+{
+	FSuqsResolveBarrier Barrier;
+
+	if (Status == ESuqsQuestStatus::Completed ||
+		Status == ESuqsQuestStatus::Failed)
+	{
+		if (DefaultQuestResolveTimeDelay > 0)
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+			Barrier.TimeRemaining = DefaultQuestResolveTimeDelay;
+		}
+		if (Quest->ResolveDelay >= 0) // >= because default is -1, so that 0 can override >0 default
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+			Barrier.TimeRemaining = Quest->ResolveDelay;
+		}
+		if (!Quest->ResolveGate.IsNone())
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
+			Barrier.Gate = Quest->ResolveGate;
+		}
+		if (!Quest->bResolveAutomatically)
+		{
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Explicit);
+		}
+	}
+
+	// Always pending, even if no condition, since need to raise event once
+	Barrier.bPending = true;
+	return Barrier;
 }
 
 // FTickableGameObject start
@@ -716,6 +874,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 	ActiveQuests.Empty();
 	QuestArchive.Empty();
 	GlobalActiveBranches.Empty();
+	OpenGates.Empty();
 
 	bSuppressEvents = true;
 	
@@ -739,9 +898,15 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 				{
 					T->SetNumber(TData.Number);
 					T->SetTimeRemaining(TData.TimeRemaining);
+					// It's important this is done LAST, because completion triggered from the above can generate
+					// a new barrier
+					T->SetResolveBarrier(TData.ResolveBarrier);
 				}		
 			}
-			
+
+			// Again, set the resolve barrier last to ensure we overwrite any new generated one
+			Q->SetResolveBarrier(QData.ResolveBarrier);
+
             if (QData.Status == ESuqsQuestDataStatus::Incomplete)
             	ActiveQuests.Add(QDef->Identifier, Q);
 			else
@@ -765,6 +930,10 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 	{
 		SetGlobalQuestBranchActive(FName(Branch), true);
 	}
+	for (FString Gate : Data.OpenGates)
+	{
+		SetGateOpen(FName(Gate), true);
+	}
 	
 
 	bSuppressEvents = false;
@@ -774,9 +943,15 @@ void USuqsProgression::SaveToData(FSuqsSaveData& Data) const
 {
 	Data.QuestData.Empty();
 	Data.GlobalActiveBranches.Empty();
+	Data.OpenGates.Empty();
+	
 	for (FName Branch : GlobalActiveBranches)
 	{
 		Data.GlobalActiveBranches.Add(Branch.ToString());		
+	}
+	for (FName Gate : OpenGates)
+	{
+		Data.OpenGates.Add(Gate.ToString());		
 	}
 	SaveToData(ActiveQuests, Data);
 	SaveToData(QuestArchive, Data);
@@ -810,6 +985,8 @@ void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSav
 			QData.ActiveBranches.Add(Branch.ToString());
 		}
 
+		QData.ResolveBarrier = Q->ResolveBarrier;
+
 		for (auto O : Q->Objectives)
 		{
 			for (auto T : O->GetTasks())
@@ -818,6 +995,7 @@ void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSav
 				TData.Identifier = T->GetIdentifier().ToString();
 				TData.Number = T->GetNumber();
 				TData.TimeRemaining = T->GetTimeRemaining();
+				TData.ResolveBarrier = T->GetResolveBarrier();
 			}
 		}
 	}

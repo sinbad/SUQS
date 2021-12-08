@@ -37,7 +37,7 @@ protected:
 	/// List of detailed task status
 	UPROPERTY(BlueprintReadOnly, Category="Objective Status")
 	TArray<USuqsTaskState*> Tasks;
-
+	
 	const FSuqsObjective* ObjectiveDefinition;
 	TWeakObjectPtr<USuqsQuestState> ParentQuest;
 	TWeakObjectPtr<USuqsProgression> Progression;
@@ -99,6 +99,7 @@ public:
 
 	/// Get the next incomplete mandatory task required to fulfil this objective
 	/// If there are multiple mandatory tasks and ordering doesn't matter, returns the first one found
+	/// May return nullptr if there is nothing to do next right now (may occur due to e.g. barriers)
 	UFUNCTION(BlueprintCallable)
 	USuqsTaskState* GetNextMandatoryTask() const;
 
@@ -117,4 +118,5 @@ public:
 
 	
 	void NotifyTaskStatusChanged();
+	void NotifyGateOpened(const FName& GateName);
 };

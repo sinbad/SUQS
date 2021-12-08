@@ -4,6 +4,8 @@
 #include "SuqsProgression.h"
 #include "SuqsTaskState.h"
 
+//PRAGMA_DISABLE_OPTIMIZATION
+
 void USuqsQuestState::Initialise(const FSuqsQuest* Def, USuqsProgression* Root)
 {
 	// We always build quest state from the master quest definition
@@ -36,12 +38,21 @@ void USuqsQuestState::Initialise(const FSuqsQuest* Def, USuqsProgression* Root)
 
 void USuqsQuestState::Tick(float DeltaTime)
 {
+	// We tick our own conditions FIRST, otherwise ticking children could change our status and tick us simultaneously
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Time))
+	{
+		ResolveBarrier.TimeRemaining = FMath::Max(ResolveBarrier.TimeRemaining - DeltaTime, 0.f);
+	}
+	
 	// only tick the current objective
 	auto Obj = GetCurrentObjective();
 	if (Obj)
 	{
 		Obj->Tick(DeltaTime);
-	}	
+	}
+
+	MaybeNotifyStatusChange();
+	
 }
 
 
@@ -97,6 +108,14 @@ bool USuqsQuestState::CompleteTask(FName TaskID)
 		return T->Complete();
 	}
 	return false;
+}
+
+void USuqsQuestState::ResolveTask(FName TaskID)
+{
+	if (auto T = GetTask(TaskID))
+	{
+		T->Resolve();
+	}
 }
 
 void USuqsQuestState::FailTask(const FName& TaskID)
@@ -156,6 +175,13 @@ void USuqsQuestState::GetActiveObjectives(TArray<USuqsObjectiveState*>& ActiveOb
 		if (O->IsOnActiveBranch())
 			ActiveObjectivesOut.Add(O);
 	}	
+}
+
+bool USuqsQuestState::IsResolveBlocked() const
+{
+	return (IsCompleted() || IsFailed()) &&
+		ResolveBarrier.Conditions > 0 &&
+		ResolveBarrier.bPending;
 }
 
 bool USuqsQuestState::IsObjectiveIncomplete(const FName& Identifier) const
@@ -282,6 +308,20 @@ void USuqsQuestState::Complete()
 	}
 }
 
+void USuqsQuestState::Resolve()
+{
+	ResolveBarrier.bGrantedExplicitly = true;
+	
+	MaybeNotifyStatusChange();
+}
+
+void USuqsQuestState::SetResolveBarrier(const FSuqsResolveBarrierStateData& Barrier)
+{
+	ResolveBarrier = Barrier;
+	// In case this completes
+	MaybeNotifyStatusChange();
+}
+
 void USuqsQuestState::NotifyObjectiveStatusChanged()
 {
 	// Re-scan the objectives from top to bottom (this allows ANY change to have been made, including backtracking)
@@ -334,6 +374,19 @@ void USuqsQuestState::OverrideStatus(ESuqsQuestStatus OverrideStatus)
 	ChangeStatus(OverrideStatus);
 }
 
+void USuqsQuestState::NotifyGateOpened(const FName& GateName)
+{
+	// This one proceeds downards to children
+	// Cascade first so that objectives & tasks are finished first
+	for (auto Obj : Objectives)
+	{
+		Obj->NotifyGateOpened(GateName);
+	}
+
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Gate) && ResolveBarrier.Gate == GateName)
+		MaybeNotifyStatusChange();
+}
+
 void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
 {
 	if (Status != NewStatus)
@@ -353,5 +406,64 @@ void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
 			break;
 		default: break;
 		}
+
+		QueueStatusChangeNotification();
 	}
 }
+
+void USuqsQuestState::QueueStatusChangeNotification()
+{
+	ResolveBarrier = Progression->GetResolveBarrierForQuest(QuestDefinition, Status);
+
+	// May immediately be satisfied
+	MaybeNotifyStatusChange();
+	
+}
+
+bool USuqsQuestState::IsResolveBlockedOn(ESuqsResolveBarrierCondition Barrier) const
+{
+	return ResolveBarrier.bPending &&
+	   (ResolveBarrier.Conditions & static_cast<uint32>(Barrier)) > 0;
+}
+
+void USuqsQuestState::MaybeNotifyStatusChange()
+{
+	// Early-out if incomplete or barrier has already been processed so we only do this once per status change
+	if (!ResolveBarrier.bPending)
+		return;
+
+	// Can't resolve unless completed/failed
+	if (!IsCompleted() && !IsFailed())
+		return;
+
+	// Assume cleared
+	bool bCleared = true;
+
+	// All conditions have to be fulfilled
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Time))
+	{
+		if (ResolveBarrier.TimeRemaining > 0)
+		{
+			bCleared = false;
+		}
+	}
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Gate))
+	{
+		if (!Progression->IsGateOpen(ResolveBarrier.Gate))
+		{
+			bCleared = false;
+		}
+	}
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Explicit))
+	{
+		bCleared = ResolveBarrier.bGrantedExplicitly;
+	}
+	
+	if (bCleared)
+	{
+		Progression->ProcessQuestStatusChange(this);
+		ResolveBarrier.bPending = false;
+	}
+}
+
+//PRAGMA_ENABLE_OPTIMIZATION

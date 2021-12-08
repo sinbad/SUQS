@@ -3,6 +3,23 @@
 #include "CoreMinimal.h"
 #include "SuqsSaveData.generated.h"
 
+struct FSuqsResolveBarrier;
+/// Saved state of any progression barrier
+USTRUCT(BlueprintType)
+struct SUQS_API FSuqsResolveBarrierStateData
+{
+	GENERATED_BODY()
+
+public:
+	int32 Conditions;
+	float TimeRemaining;
+	FString Gate;
+	bool bGrantedExplicitly;
+	bool bPending;
+	::FSuqsResolveBarrierStateData& operator=(const FSuqsResolveBarrier& Barrier);
+	void SaveToArchive(FArchive& Ar);
+	void LoadFromArchive(FArchive& Ar, int FileVersion);
+};
 /** Saved state data for a task. Objectives are implied from this.
 */
 USTRUCT(BlueprintType)
@@ -14,6 +31,7 @@ public:
 	FString Identifier;
 	int Number;
 	float TimeRemaining;
+	FSuqsResolveBarrierStateData ResolveBarrier;
 
 	// We don't store status or hidden, those are derived from everything else
 	// Although we do store quest status to allow archived quests to stay archived if changed.
@@ -45,6 +63,7 @@ public:
 	ESuqsQuestDataStatus Status;
 	TArray<FSuqsTaskStateData> TaskData;
 	TArray<FString> ActiveBranches;
+	FSuqsResolveBarrierStateData ResolveBarrier;
 
 	void SaveToArchive(FArchive& Ar);
 	void LoadFromArchive(FArchive& Ar, int FileVersion);
@@ -69,6 +88,7 @@ public:
 	int Version;
 	TArray<FSuqsQuestStateData> QuestData;
 	TArray<FString> GlobalActiveBranches;
+	TArray<FString> OpenGates;
 
 	void SaveToArchive(FArchive& Ar);
 	void LoadFromArchive(FArchive& Ar);

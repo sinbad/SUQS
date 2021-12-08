@@ -26,6 +26,95 @@ enum class ESuqsQuestStatus : uint8
 	Unavailable = 30
 };
 
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class ESuqsResolveBarrierCondition : uint8
+{
+	None       = 0 UMETA(Hidden),
+	/// Resolve won't occur until time passes
+	Time       = (1 << 0),
+	/// Resolve won't occur until a gate is opened (on Quest)
+	Gate       = (1 << 1),
+	/// Resolve won't occur until Resolve[Quest/Task] is called
+	Explicit   = (1 << 2),
+
+};
+ENUM_CLASS_FLAGS(ESuqsResolveBarrierCondition);
+
+USTRUCT(BlueprintType)
+struct FSuqsResolveBarrier
+{
+	GENERATED_BODY()
+
+	/// Bitflags identifying the conditional barriers to progression
+	UPROPERTY(BlueprintReadOnly, meta = (Bitmask, BitmaskEnum = ESuqsProgressionBarrierCondition))
+	int32 Conditions;
+
+	/// The time remaining if the barrier includes time
+	UPROPERTY(BlueprintReadOnly)
+	float TimeRemaining;
+
+	/// The gate that progression is blocked by, if barrier includes it
+	UPROPERTY(BlueprintReadOnly)
+	FName Gate;
+
+	/// Whether explicit permission has been given to resolve
+	UPROPERTY(BlueprintReadOnly)
+	bool bGrantedExplicitly;
+	
+	/// Flag indicating whether this barrier is still pending resolution
+	UPROPERTY(BlueprintReadOnly)
+	bool bPending;
+
+	FSuqsResolveBarrier() :
+		Conditions(0),
+		TimeRemaining(0),
+		Gate(FName()),
+		bGrantedExplicitly(false),
+		bPending(false)
+	{
+	}
+
+	FSuqsResolveBarrier(int32 InBarriers, float InTimeRemaining, const FName& InGate, bool bInGrantedExplicitly, bool bInPending)
+		: Conditions(InBarriers),
+		  TimeRemaining(InTimeRemaining),
+		  Gate(InGate),
+		  bGrantedExplicitly(bInGrantedExplicitly),
+		  bPending(bInPending)
+	{
+	}
+
+	::FSuqsResolveBarrier& operator=(const FSuqsResolveBarrierStateData& B)
+	{
+		Conditions = B.Conditions;
+		TimeRemaining = B.TimeRemaining;
+		Gate = FName(B.Gate);
+		bGrantedExplicitly = B.bGrantedExplicitly;
+		bPending = B.bPending;
+		return *this;
+	}
+
+	friend bool operator==(const FSuqsResolveBarrier& A, const FSuqsResolveBarrier& B)
+	{
+		return A.Conditions == B.Conditions
+			&& A.TimeRemaining == B.TimeRemaining
+			&& A.Gate == B.Gate
+			&& A.bGrantedExplicitly == B.bGrantedExplicitly
+			&& A.bPending == B.bPending;
+	}
+
+	friend bool operator!=(const FSuqsResolveBarrier& A, const FSuqsResolveBarrier& B)
+	{
+		return !(A == B);
+	}
+
+	FSuqsResolveBarrier(const FSuqsResolveBarrierStateData& B)
+	{
+		*this = B;
+	}
+
+	
+};
+
 /**
  * Quest state
  */
@@ -53,6 +142,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
 	int CurrentObjectiveIndex = -1;
 
+	/// A barrier is set when status changes but parent hasn't been notified yet
+	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
+	FSuqsResolveBarrier ResolveBarrier;
 
 	UPROPERTY()
 	TMap<FName, USuqsTaskState*> FastTaskLookup;
@@ -64,12 +156,16 @@ protected:
 	void Initialise(const FSuqsQuest* Def, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsQuestStatus NewStatus);
+	void QueueStatusChangeNotification();
+	bool IsResolveBlockedOn(ESuqsResolveBarrierCondition Barrier) const;
+	void MaybeNotifyStatusChange();
 	
 public:
 	ESuqsQuestStatus GetStatus() const { return Status; }
 	/// Return the list of ALL objectives. If you only want active objectives (branching), use GetActiveObjectives
 	const TArray<USuqsObjectiveState*>& GetObjectives() const { return Objectives; }
 	const TArray<FName>& GetActiveBranches() const { return ActiveBranches; }
+	const FSuqsResolveBarrier& GetResolveBarrier() const { return ResolveBarrier; }
 
 	/// Get the unique quest identifier
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -104,6 +200,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CompleteTask(FName TaskID);
 
+	/**
+	 * Resolve the outcome of a completed/failed task; activate the next task, or complete/fail the quest if it's the last.
+	 * You do not normally need to call this, tasks resolve automatically on completion/failure by default. However if
+	 * the task definition sets "ResolveAutomatically" to false then you have to call this to resolve it.
+	 * Has no effect on tasks which are incomplete.
+	 * @param TaskID The identifier of the task within the quest (required)
+	 */
+	UFUNCTION(BlueprintCallable)
+	void ResolveTask(FName TaskID);
+	
 	/**
 	 * Fail a task if it exists. 
 	 * @param TaskID The identifier of the task within the quest
@@ -147,6 +253,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     bool IsFailed() const { return Status == ESuqsQuestStatus::Failed; }
 
+	/// Return whether this quest is completed/failed but is blocked from resolving because of an unfulfilled condition
+	UFUNCTION(BlueprintCallable)
+	bool IsResolveBlocked() const;
+	
 	/// Return whether a given objective is incomplete ie not failed or completed
 	UFUNCTION(BlueprintCallable)
 	bool IsObjectiveIncomplete(const FName& Identifier) const;
@@ -166,6 +276,7 @@ public:
 	/// Get the next mandatory task for this quest
 	/// If the objective for this quest only requires ONE of a number of tasks to be completed, this will be the first one.
 	/// Check the current objective for more details.
+	/// May return nullptr if there is nothing to do next right now (may occur due to e.g. barriers)
 	UFUNCTION(BlueprintCallable)
 	USuqsTaskState* GetNextMandatoryTask() const;
 
@@ -203,6 +314,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Complete();
 
+	/// Resolve the outcome of a completed/failed quest; move it to the quest archive and process the knock-on
+	/// effects such as activating dependent quests.
+	/// You do not normally need to call this, quests resolve automatically on completion/failure by default. However if
+	/// the quest definition sets "ResolveAutomatically" to false then you have to call this to resolve it.
+	/// Has no effect on quests which are incomplete.
+	UFUNCTION(BlueprintCallable)
+	void Resolve();
+
 	/// Find a task with the given identifier in this quest
 	UFUNCTION(BlueprintCallable)
 	USuqsTaskState* GetTask(const FName& TaskID) const;
@@ -210,4 +329,7 @@ public:
 	void NotifyObjectiveStatusChanged();
 
 	void OverrideStatus(ESuqsQuestStatus OverrideStatus);
+	void NotifyGateOpened(const FName& GateName);
+	// Manually override the barrier data
+	void SetResolveBarrier(const FSuqsResolveBarrierStateData& Barrier);
 };

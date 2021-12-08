@@ -55,6 +55,20 @@
             "type": "string"
           }
         },
+        "bResolveAutomatically": {
+          "description": "Whether to resolve the outcomes of completion / failure automatically (default true) or to require explicit ResolveQuest call.",
+          "type": "boolean",
+          "default": true
+        },
+        "ResolveDelay": {
+          "description": "Optional time delay after completion / failure of this quest, before knock-on effects occur (updating quest list, activating dependent quests)",
+          "type": "number",
+          "default": -1
+        },
+        "ResolveGate": {
+          "description": "Optional Gate name; after completion / failure of this quest, knock-on effects won't occur until the Gate of this name is opened on the Progression instance (updating quest list, activating dependent quests)",
+          "type": "string"
+        },
         "Objectives": {
           "description": "List of sequential objectives which carry the quest forward. Can branch but always in order. Groups nested Tasks which are more flexible.",
           "type": "array",
@@ -123,6 +137,20 @@
                           "description": "Optional time limit to apply to this task, which starts as soon as it is the next mandatory task. 0 indicates no time limit",
                           "type": "number",
                           "default": 0
+                        },
+                        "bResolveAutomatically": {
+                          "description": "Whether to resolve the outcomes of completion / failure automatically (default true) or to require explicit ResolveTask call.",
+                          "type": "boolean",
+                          "default": true
+                        },
+                        "ResolveDelay": {
+                          "description": "Optional time delay after completion / failure of this task, before knock-on effects occur (activating next task, completing/failing quest)",
+                          "type": "number",
+                          "default": -1
+                        },
+                        "ResolveGate": {
+                          "description": "Optional Gate name; after completion / failure of this objective, knock-on effects won't occur until the Gate of this name is opened on the Progression instance (activating next task, completing/failing quest)",
+                          "type": "string"
                         }
                       },
                       "required": [
