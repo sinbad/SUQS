@@ -121,7 +121,7 @@ protected:
 
 	/// A barrier is set when status changes but parent hasn't been notified yet
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
-	FSuqsResolveBarrier ProgressionBarrier;
+	FSuqsResolveBarrier ResolveBarrier;
 
 	UPROPERTY()
 	TMap<FName, USuqsTaskState*> FastTaskLookup;
