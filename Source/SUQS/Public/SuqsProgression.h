@@ -57,8 +57,8 @@ protected:
 	TMultiMap<FName, FName> QuestFailureDeps;
 
 	bool bSuppressEvents = false;
-	float DefaultQuestProgressionTimeDelay = 0;
-	float DefaultTaskProgressionTimeDelay = 0;
+	float DefaultQuestResolveTimeDelay = 0;
+	float DefaultTaskResolveTimeDelay = 0;
 	
 
 	USuqsQuestState* FindQuestState(const FName& QuestID);
@@ -361,9 +361,9 @@ public:
 	const FSuqsQuest* GetQuestDefinition(const FName& QuestID);
 
 	/// Given a task definition and status, return progression barrier information
-	FSuqsProgressionBarrier GetProgressionBarrierForTask(const FSuqsTask* Task, ESuqsTaskStatus Status) const;
+	FSuqsResolveBarrier GetResolveBarrierForTask(const FSuqsTask* Task, ESuqsTaskStatus Status) const;
 	/// Given a task definition and status, return progression barrier information
-	FSuqsProgressionBarrier GetProgressionBarrierForQuest(const FSuqsQuest* Q, ESuqsQuestStatus Status) const;
+	FSuqsResolveBarrier GetResolveBarrierForQuest(const FSuqsQuest* Q, ESuqsQuestStatus Status) const;
 
 	/// Standard serialisation support
 	virtual void Serialize(FArchive& Ar) override;

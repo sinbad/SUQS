@@ -27,7 +27,7 @@ enum class ESuqsQuestStatus : uint8
 };
 
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
-enum class ESuqsProgressionBarrierCondition : uint8
+enum class ESuqsResolveBarrierCondition : uint8
 {
 	None       = 0 UMETA(Hidden),
 	/// Progression won't occur until time passes
@@ -36,10 +36,10 @@ enum class ESuqsProgressionBarrierCondition : uint8
 	Gate       = 1 << 1,
 
 };
-ENUM_CLASS_FLAGS(ESuqsProgressionBarrierCondition);
+ENUM_CLASS_FLAGS(ESuqsResolveBarrierCondition);
 
 USTRUCT(BlueprintType)
-struct FSuqsProgressionBarrier
+struct FSuqsResolveBarrier
 {
 	GENERATED_BODY()
 
@@ -59,7 +59,7 @@ struct FSuqsProgressionBarrier
 	UPROPERTY(BlueprintReadOnly)
 	bool bPending;
 
-	FSuqsProgressionBarrier() :
+	FSuqsResolveBarrier() :
 		Conditions(0),
 		TimeRemaining(0),
 		Gate(FName()),
@@ -67,7 +67,7 @@ struct FSuqsProgressionBarrier
 	{
 	}
 
-	FSuqsProgressionBarrier(int32 Barriers, float TimeRemaining, const FName& Gate, bool bPending)
+	FSuqsResolveBarrier(int32 Barriers, float TimeRemaining, const FName& Gate, bool bPending)
 		: Conditions(Barriers),
 		  TimeRemaining(TimeRemaining),
 		  Gate(Gate),
@@ -75,7 +75,7 @@ struct FSuqsProgressionBarrier
 	{
 	}
 
-	::FSuqsProgressionBarrier& operator=(const FSuqsProgressionBarrierStateData& B)
+	::FSuqsResolveBarrier& operator=(const FSuqsResolveBarrierStateData& B)
 	{
 		Conditions = B.Conditions;
 		TimeRemaining = B.TimeRemaining;
@@ -84,7 +84,7 @@ struct FSuqsProgressionBarrier
 		return *this;
 	}
 
-	FSuqsProgressionBarrier(const FSuqsProgressionBarrierStateData& B)
+	FSuqsResolveBarrier(const FSuqsResolveBarrierStateData& B)
 	{
 		*this = B;
 	}
@@ -121,7 +121,7 @@ protected:
 
 	/// A barrier is set when status changes but parent hasn't been notified yet
 	UPROPERTY(BlueprintReadOnly, Category="Quest Status")
-	FSuqsProgressionBarrier ProgressionBarrier;
+	FSuqsResolveBarrier ProgressionBarrier;
 
 	UPROPERTY()
 	TMap<FName, USuqsTaskState*> FastTaskLookup;
@@ -134,7 +134,7 @@ protected:
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsQuestStatus NewStatus);
 	void QueueStatusChangeNotification();
-	bool IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const;
+	bool IsResolveBlockedOn(ESuqsResolveBarrierCondition Barrier) const;
 	void MaybeNotifyStatusChange();
 	
 public:

@@ -8,7 +8,7 @@ constexpr int FileVersion_AddedOpenGates = 2;
 constexpr int FileVersion_AddedBarrierState = 2;
 
 
-void FSuqsProgressionBarrierStateData::SaveToArchive(FArchive& Ar)
+void FSuqsResolveBarrierStateData::SaveToArchive(FArchive& Ar)
 {
 	Ar << Conditions;
 	Ar << TimeRemaining;
@@ -16,7 +16,7 @@ void FSuqsProgressionBarrierStateData::SaveToArchive(FArchive& Ar)
 	Ar << bPending;
 }
 
-void FSuqsProgressionBarrierStateData::LoadFromArchive(FArchive& Ar, int FileVersion)
+void FSuqsResolveBarrierStateData::LoadFromArchive(FArchive& Ar, int FileVersion)
 {
 	Ar << Conditions;
 	Ar << TimeRemaining;
@@ -24,13 +24,13 @@ void FSuqsProgressionBarrierStateData::LoadFromArchive(FArchive& Ar, int FileVer
 	Ar << bPending;
 }
 
-FSuqsProgressionBarrierStateData& FSuqsProgressionBarrierStateData::operator=(
-	const FSuqsProgressionBarrier& PB)
+FSuqsResolveBarrierStateData& FSuqsResolveBarrierStateData::operator=(
+	const FSuqsResolveBarrier& B)
 {
-	Conditions = PB.Conditions;
-	TimeRemaining = PB.TimeRemaining;
-	Gate = PB.Gate.IsNone() ? "" : PB.Gate.ToString();
-	bPending = PB.bPending;
+	Conditions = B.Conditions;
+	TimeRemaining = B.TimeRemaining;
+	Gate = B.Gate.IsNone() ? "" : B.Gate.ToString();
+	bPending = B.bPending;
 	return *this;
 }
 
@@ -39,7 +39,7 @@ void FSuqsTaskStateData::SaveToArchive(FArchive& Ar)
 	Ar << Identifier;
 	Ar << Number;
 	Ar << TimeRemaining;
-	ProgressionBarrier.SaveToArchive(Ar);
+	ResolveBarrier.SaveToArchive(Ar);
 	
 }
 
@@ -56,7 +56,7 @@ void FSuqsTaskStateData::LoadFromArchive(FArchive& Ar, int FileVersion)
 
 	if (FileVersion >= FileVersion_AddedBarrierState)
 	{
-		ProgressionBarrier.LoadFromArchive(Ar, FileVersion);
+		ResolveBarrier.LoadFromArchive(Ar, FileVersion);
 	}
 	
 }
@@ -69,7 +69,7 @@ void FSuqsQuestStateData::SaveToArchive(FArchive& Ar)
 
 	Ar << ActiveBranches;
 
-	ProgressionBarrier.SaveToArchive(Ar);
+	ResolveBarrier.SaveToArchive(Ar);
 
 	int NumTasks = TaskData.Num();
 	Ar << NumTasks;
@@ -97,7 +97,7 @@ void FSuqsQuestStateData::LoadFromArchive(FArchive& Ar, int FileVersion)
 
 	if (FileVersion >= FileVersion_AddedBarrierState)
 	{
-		ProgressionBarrier.LoadFromArchive(Ar, FileVersion);
+		ResolveBarrier.LoadFromArchive(Ar, FileVersion);
 	}
 
 	int NumTasks;

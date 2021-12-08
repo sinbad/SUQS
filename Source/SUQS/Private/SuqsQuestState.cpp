@@ -43,7 +43,7 @@ void USuqsQuestState::Tick(float DeltaTime)
 		Obj->Tick(DeltaTime);
 	}
 	
-	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Time))
 	{
 		ProgressionBarrier.TimeRemaining = FMath::Max(ProgressionBarrier.TimeRemaining - DeltaTime, 0.f);
 		MaybeNotifyStatusChange();
@@ -350,7 +350,7 @@ void USuqsQuestState::NotifyGateOpened(const FName& GateName)
 		Obj->NotifyGateOpened(GateName);
 	}
 
-	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate) && ProgressionBarrier.Gate == GateName)
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Gate) && ProgressionBarrier.Gate == GateName)
 		MaybeNotifyStatusChange();
 }
 
@@ -380,14 +380,14 @@ void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
 
 void USuqsQuestState::QueueStatusChangeNotification()
 {
-	ProgressionBarrier = Progression->GetProgressionBarrierForQuest(QuestDefinition, Status);
+	ProgressionBarrier = Progression->GetResolveBarrierForQuest(QuestDefinition, Status);
 
 	// May immediately be satisfied
 	MaybeNotifyStatusChange();
 	
 }
 
-bool USuqsQuestState::IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const
+bool USuqsQuestState::IsResolveBlockedOn(ESuqsResolveBarrierCondition Barrier) const
 {
 	return ProgressionBarrier.bPending &&
 	   (ProgressionBarrier.Conditions & static_cast<uint32>(Barrier)) > 0;
@@ -403,14 +403,14 @@ void USuqsQuestState::MaybeNotifyStatusChange()
 	bool bCleared = true;
 
 	// All conditions have to be fulfilled
-	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Time))
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Time))
 	{
 		if (ProgressionBarrier.TimeRemaining > 0)
 		{
 			bCleared = false;
 		}
 	}
-	if (IsProgressionBlockedOn(ESuqsProgressionBarrierCondition::Gate))
+	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Gate))
 	{
 		if (!Progression->IsGateOpen(ProgressionBarrier.Gate))
 		{

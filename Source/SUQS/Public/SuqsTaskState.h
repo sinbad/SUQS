@@ -47,7 +47,7 @@ protected:
 
 	/// A barrier is set when status changes but parent hasn't been notified yet
 	UPROPERTY(BlueprintReadOnly, Category="Task State")
-	FSuqsProgressionBarrier ProgressionBarrier;
+	FSuqsResolveBarrier ProgressionBarrier;
 	
 	const FSuqsTask* TaskDefinition;
 	TWeakObjectPtr<USuqsObjectiveState> ParentObjective;
@@ -58,7 +58,7 @@ protected:
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsTaskStatus NewStatus);
 	void QueueParentStatusChangeNotification();
-	bool IsProgressionBlockedOn(ESuqsProgressionBarrierCondition Barrier) const;
+	bool IsResolveBlockedOn(ESuqsResolveBarrierCondition Barrier) const;
 	void MaybeNotifyParentStatusChange();
 public:
 	// expose BP properties for C++ 
@@ -114,7 +114,7 @@ public:
 
 	/// Directly change the barrier state
 	UFUNCTION(BlueprintCallable)
-	void SetProgressionBarrier(const FSuqsProgressionBarrier& Barrier);
+	void SetResolveBarrier(const FSuqsResolveBarrier& Barrier);
 
 	/// Get the number of "things" still left to do, will only be > 1 if TargetNumber on the task was > 1
 	UFUNCTION(BlueprintCallable)

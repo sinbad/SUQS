@@ -45,8 +45,8 @@ void USuqsProgression::InitWithQuestDataTablesInPaths(const TArray<FString>& Pat
 
 void USuqsProgression::SetDefaultProgressionTimeDelays(float QuestDelay, float TaskDelay)
 {
-	DefaultQuestProgressionTimeDelay = QuestDelay;
-	DefaultTaskProgressionTimeDelay = TaskDelay;
+	DefaultQuestResolveTimeDelay = QuestDelay;
+	DefaultTaskResolveTimeDelay = TaskDelay;
 }
 
 
@@ -714,29 +714,29 @@ const FSuqsQuest* USuqsProgression::GetQuestDefinition(const FName& QuestID)
 	return QuestDefinitions.Find(QuestID);
 }
 
-FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForTask(const FSuqsTask* Task,
+FSuqsResolveBarrier USuqsProgression::GetResolveBarrierForTask(const FSuqsTask* Task,
 	ESuqsTaskStatus Status) const
 {
-	FSuqsProgressionBarrier Barrier;
+	FSuqsResolveBarrier Barrier;
 
 	if (Status == ESuqsTaskStatus::Completed ||
 		Status == ESuqsTaskStatus::Failed)
 	{
-		if (DefaultTaskProgressionTimeDelay > 0)
+		if (DefaultTaskResolveTimeDelay > 0)
 		{
-			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
-			Barrier.TimeRemaining = DefaultTaskProgressionTimeDelay;
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+			Barrier.TimeRemaining = DefaultTaskResolveTimeDelay;
 		}
 
-		if (Task->ProgressionDelay >= 0) // >= because default is -1, so that 0 can override >0 default
+		if (Task->ResolveDelay >= 0) // >= because default is -1, so that 0 can override >0 default
 		{
-			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
-			Barrier.TimeRemaining = Task->ProgressionDelay;
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+			Barrier.TimeRemaining = Task->ResolveDelay;
 		}
-		if (!Task->ProgressionGate.IsNone())
+		if (!Task->ResolveGate.IsNone())
 		{
-			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Gate);
-			Barrier.Gate = Task->ProgressionGate;
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
+			Barrier.Gate = Task->ResolveGate;
 		}
 	}
 	
@@ -745,27 +745,27 @@ FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForTask(const FSu
 	return Barrier;
 }
 
-FSuqsProgressionBarrier USuqsProgression::GetProgressionBarrierForQuest(const FSuqsQuest* Quest, ESuqsQuestStatus Status) const
+FSuqsResolveBarrier USuqsProgression::GetResolveBarrierForQuest(const FSuqsQuest* Quest, ESuqsQuestStatus Status) const
 {
-	FSuqsProgressionBarrier Barrier;
+	FSuqsResolveBarrier Barrier;
 
 	if (Status == ESuqsQuestStatus::Completed ||
 		Status == ESuqsQuestStatus::Failed)
 	{
-		if (DefaultQuestProgressionTimeDelay > 0)
+		if (DefaultQuestResolveTimeDelay > 0)
 		{
-			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
-			Barrier.TimeRemaining = DefaultQuestProgressionTimeDelay;
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+			Barrier.TimeRemaining = DefaultQuestResolveTimeDelay;
 		}
-		if (Quest->ProgressionDelay >= 0) // >= because default is -1, so that 0 can override >0 default
+		if (Quest->ResolveDelay >= 0) // >= because default is -1, so that 0 can override >0 default
 		{
-			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Time);
-			Barrier.TimeRemaining = Quest->ProgressionDelay;
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+			Barrier.TimeRemaining = Quest->ResolveDelay;
 		}
-		if (!Quest->ProgressionGate.IsNone())
+		if (!Quest->ResolveGate.IsNone())
 		{
-			Barrier.Conditions |= static_cast<int>(ESuqsProgressionBarrierCondition::Gate);
-			Barrier.Gate = Quest->ProgressionGate;
+			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
+			Barrier.Gate = Quest->ResolveGate;
 		}
 	}
 
@@ -843,7 +843,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 			// This will re-create the quest structure, including objectives and tasks, based on *current* definition
 			Q->Initialise(QDef, this);
 
-			Q->ProgressionBarrier = QData.ProgressionBarrier;
+			Q->ProgressionBarrier = QData.ResolveBarrier;
 			
 			for (FString Branch : QData.ActiveBranches)
 			{
@@ -855,7 +855,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 				// Discard task state which isn't in the quest any more
 				if (auto T = Q->GetTask(FName(TData.Identifier)))
 				{
-					T->SetProgressionBarrier(TData.ProgressionBarrier);
+					T->SetResolveBarrier(TData.ResolveBarrier);
 					T->SetNumber(TData.Number);
 					T->SetTimeRemaining(TData.TimeRemaining);
 				}		
@@ -939,7 +939,7 @@ void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSav
 			QData.ActiveBranches.Add(Branch.ToString());
 		}
 
-		QData.ProgressionBarrier = Q->ProgressionBarrier;
+		QData.ResolveBarrier = Q->ProgressionBarrier;
 
 		for (auto O : Q->Objectives)
 		{

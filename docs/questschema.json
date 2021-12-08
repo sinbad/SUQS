@@ -55,12 +55,12 @@
             "type": "string"
           }
         },
-        "ProgressionDelay": {
+        "ResolveDelay": {
           "description": "Optional time delay after completion / failure of this quest, before knock-on effects occur (updating quest list, activating dependent quests)",
           "type": "number",
           "default": -1
         },
-        "ProgressionGate": {
+        "ResolveGate": {
           "description": "Optional Gate name; after completion / failure of this quest, knock-on effects won't occur until the Gate of this name is opened on the Progression instance (updating quest list, activating dependent quests)",
           "type": "string"
         },
@@ -133,12 +133,12 @@
                           "type": "number",
                           "default": 0
                         },
-                        "ProgressionDelay": {
+                        "ResolveDelay": {
                           "description": "Optional time delay after completion / failure of this task, before knock-on effects occur (activating next task, completing/failing quest)",
                           "type": "number",
                           "default": -1
                         },
-                        "ProgressionGate": {
+                        "ResolveGate": {
                           "description": "Optional Gate name; after completion / failure of this objective, knock-on effects won't occur until the Gate of this name is opened on the Progression instance (activating next task, completing/failing quest)",
                           "type": "string"
                         }
