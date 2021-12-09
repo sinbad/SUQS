@@ -105,6 +105,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	USuqsTaskState* GetNextMandatoryTask() const;
 
+	/// Convenience function to get a list of all tasks which are useful to display to a player. This means
+	/// all the completed or failed tasks in this objective, plus the next incomplete mandatory task(s) (multiple if non-sequential),
+	/// and any optional tasks.
+	UFUNCTION(BlueprintCallable)
+	void GetAllRelevantTasks(TArray<USuqsTaskState*>& RelevantTasksOut) const;
+
+
 	/// Get a list of tasks which are incomplete
 	UFUNCTION(BlueprintCallable)
 	void GetIncompleteTasks(TArray<USuqsTaskState*>& IncompleteTasksOut) const;
