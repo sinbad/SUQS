@@ -23,7 +23,7 @@ enum class ESuqsTaskStatus : uint8
 /**
  * Record of the state of a task in a quest objective
  */
-UCLASS()
+UCLASS(BlueprintType)
 class SUQS_API USuqsTaskState : public UObject
 {
 	GENERATED_BODY()

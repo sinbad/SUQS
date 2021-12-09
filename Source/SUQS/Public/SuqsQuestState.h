@@ -118,7 +118,7 @@ struct FSuqsResolveBarrier
 /**
  * Quest state
  */
-UCLASS()
+UCLASS(BlueprintType)
 class SUQS_API USuqsQuestState : public UObject
 {
 	GENERATED_BODY()

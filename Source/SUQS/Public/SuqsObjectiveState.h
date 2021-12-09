@@ -23,7 +23,7 @@ enum class ESuqsObjectiveStatus : uint8
 /**
  * Objective state
  */
-UCLASS()
+UCLASS(BlueprintType)
 class SUQS_API USuqsObjectiveState : public UObject
 {
 	GENERATED_BODY()
