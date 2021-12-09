@@ -64,6 +64,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     USuqsQuestState* GetParentQuest() const { return ParentQuest.Get(); }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	USuqsProgression* GetRootProgression() const { return Progression.Get(); }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const FName& GetBranch() const { return ObjectiveDefinition->Branch; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     bool AreTasksSequential() const { return ObjectiveDefinition->bSequentialTasks; }

@@ -89,6 +89,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsObjectiveState* GetParentObjective() const { return ParentObjective.Get(); }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	USuqsProgression* GetRootProgression() const { return Progression.Get(); }
+	
 	/// Fail this task
 	UFUNCTION(BlueprintCallable)
 	void Fail();

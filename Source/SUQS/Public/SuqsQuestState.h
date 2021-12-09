@@ -177,6 +177,8 @@ public:
 	/// For any additional objective description, see GetCurrentObjective()->GetDescription();
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FText& GetDescription() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	USuqsProgression* GetRootProgression() const { return Progression.Get(); }
 	
 	/// Set an objective branch to be active in this quest. Objectives associated with this branch will then be allowed
 	/// to activate.
