@@ -31,6 +31,8 @@ public:
 	TArray<USuqsObjectiveState*> CompletedObjectives;
 	UPROPERTY()
 	TArray<USuqsObjectiveState*> FailedObjectives;
+	UPROPERTY()
+	TArray<FSuqsProgressionEventDetails> ProgressionEvents;
 	UFUNCTION()
     void OnQuestAccepted(USuqsQuestState* Quest) { AcceptedQuests.Add(Quest); }
 	UFUNCTION()
@@ -47,6 +49,9 @@ public:
     void OnObjectiveCompleted(USuqsObjectiveState* Objective) { CompletedObjectives.Add(Objective); }
 	UFUNCTION()
     void OnObjectiveFailed(USuqsObjectiveState* Objective) { FailedObjectives.Add(Objective); }
+	UFUNCTION()
+	void OnProgression(const FSuqsProgressionEventDetails& Dtls) { ProgressionEvents.Add(Dtls); }
+	
 
 	void Subscribe(USuqsProgression* Progression);
 };

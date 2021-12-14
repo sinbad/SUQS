@@ -213,14 +213,32 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 				return false;
 			}
 
+			// Quest reset will raise all the necessary events
 			Quest->Reset();
 		}
 		else
 		{
 			// New quest
 			Quest = NewObject<USuqsQuestState>(this);
+			// The problem is that initialisation could trigger detail events while it sorts itself out, out of order
+			// Let's suppress that
+			const bool bPrevSuppressed = bSuppressEvents;
+			bSuppressEvents = true;
 			Quest->Initialise(QDef, this);
+			bSuppressEvents = bPrevSuppressed;
+			
 			ActiveQuests.Add(QuestID, Quest);
+			
+			if (!bSuppressEvents)
+			{
+				// Manually raise all the initialisation events since these will have been suppressed
+				OnQuestAccepted.Broadcast(Quest);
+				OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::QuestAccepted, Quest));
+				OnActiveQuestsListChanged.Broadcast();
+				OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::ActiveQuestsChanged));
+
+				RaiseCurrentObjectiveChanged(Quest);
+			}
 
 			// Propagate global quest branches
 			for (auto& Branch : GlobalActiveBranches)
@@ -229,13 +247,6 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 			}
 		}
 
-		if (!bSuppressEvents)
-		{
-			OnQuestAccepted.Broadcast(Quest);
-			OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::QuestAccepted, Quest));
-			OnActiveQuestsListChanged.Broadcast();
-			OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::ActiveQuestsChanged));
-		}
 		return true;
 	}
 	else

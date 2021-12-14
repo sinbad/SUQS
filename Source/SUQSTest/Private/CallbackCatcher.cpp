@@ -12,5 +12,7 @@ void UCallbackCatcher::Subscribe(USuqsProgression* Progression)
 	Progression->OnTaskUpdated.AddDynamic(this, &UCallbackCatcher::OnTaskUpdated);
 	Progression->OnTaskFailed.AddDynamic(this, &UCallbackCatcher::OnTaskFailed);
 	Progression->OnTaskCompleted.AddDynamic(this, &UCallbackCatcher::OnTaskCompleted);
+
+	Progression->OnProgressionEvent.AddDynamic(this, &UCallbackCatcher::OnProgression);
 	
 }
