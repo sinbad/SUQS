@@ -232,7 +232,9 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 		if (!bSuppressEvents)
 		{
 			OnQuestAccepted.Broadcast(Quest);
+			OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::QuestAccepted, Quest));
 			OnActiveQuestsListChanged.Broadcast();
+			OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::ActiveQuestsChanged));
 		}
 		return true;
 	}
@@ -667,38 +669,73 @@ void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)
 {
 	// might be worth queuing these up and raising combined?
 	if (!bSuppressEvents)
+	{
 		OnTaskUpdated.Broadcast(Task);
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskUpdated, Task));
+	}
 }
 
 void USuqsProgression::RaiseTaskCompleted(USuqsTaskState* Task)
 {
 	if (!bSuppressEvents)
+	{
 		OnTaskCompleted.Broadcast(Task);
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskCompleted, Task));
+	}
 }
+
+void USuqsProgression::RaiseTaskAdded(USuqsTaskState* Task)
+{
+	if (!bSuppressEvents)
+	{
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskAdded, Task));
+	}
+}
+
+void USuqsProgression::RaiseTaskRemoved(USuqsTaskState* Task)
+{
+	if (!bSuppressEvents)
+	{
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskRemoved, Task));
+	}
+}
+
 void USuqsProgression::RaiseTaskFailed(USuqsTaskState* Task)
 {
 	if (!bSuppressEvents)
+	{
 		OnTaskFailed.Broadcast(Task);
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskFailed, Task));
+	}
 }
 
 
 void USuqsProgression::RaiseObjectiveCompleted(USuqsObjectiveState* Objective)
 {
 	if (!bSuppressEvents)
+	{
 		OnObjectiveCompleted.Broadcast(Objective);
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::ObjectiveCompleted, Objective));
+	}
 }
 
 void USuqsProgression::RaiseObjectiveFailed(USuqsObjectiveState* Objective)
 {
 	if (!bSuppressEvents)
+	{
 		OnObjectiveFailed.Broadcast(Objective);
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::ObjectiveFailed, Objective));
+	}
 }
 
 
 void USuqsProgression::RaiseQuestCompleted(USuqsQuestState* Quest)
 {
 	if (!bSuppressEvents)
+	{
 		OnQuestCompleted.Broadcast(Quest);
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::QuestCompleted, Quest));
+	}
 
 	// We don't process changes caused by complete / fail until barriers resolved (see ProcessQuestStatusChange)
 	
@@ -707,7 +744,10 @@ void USuqsProgression::RaiseQuestCompleted(USuqsQuestState* Quest)
 void USuqsProgression::RaiseQuestFailed(USuqsQuestState* Quest)
 {
 	if (!bSuppressEvents)
+	{
 		OnQuestFailed.Broadcast(Quest);
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::QuestFailed, Quest));
+	}
 
 	// We don't process changes caused by complete / fail until barriers resolved (see ProcessQuestStatusChange)
 	
@@ -721,9 +761,36 @@ void USuqsProgression::RaiseQuestReset(USuqsQuestState* Quest)
 	
 	if (!bSuppressEvents)
 	{
+		// Always raise as new acceptance
 		OnQuestAccepted.Broadcast(Quest);
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::QuestAccepted, Quest));
+		
+		// Only raise list change if moved from archived
 		if (NumRemoved > 0)
+		{
 			OnActiveQuestsListChanged.Broadcast();
+			OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::ActiveQuestsChanged));
+		}
+	}
+}
+
+void USuqsProgression::RaiseCurrentObjectiveChanged(USuqsQuestState* Quest)
+{
+	if (!bSuppressEvents)
+	{
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::QuestCurrentObjectiveChanged, Quest));
+
+		// Also raise events for every task which is now relevant
+		if (const auto Obj = Quest->GetCurrentObjective())
+		{
+			TArray<USuqsTaskState*> Tasks;
+			Obj->GetAllRelevantTasks(Tasks);
+			for (const auto T : Tasks)
+			{
+				OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskAdded, T));
+			}
+		}
+		
 	}
 }
 
@@ -737,9 +804,17 @@ void USuqsProgression::ProcessQuestStatusChange(USuqsQuestState* Quest)
 		// Move quest to the correct list
 		ActiveQuests.Remove(Quest->GetIdentifier());
 		QuestArchive.Add(Quest->GetIdentifier(), Quest);
+		if (!bSuppressEvents)
+		{
+			OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::QuestArchived, Quest));
+		}
+		
 		AutoAcceptQuests(Quest->GetIdentifier(), Status == ESuqsQuestStatus::Failed);
 		if (!bSuppressEvents)
+		{
 			OnActiveQuestsListChanged.Broadcast();
+			OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::ActiveQuestsChanged));
+		}
 		
 	}
 }

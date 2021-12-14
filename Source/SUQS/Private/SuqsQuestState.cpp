@@ -327,6 +327,7 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 	// Re-scan the objectives from top to bottom (this allows ANY change to have been made, including backtracking)
 	// The next active objective is the next incomplete one in sequence which is on an active branch
 	// If there is no next objective, then the quest is complete.
+	int PrevObjIndex = CurrentObjectiveIndex;
 	CurrentObjectiveIndex = -1;
 	bool ObjectivesFailed = false;
 
@@ -340,8 +341,6 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 			if (Obj->IsIncomplete())
 			{
 				CurrentObjectiveIndex = i;
-				// Call this anyway, may not change but that's OK
-				ChangeStatus(ESuqsQuestStatus::Incomplete);
 				// first incomplete unfiltered objective is the next one 
 				break;
 			}
@@ -364,6 +363,11 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 	{
 		// Just in case we go backwards (e.g. reset)
 		ChangeStatus(ESuqsQuestStatus::Incomplete);
+
+		if (PrevObjIndex != CurrentObjectiveIndex)
+		{
+			Progression->RaiseCurrentObjectiveChanged(this);
+		}
 	}
 	
 

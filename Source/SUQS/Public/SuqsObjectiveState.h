@@ -126,6 +126,6 @@ public:
     bool IsOnActiveBranch() const;
 
 	
-	void NotifyTaskStatusChanged();
+	void NotifyTaskStatusChanged(const USuqsTaskState* ChangedTaskOrNull);
 	void NotifyGateOpened(const FName& GateName);
 };

@@ -9,6 +9,98 @@
 #include "SuqsTaskState.h"
 #include "SuqsProgression.generated.h"
 
+/// Identifies the type of quest event that has occurred, for those who want to listen in to a single event source
+UENUM(BlueprintType)
+enum class ESuqsProgressionEventType : uint8
+{
+	/// Raised when the list of active quests changes (quests may not be removed from the list immediately on completion/failure)
+	ActiveQuestsChanged,
+	/// Raised when a quest is archived because it was previously completed or failed, details include quest link
+	QuestArchived,
+	/// Raised when a quest is accepted, details include quest link
+	QuestAccepted,
+	/// Raised when a quest is completed, details include quest link
+	QuestCompleted,
+	/// Raised when a quest is failed, details include quest link
+	QuestFailed,
+	/// Raised when the current objective on a quest changes, details include quest link
+	/// This implicitly resets the list of relevant tasks, you should assume that TaskAdded will be called for new ones
+	QuestCurrentObjectiveChanged,
+	/// Raised when an objective is completed, details include objective link
+	ObjectiveCompleted,
+	/// Raised when an objective is failed, details include objective link
+	ObjectiveFailed,
+	/// Raised when a new task has been added to the list of relevant ones to be displayed within the current objective
+	/// Details include  task
+	TaskAdded,
+	/// Raised when something on the detail of a task has changed (progress made, time etc)
+	TaskUpdated,
+	/// Raised when a task has been completed, details include task
+	TaskCompleted,
+	/// Raised when a task has failed, details include task
+	TaskFailed,
+	/// Raised when a task has been removed from the list of relevant ones to be displayed within the current objective
+	/// This is not called for each task before CurrentObjectiveChanged, assume that means all tasks are gone
+	/// Really this only happens for sequential mandatory tasks, before the objective is changed
+	/// Details include  task
+	TaskRemoved,
+	
+};
+
+/// Details to go with the general progression event, not all members will be valid, see ESuqsProgressionEventType
+USTRUCT(BlueprintType)
+struct FSuqsProgressionEventDetails
+{
+	GENERATED_BODY()
+public:
+	/// The event type, always present
+	UPROPERTY(BlueprintReadOnly)
+	ESuqsProgressionEventType EventType;
+	/// The relevant quest; only present for applicable event types
+	UPROPERTY(BlueprintReadOnly)
+	class USuqsQuestState* Quest;
+	/// The relevant objective; only present for applicable event types
+	UPROPERTY(BlueprintReadOnly)
+	class USuqsObjectiveState* Objective;
+	/// The relevant task; only present for applicable event types
+	UPROPERTY(BlueprintReadOnly)
+	class USuqsTaskState* Task;
+
+	explicit FSuqsProgressionEventDetails(ESuqsProgressionEventType EType)
+		: EventType(EType), Quest(nullptr), Objective(nullptr), Task(nullptr)
+	{
+	}
+
+	FSuqsProgressionEventDetails(ESuqsProgressionEventType EventType, USuqsQuestState* Quest)
+		: EventType(EventType),
+		  Quest(Quest),
+		  Objective(nullptr),
+		  Task(nullptr)
+	{
+	}
+
+	FSuqsProgressionEventDetails(ESuqsProgressionEventType EventType, USuqsObjectiveState* Objective)
+		: EventType(EventType),
+		  Quest(nullptr),
+		  Objective(Objective),
+		  Task(nullptr)
+	{
+	}
+
+	FSuqsProgressionEventDetails(ESuqsProgressionEventType EventType, USuqsTaskState* Task)
+		: EventType(EventType),
+		  Quest(nullptr),
+		  Objective(nullptr),
+		  Task(Task)
+	{
+	}
+
+	FSuqsProgressionEventDetails(): EventType(), Quest(nullptr), Objective(nullptr), Task(nullptr)
+	{
+	}
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnProgressionEvent, const FSuqsProgressionEventDetails&, Details);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskUpdated, USuqsTaskState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskCompleted, USuqsTaskState*, Task);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTaskFailed, USuqsTaskState*, Task);
@@ -104,6 +196,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetDefaultProgressionTimeDelays(float QuestDelay, float TaskDelay);
 
+	/// This single event is best for quest UIs since it can give details about any relevant change in quest state
+	UPROPERTY(BlueprintAssignable)
+	FOnProgressionEvent OnProgressionEvent;
 	/// Fired when a task is completed
 	UPROPERTY(BlueprintAssignable)
 	FOnTaskCompleted OnTaskCompleted;
@@ -374,11 +469,15 @@ public:
 	void RaiseTaskUpdated(USuqsTaskState* Task);
 	void RaiseTaskFailed(USuqsTaskState* Task);
 	void RaiseTaskCompleted(USuqsTaskState* Task);
+	void RaiseTaskAdded(USuqsTaskState* Task);
+	void RaiseTaskRemoved(USuqsTaskState* Task);
 	void RaiseObjectiveCompleted(USuqsObjectiveState* Objective);
 	void RaiseObjectiveFailed(USuqsObjectiveState* Objective);
 	void RaiseQuestCompleted(USuqsQuestState* Quest);
 	void RaiseQuestFailed(USuqsQuestState* Quest);
 	void RaiseQuestReset(USuqsQuestState* Quest);
+	void RaiseCurrentObjectiveChanged(USuqsQuestState* Quest);
+
 
 	void ProcessQuestStatusChange(USuqsQuestState* Quest);
 

@@ -22,7 +22,7 @@ void USuqsObjectiveState::Initialise(const FSuqsObjective* ObjDef, USuqsQuestSta
 			++MandatoryTasksNeededToComplete;
 	}
 
-	NotifyTaskStatusChanged();
+	NotifyTaskStatusChanged(nullptr);
 	
 }
 
@@ -164,7 +164,7 @@ bool USuqsObjectiveState::IsOnActiveBranch() const
 	return ParentQuest->IsBranchActive(GetBranch());
 }
 
-void USuqsObjectiveState::NotifyTaskStatusChanged()
+void USuqsObjectiveState::NotifyTaskStatusChanged(const USuqsTaskState* ChangedTaskOrNull)
 {
 	// Re-scan our tasks and decide what this means for our own state
 	int MandatoryTasksFailed = 0;
@@ -172,6 +172,7 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 	int IncompleteMandatoryTasks = 0;
 	for (auto& Task : Tasks)
 	{
+		const bool bPreviouslyHidden = Task->bHidden;
 		Task->bHidden = false;
 		if (Task->IsMandatory())
 		{
@@ -195,6 +196,12 @@ void USuqsObjectiveState::NotifyTaskStatusChanged()
 			default:
 				break;
 			}
+		}
+		if (bPreviouslyHidden && !Task->bHidden)
+		{
+			// This task became visible during this update
+			if (Progression.IsValid())
+				Progression->RaiseTaskAdded(Task);
 		}
 	}
 	
