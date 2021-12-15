@@ -186,9 +186,11 @@ void USuqsObjectiveState::NotifyTaskStatusChanged(const USuqsTaskState* ChangedT
 				break;
 			case ESuqsTaskStatus::NotStarted:
 			case ESuqsTaskStatus::InProgress:
-				if (ObjectiveDefinition->bSequentialTasks && IncompleteMandatoryTasks > 0)
+				if (ObjectiveDefinition->bSequentialTasks &&
+					(IncompleteMandatoryTasks > 0 || MandatoryTasksFailed > 0))
 				{
-					// If tasks are sequential, and this is an incomplete task after the first, suggest hiding it
+					// If tasks are sequential, and either there have been incomplete mandatory tasks before,
+					// or a failed mandatory task before, this task should be hidden because it's not actionable
 					Task->bHidden = true;
 				}
 				++IncompleteMandatoryTasks;
