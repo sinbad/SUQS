@@ -100,31 +100,10 @@ USuqsTaskState* USuqsObjectiveState::GetNextMandatoryTask() const
 void USuqsObjectiveState::GetAllRelevantTasks(TArray<USuqsTaskState*>& RelevantTasksOut) const
 {
 	RelevantTasksOut.Empty();
-	bool bAddedMandatoryTask = false;
 	for (auto Task : Tasks)
 	{
-		// Completed / failed tasks
-		if (!Task->IsIncomplete())
-		{
+		if (!Task->bHidden)
 			RelevantTasksOut.Add(Task);
-		}
-		else
-		{
-			if (Task->IsMandatory())
-			{
-				// Only add either the first incomplete mandatory task, or all of them if non-sequential
-				if (!bAddedMandatoryTask || !AreTasksSequential())
-				{
-					RelevantTasksOut.Add(Task);
-					bAddedMandatoryTask = true;
-				}
-			}
-			else
-			{
-				// Optional tasks are always added
-				RelevantTasksOut.Add(Task);
-			}
-		}
 	}
 }
 
