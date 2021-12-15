@@ -349,13 +349,68 @@ bool FTestQuestDetailEvents::RunTest(const FString& Parameters)
 	
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Main1"));
 	auto Q = Progression->GetQuest("Q_Main1");
+
+	if (TestEqual("Should have received correct number of progress events", CallbackObj->ProgressionEvents.Num(), 5))
+	{
+		if (TestEqual("Event 0 should be quest accepted", CallbackObj->ProgressionEvents[0].EventType, ESuqsProgressionEventType::QuestAccepted))
+		{
+			TestEqual("Event 0 should be correct quest", CallbackObj->ProgressionEvents[0].Quest, Q);
+		}
+		TestEqual("Event 1 should be active quests changed", CallbackObj->ProgressionEvents[1].EventType, ESuqsProgressionEventType::ActiveQuestsChanged);
+		if (TestEqual("Event 2 should be current objective", CallbackObj->ProgressionEvents[2].EventType, ESuqsProgressionEventType::QuestCurrentObjectiveChanged))
+		{
+			TestEqual("Event 2 should be correct quest", CallbackObj->ProgressionEvents[2].Quest, Q);
+		}
+		if (TestEqual("Event 3 should be task added", CallbackObj->ProgressionEvents[3].EventType, ESuqsProgressionEventType::TaskAdded))
+		{
+			if (TestNotNull("Event 3 task should be not null", CallbackObj->ProgressionEvents[3].Task))
+			{
+				TestTrue("Event 3 task should be mandatory", CallbackObj->ProgressionEvents[3].Task->IsMandatory());
+				TestEqual("Event 3 task should be T_ReachThePlace", CallbackObj->ProgressionEvents[3].Task->GetIdentifier(), FName("T_ReachThePlace"));
+			}
+		}
+		if (TestEqual("Event 4 should be task added", CallbackObj->ProgressionEvents[4].EventType, ESuqsProgressionEventType::TaskAdded))
+		{
+			if (TestNotNull("Event 4 task should be not null", CallbackObj->ProgressionEvents[4].Task))
+			{
+				TestFalse("Event 4 task should not be mandatory", CallbackObj->ProgressionEvents[4].Task->IsMandatory());
+				TestEqual("Event 4 task should be T_CollectDoobries", CallbackObj->ProgressionEvents[4].Task->GetIdentifier(), FName("T_CollectDoobries"));
+			}
+		}
+	}
+	CallbackObj->ProgressionEvents.Empty();
+	
 	TestTrue("Task complete should work", Progression->CompleteTask("Q_Main1", "T_ReachThePlace"));
-	TestEqual("Should be a task update callback", CallbackObj->UpdatedTasks.Num(), 1);
-	if (CallbackObj->UpdatedTasks.Num() > 0)
+	if (TestEqual("Should be a task update callback", CallbackObj->UpdatedTasks.Num(), 1))
 		TestEqual("Should have received correct task update callback", CallbackObj->UpdatedTasks[0], Q->GetTask("T_ReachThePlace"));
-	TestEqual("Should be a task complete callback", CallbackObj->CompletedTasks.Num(), 1);
-	if (CallbackObj->CompletedTasks.Num() > 0)
+	if (TestEqual("Should be a task complete callback", CallbackObj->CompletedTasks.Num(), 1))
 		TestEqual("Should have received correct task complete callback", CallbackObj->CompletedTasks[0], Q->GetTask("T_ReachThePlace"));
+
+	if (TestEqual("Should have received correct number of progress events", CallbackObj->ProgressionEvents.Num(), 4))
+	{
+		if (TestEqual("Event 0 should be task updated", CallbackObj->ProgressionEvents[0].EventType, ESuqsProgressionEventType::TaskUpdated))
+		{
+			if (TestNotNull("Event 0 Task should not be null", CallbackObj->ProgressionEvents[0].Task))
+				TestEqual("Event 0 should be correct task", CallbackObj->ProgressionEvents[0].Task->GetIdentifier(), FName("T_ReachThePlace"));
+		}
+		if (TestEqual("Event 1 should be task completed", CallbackObj->ProgressionEvents[1].EventType, ESuqsProgressionEventType::TaskCompleted))
+		{
+			if (TestNotNull("Event 1 Task should not be null", CallbackObj->ProgressionEvents[1].Task))
+				TestEqual("Event 1 should be correct task", CallbackObj->ProgressionEvents[1].Task->GetIdentifier(), FName("T_ReachThePlace"));
+		}
+		if (TestEqual("Event 2 should be task removed", CallbackObj->ProgressionEvents[2].EventType, ESuqsProgressionEventType::TaskRemoved))
+		{
+			if (TestNotNull("Event 2 Task should not be null", CallbackObj->ProgressionEvents[2].Task))
+				TestEqual("Event 2 should be correct task", CallbackObj->ProgressionEvents[2].Task->GetIdentifier(), FName("T_ReachThePlace"));
+		}
+		if (TestEqual("Event 3 should be task added", CallbackObj->ProgressionEvents[3].EventType, ESuqsProgressionEventType::TaskAdded))
+		{
+			if (TestNotNull("Event 3 Task should not be null", CallbackObj->ProgressionEvents[3].Task))
+				TestEqual("Event 3 should be correct task", CallbackObj->ProgressionEvents[3].Task->GetIdentifier(), FName("T_DoTheThing"));
+		}
+	}
+	CallbackObj->ProgressionEvents.Empty();
+	
 	Progression->ProgressTask("Q_Main1", "T_CollectDoobries", 1);
 	// 2 update calls for this, one for the status change to "in progress", the other for the progress itself
 	TestEqual("Should be 2 extra task update callback for progress", CallbackObj->UpdatedTasks.Num(), 3);
@@ -364,11 +419,38 @@ bool FTestQuestDetailEvents::RunTest(const FString& Parameters)
 		TestEqual("Should have received correct task update callback", CallbackObj->UpdatedTasks[1], Q->GetTask("T_CollectDoobries"));
 		TestEqual("Should have received correct task update callback", CallbackObj->UpdatedTasks[2], Q->GetTask("T_CollectDoobries"));
 	}
+
+	if (TestEqual("Should have received correct number of progress events", CallbackObj->ProgressionEvents.Num(), 2))
+	{
+		if (TestEqual("Event 0 should be task updated", CallbackObj->ProgressionEvents[0].EventType, ESuqsProgressionEventType::TaskUpdated))
+		{
+			if (TestNotNull("Event 0 Task should not be null", CallbackObj->ProgressionEvents[0].Task))
+				TestEqual("Event 0 should be correct task", CallbackObj->ProgressionEvents[0].Task->GetIdentifier(), FName("T_CollectDoobries"));
+		}
+		if (TestEqual("Event 1 should be task updated", CallbackObj->ProgressionEvents[1].EventType, ESuqsProgressionEventType::TaskUpdated))
+		{
+			if (TestNotNull("Event 1 Task should not be null", CallbackObj->ProgressionEvents[1].Task))
+				TestEqual("Event 1 should be correct task", CallbackObj->ProgressionEvents[1].Task->GetIdentifier(), FName("T_CollectDoobries"));
+		}
+	}
+	CallbackObj->ProgressionEvents.Empty();
+	
 	// Collecting one more should only raise 1 update, for the number increase only (no status change)
 	Progression->ProgressTask("Q_Main1", "T_CollectDoobries", 1);
-	TestEqual("Should be 2 extra task update callback for progress", CallbackObj->UpdatedTasks.Num(), 4);
+	TestEqual("Should be 1 extra task update callback for progress", CallbackObj->UpdatedTasks.Num(), 4);
 	if (CallbackObj->UpdatedTasks.Num() == 4)
 		TestEqual("Should have received correct task update callback", CallbackObj->UpdatedTasks[3], Q->GetTask("T_CollectDoobries"));
+
+	if (TestEqual("Should have received correct number of progress events", CallbackObj->ProgressionEvents.Num(), 1))
+	{
+		if (TestEqual("Event 0 should be task updated", CallbackObj->ProgressionEvents[0].EventType, ESuqsProgressionEventType::TaskUpdated))
+		{
+			if (TestNotNull("Event 0 Task should not be null", CallbackObj->ProgressionEvents[0].Task))
+				TestEqual("Event 0 should be correct task", CallbackObj->ProgressionEvents[0].Task->GetIdentifier(), FName("T_CollectDoobries"));
+		}
+	}
+	CallbackObj->ProgressionEvents.Empty();
+
 
 	TestEqual("Should be no failed tasks yet", CallbackObj->FailedTasks.Num(), 0);
 	Progression->FailTask("Q_Main1", "T_CollectDoobries");
@@ -378,12 +460,82 @@ bool FTestQuestDetailEvents::RunTest(const FString& Parameters)
 	// this should NOT have triggered any Objective/Quest failure callbacks though (it's optional)
 	TestEqual("Should be no failed objectives yet", CallbackObj->FailedObjectives.Num(), 0);
 	TestEqual("Should be no failed quests yet", CallbackObj->FailedQuests.Num(), 0);
-	
+
+	if (TestEqual("Should have received correct number of progress events", CallbackObj->ProgressionEvents.Num(), 2))
+	{
+		if (TestEqual("Event 0 should be task updated", CallbackObj->ProgressionEvents[0].EventType, ESuqsProgressionEventType::TaskUpdated))
+		{
+			if (TestNotNull("Event 0 Task should not be null", CallbackObj->ProgressionEvents[0].Task))
+				TestEqual("Event 0 should be correct task", CallbackObj->ProgressionEvents[0].Task->GetIdentifier(), FName("T_CollectDoobries"));
+		}
+		if (TestEqual("Event 1 should be task failed", CallbackObj->ProgressionEvents[1].EventType, ESuqsProgressionEventType::TaskFailed))
+		{
+			if (TestNotNull("Event 1 Task should not be null", CallbackObj->ProgressionEvents[1].Task))
+				TestEqual("Event 1 should be correct task", CallbackObj->ProgressionEvents[1].Task->GetIdentifier(), FName("T_CollectDoobries"));
+		}
+
+		// This was an optional task so shouldn't have made any objective / quest change
+	}
+	CallbackObj->ProgressionEvents.Empty();
+
 	// Complete another task that completes the objective
 	TestTrue("Task complete should work", Progression->CompleteTask("Q_Main1", "T_DoTheThing"));
 	TestEqual("Should be a objective complete callback", CallbackObj->CompletedObjectives.Num(), 1);
 	if (CallbackObj->CompletedObjectives.Num() > 0)
 		TestEqual("Should have received correct objective complete callback", CallbackObj->CompletedObjectives[0], Q->GetObjective("O1"));
+
+	if (TestEqual("Should have received correct number of progress events", CallbackObj->ProgressionEvents.Num(), 7))
+	{
+		if (TestEqual("Event 0 should be task updated", CallbackObj->ProgressionEvents[0].EventType, ESuqsProgressionEventType::TaskUpdated))
+		{
+			if (TestNotNull("Event 0 task should be not null", CallbackObj->ProgressionEvents[0].Task))
+			{
+				TestEqual("Event 0 should be correct task", CallbackObj->ProgressionEvents[0].Task->GetIdentifier(), FName("T_DoTheThing"));
+			}
+		}
+		if (TestEqual("Event 1 should be task complete", CallbackObj->ProgressionEvents[1].EventType, ESuqsProgressionEventType::TaskCompleted))
+		{
+			if (TestNotNull("Event 1 task should be not null", CallbackObj->ProgressionEvents[1].Task))
+			{
+				TestEqual("Event 1 should be correct task", CallbackObj->ProgressionEvents[1].Task->GetIdentifier(), FName("T_DoTheThing"));
+			}
+		}
+		if (TestEqual("Event 2 should be task removed", CallbackObj->ProgressionEvents[2].EventType, ESuqsProgressionEventType::TaskRemoved))
+		{
+			if (TestNotNull("Event 2 task should be not null", CallbackObj->ProgressionEvents[2].Task))
+			{
+				TestEqual("Event 2 should be correct task", CallbackObj->ProgressionEvents[2].Task->GetIdentifier(), FName("T_DoTheThing"));
+			}
+		}
+		// Completion should bubble up
+		if (TestEqual("Event 3 should be objective complete", CallbackObj->ProgressionEvents[3].EventType, ESuqsProgressionEventType::ObjectiveCompleted))
+		{
+			if (TestNotNull("Event 3 objective should be not null", CallbackObj->ProgressionEvents[3].Objective))
+			{
+				TestEqual("Event 3 should be correct objective", CallbackObj->ProgressionEvents[3].Objective->GetIdentifier(), FName("O1"));
+			}
+		}
+		// then it will switch to a new objective
+		TestEqual("Event 4 should be current objective changed", CallbackObj->ProgressionEvents[4].EventType, ESuqsProgressionEventType::QuestCurrentObjectiveChanged);
+		// then add the 2 non-sequential tasks from the next objective
+		if (TestEqual("Event 5 should be task added", CallbackObj->ProgressionEvents[5].EventType, ESuqsProgressionEventType::TaskAdded))
+		{
+			if (TestNotNull("Event 5 task should be not null", CallbackObj->ProgressionEvents[5].Task))
+			{
+				TestTrue("Event 5 task should be mandatory", CallbackObj->ProgressionEvents[5].Task->IsMandatory());
+				TestEqual("Event 5 task should be correct", CallbackObj->ProgressionEvents[5].Task->GetIdentifier(), FName("T_Something1"));
+			}
+		}
+		if (TestEqual("Event 6 should be task added", CallbackObj->ProgressionEvents[6].EventType, ESuqsProgressionEventType::TaskAdded))
+		{
+			if (TestNotNull("Event 6 task should be not null", CallbackObj->ProgressionEvents[6].Task))
+			{
+				TestTrue("Event 6 task should be mandatory", CallbackObj->ProgressionEvents[6].Task->IsMandatory());
+				TestEqual("Event 6 task should be correct", CallbackObj->ProgressionEvents[6].Task->GetIdentifier(), FName("T_Something2"));
+			}
+		}
+	}
+	CallbackObj->ProgressionEvents.Empty();
 	
 	// Now fail the next objective
 	Progression->FailTask("Q_Main1", "T_Something1");
@@ -391,6 +543,44 @@ bool FTestQuestDetailEvents::RunTest(const FString& Parameters)
 	if (CallbackObj->FailedObjectives.Num() > 0)
 		TestEqual("Should have received correct objective failure callback", CallbackObj->FailedObjectives[0], Q->GetObjective("O2"));
 	
+	if (TestEqual("Should have received correct number of progress events", CallbackObj->ProgressionEvents.Num(), 6))
+	{
+		if (TestEqual("Event 0 should be task updated", CallbackObj->ProgressionEvents[0].EventType, ESuqsProgressionEventType::TaskUpdated))
+		{
+			if (TestNotNull("Event 0 task should be not null", CallbackObj->ProgressionEvents[0].Task))
+			{
+				TestEqual("Event 0 should be correct task", CallbackObj->ProgressionEvents[0].Task->GetIdentifier(), FName("T_Something1"));
+			}
+		}
+		if (TestEqual("Event 1 should be task failed", CallbackObj->ProgressionEvents[1].EventType, ESuqsProgressionEventType::TaskFailed))
+		{
+			if (TestNotNull("Event 1 task should be not null", CallbackObj->ProgressionEvents[1].Task))
+			{
+				TestEqual("Event 1 should be correct task", CallbackObj->ProgressionEvents[1].Task->GetIdentifier(), FName("T_Something1"));
+			}
+		}
+		if (TestEqual("Event 2 should be objective failed", CallbackObj->ProgressionEvents[2].EventType, ESuqsProgressionEventType::ObjectiveFailed))
+		{
+			if (TestNotNull("Event 2 task should be not null", CallbackObj->ProgressionEvents[2].Objective))
+			{
+				TestEqual("Event 2 should be correct task", CallbackObj->ProgressionEvents[2].Objective->GetIdentifier(), FName("O2"));
+			}
+		}
+		if (TestEqual("Event 3 should be quest failed", CallbackObj->ProgressionEvents[3].EventType, ESuqsProgressionEventType::QuestFailed))
+		{
+			TestEqual("Event 3 should be correct quest", CallbackObj->ProgressionEvents[3].Quest, Q);
+		}
+		// Failed quests should be archived, then list updated
+		if (TestEqual("Event 4 should be quest archived", CallbackObj->ProgressionEvents[4].EventType, ESuqsProgressionEventType::QuestArchived))
+		{
+			if (TestNotNull("Event 4 quest should be not null", CallbackObj->ProgressionEvents[4].Quest))
+			{
+				TestEqual("Event 4 should be correct quest", CallbackObj->ProgressionEvents[4].Quest, Q);
+			}
+		}
+		TestEqual("Event 5 should be active quests changed", CallbackObj->ProgressionEvents[5].EventType, ESuqsProgressionEventType::ActiveQuestsChanged);
+	}
+	CallbackObj->ProgressionEvents.Empty();
 	
 	return true;
 }
