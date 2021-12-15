@@ -27,10 +27,10 @@ bool FTestQuestTopLevelEvents::RunTest(const FString& Parameters)
 
 	TestEqual("Should be no accepted to start", CallbackObj->AcceptedQuests.Num(), 0);
 	TestTrue("Accept quest OK", Progression->AcceptQuest("Q_Main1"));
-	TestEqual("Should have got one accept callback", CallbackObj->AcceptedQuests.Num(), 1);
-	auto Q = Progression->GetQuest("Q_Main1");
-	if (CallbackObj->AcceptedQuests.Num() > 0)
+	const auto Q = Progression->GetQuest("Q_Main1");
+	if (TestEqual("Should have got one accept callback", CallbackObj->AcceptedQuests.Num(), 1))
 		TestEqual("Should have received correct quest callback", CallbackObj->AcceptedQuests[0], Q);
+
 
 	// Should have received these events
 	// 1. Accept quest
@@ -66,21 +66,65 @@ bool FTestQuestTopLevelEvents::RunTest(const FString& Parameters)
 		}
 	}
 
+	CallbackObj->ProgressionEvents.Empty();
+
 	TestEqual("Should be no failed to start", CallbackObj->FailedQuests.Num(), 0);
 	Progression->GetNextMandatoryTask("Q_Main1")->Fail();
-	TestEqual("Should be a failed callback", CallbackObj->FailedQuests.Num(), 1);
-	if (CallbackObj->FailedQuests.Num() > 0)
+	if (TestEqual("Should be a failed callback", CallbackObj->FailedQuests.Num(), 1))
 		TestEqual("Should have received correct quest callback", CallbackObj->FailedQuests[0], Q);
-
+	
+	if (TestEqual("Should have received correct number of progress events", CallbackObj->ProgressionEvents.Num(), 6))
+	{
+		// Failing quest fails the active task
+		if (TestEqual("Event 0 should be task updated", CallbackObj->ProgressionEvents[0].EventType, ESuqsProgressionEventType::TaskUpdated))
+		{
+			if (TestNotNull("Event 0 task should be not null", CallbackObj->ProgressionEvents[0].Task))
+			{
+				TestEqual("Event 0 should be correct task", CallbackObj->ProgressionEvents[0].Task->GetIdentifier(), FName("T_ReachThePlace"));
+			}
+		}
+		if (TestEqual("Event 1 should be task failed", CallbackObj->ProgressionEvents[1].EventType, ESuqsProgressionEventType::TaskFailed))
+		{
+			if (TestNotNull("Event 1 task should be not null", CallbackObj->ProgressionEvents[1].Task))
+			{
+				TestEqual("Event 1 should be correct task", CallbackObj->ProgressionEvents[1].Task->GetIdentifier(), FName("T_ReachThePlace"));
+			}
+		}
+		// Failure should bubble up
+		if (TestEqual("Event 2 should be objective failed", CallbackObj->ProgressionEvents[2].EventType, ESuqsProgressionEventType::ObjectiveFailed))
+		{
+			if (TestNotNull("Event 2 objective should be not null", CallbackObj->ProgressionEvents[2].Objective))
+			{
+				TestEqual("Event 2 should be correct objective", CallbackObj->ProgressionEvents[2].Objective->GetIdentifier(), FName("O1"));
+			}
+		}
+		if (TestEqual("Event 3 should be quest failed", CallbackObj->ProgressionEvents[3].EventType, ESuqsProgressionEventType::QuestFailed))
+		{
+			if (TestNotNull("Event 3 quest should be not null", CallbackObj->ProgressionEvents[3].Quest))
+			{
+				TestEqual("Event 3 should be correct quest", CallbackObj->ProgressionEvents[3].Quest, Q);
+			}
+		}
+		// Failed quests should be archived, then list updated
+		if (TestEqual("Event 4 should be quest archived", CallbackObj->ProgressionEvents[4].EventType, ESuqsProgressionEventType::QuestArchived))
+		{
+			if (TestNotNull("Event 4 quest should be not null", CallbackObj->ProgressionEvents[4].Quest))
+			{
+				TestEqual("Event 4 should be correct quest", CallbackObj->ProgressionEvents[4].Quest, Q);
+			}
+		}
+		TestEqual("Event 5 should be active quests changed", CallbackObj->ProgressionEvents[5].EventType, ESuqsProgressionEventType::ActiveQuestsChanged);
+		
+		
+	}
+	
 	Q->Reset();
-	TestEqual("Should have got another accept callback on reset", CallbackObj->AcceptedQuests.Num(), 2);
-	if (CallbackObj->AcceptedQuests.Num() > 1)
+	if (TestEqual("Should have got another accept callback on reset", CallbackObj->AcceptedQuests.Num(), 2))
 		TestEqual("Should have received correct quest callback", CallbackObj->AcceptedQuests[1], Q);
 
 	TestEqual("Should be no completed to start", CallbackObj->CompletedQuests.Num(), 0);
 	Q->Complete();
-	TestEqual("Should get quest completion callback", CallbackObj->CompletedQuests.Num(), 1);
-	if (CallbackObj->CompletedQuests.Num() > 0)
+	if (TestEqual("Should get quest completion callback", CallbackObj->CompletedQuests.Num(), 1))
 		TestEqual("Should have received correct quest callback", CallbackObj->CompletedQuests[0], Q);
 	
 	return true;
