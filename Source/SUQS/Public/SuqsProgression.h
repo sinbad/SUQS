@@ -158,7 +158,7 @@ protected:
 	USuqsTaskState* FindTaskStatus(const FName& QuestID, const FName& TaskID);
 
 	void RebuildAllQuestData();
-	void AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed);
+	bool AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed);
 	static void SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSaveData& Data);
 
 public:

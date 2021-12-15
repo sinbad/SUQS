@@ -258,8 +258,9 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 }
 
 
-void USuqsProgression::AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed)
+bool USuqsProgression::AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed)
 {
+	bool bAnyAccepted = false;
 	TArray<FName> DependentQuestIDs;
 	if (bFailed)
 		QuestFailureDeps.MultiFind(FinishedQuestID, DependentQuestIDs);
@@ -269,8 +270,12 @@ void USuqsProgression::AutoAcceptQuests(const FName& FinishedQuestID, bool bFail
 	for (const auto& DepQuestID : DependentQuestIDs)
 	{
 		if (!IsQuestAccepted(DepQuestID) && QuestDependenciesMet(DepQuestID))
-			AcceptQuest(DepQuestID);
+		{
+			bAnyAccepted = AcceptQuest(DepQuestID) || bAnyAccepted;
+		}
 	}
+
+	return bAnyAccepted;
 }
 
 void USuqsProgression::ResetQuest(FName QuestID)
@@ -818,14 +823,13 @@ void USuqsProgression::ProcessQuestStatusChange(USuqsQuestState* Quest)
 		if (!bSuppressEvents)
 		{
 			OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::QuestArchived, Quest));
-		}
-		
-		AutoAcceptQuests(Quest->GetIdentifier(), Status == ESuqsQuestStatus::Failed);
-		if (!bSuppressEvents)
-		{
+			// Raise this here for the purpose of archive quests
+			// Auto-accepts will raise this again
 			OnActiveQuestsListChanged.Broadcast();
 			OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::ActiveQuestsChanged));
 		}
+		
+		AutoAcceptQuests(Quest->GetIdentifier(), Status == ESuqsQuestStatus::Failed);
 		
 	}
 }
