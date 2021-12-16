@@ -33,7 +33,7 @@ enum class ESuqsProgressionEventType : uint8
 	/// Raised when a new task has been added to the list of relevant ones to be displayed within the current objective
 	/// Details include  task
 	TaskAdded,
-	/// Raised when something on the detail of a task has changed (progress made, time etc)
+	/// Raised when some detail on the task changes - progress made, time changed etc. NOT raised for status changes e.g. completion (but changes may cause them)
 	TaskUpdated,
 	/// Raised when a task has been completed, details include task
 	TaskCompleted,
@@ -217,7 +217,8 @@ public:
 	/// Fired when a quest has failed
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestFailed OnQuestFailed;
-	/// Fired when something on the detail of a task has changed (progress, time etc)
+	/// Fired when something on the detail of a task has changed (progress, time etc). NOT raised for status changes e.g. completion (but changes may cause them)
+
 	UPROPERTY(BlueprintAssignable)
 	FOnTaskUpdated OnTaskUpdated;
 	/// Fired when a quest has been accepted for the first time
