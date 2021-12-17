@@ -268,6 +268,7 @@ void USuqsQuestState::ResetTask(FName TaskID)
 
 void USuqsQuestState::Reset()
 {
+	const int OldObjective = CurrentObjectiveIndex;
 	for (auto Obj : Objectives)
 	{
 		// This will trigger notifications on change
@@ -275,6 +276,13 @@ void USuqsQuestState::Reset()
 	}
 
 	ResetBranches();
+
+	if (OldObjective == CurrentObjectiveIndex)
+	{
+		// Raise objective changed anyway, to better indicate reset
+		Progression->RaiseCurrentObjectiveChanged(this);
+	}
+	
 	
 }
 
