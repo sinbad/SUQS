@@ -57,7 +57,7 @@ void USuqsTaskState::SetResolveBarrier(const FSuqsResolveBarrier& Barrier)
 	MaybeNotifyParentStatusChange();
 }
 
-void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus)
+void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus, bool bIgnoreResolveBarriers)
 {
 	if (Status != NewStatus)
 	{
@@ -75,14 +75,22 @@ void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus)
 			break;
 		}
 
-		QueueParentStatusChangeNotification();
+		QueueParentStatusChangeNotification(bIgnoreResolveBarriers);
 
 	}
 }
 
-void USuqsTaskState::QueueParentStatusChangeNotification()
+void USuqsTaskState::QueueParentStatusChangeNotification(bool bIgnoreBarriers)
 {
-	ResolveBarrier = Progression->GetResolveBarrierForTask(TaskDefinition, Status);
+	if (bIgnoreBarriers)
+	{
+		ResolveBarrier = FSuqsResolveBarrier();
+		ResolveBarrier.bPending = true;
+	}
+	else
+	{
+		ResolveBarrier = Progression->GetResolveBarrierForTask(TaskDefinition, Status);
+	}
 
 	MaybeNotifyParentStatusChange();
 	
@@ -148,12 +156,12 @@ void USuqsTaskState::MaybeNotifyParentStatusChange()
 	}
 }
 
-void USuqsTaskState::Fail()
+void USuqsTaskState::Fail(bool bIgnoreResolveBarriers)
 {
-	ChangeStatus(ESuqsTaskStatus::Failed);
+	ChangeStatus(ESuqsTaskStatus::Failed, bIgnoreResolveBarriers);
 }
 
-bool USuqsTaskState::Complete()
+bool USuqsTaskState::Complete(bool bIgnoreResolveBarriers)
 {
 	if (Status != ESuqsTaskStatus::Completed)
 	{
@@ -175,7 +183,7 @@ bool USuqsTaskState::Complete()
 		}
 		
 		Number = TaskDefinition->TargetNumber;
-		ChangeStatus(ESuqsTaskStatus::Completed);
+		ChangeStatus(ESuqsTaskStatus::Completed, bIgnoreResolveBarriers);
 	}
 	// Already completed
 	return true;

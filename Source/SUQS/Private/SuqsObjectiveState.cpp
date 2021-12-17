@@ -66,7 +66,8 @@ void USuqsObjectiveState::FailOutstandingTasks()
 	{
 		if (Task->IsIncomplete() && !Task->bHidden)
 		{
-			Task->Fail();
+			// Don't wait to resolve
+			Task->Fail(true);
 		}
 	}
 }
@@ -78,7 +79,8 @@ void USuqsObjectiveState::CompleteAllMandatoryTasks()
 		if (Task->IsMandatory())
 		{
 			// Override failed as well
-			Task->Complete();
+			// Immediately resolve, don't wait for barriers
+			Task->Complete(true);
 			if (!AreAllMandatoryTasksRequired())
 				break;
 		}

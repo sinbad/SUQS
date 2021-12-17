@@ -56,8 +56,8 @@ protected:
 	
 	void Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsProgression* Root);
 	void Tick(float DeltaTime);
-	void ChangeStatus(ESuqsTaskStatus NewStatus);
-	void QueueParentStatusChangeNotification();
+	void ChangeStatus(ESuqsTaskStatus NewStatus, bool bIgnoreResolveBarriers = false);
+	void QueueParentStatusChangeNotification(bool bIgnoreBarriers);
 	bool IsResolveBlockedOn(ESuqsResolveBarrierCondition Barrier) const;
 	void MaybeNotifyParentStatusChange();
 public:
@@ -94,10 +94,10 @@ public:
 	
 	/// Fail this task
 	UFUNCTION(BlueprintCallable)
-	void Fail();
+	void Fail(bool bIgnoreResolveBarriers = false);
 	/// Complete this task (setting number to target number automatically)
 	UFUNCTION(BlueprintCallable)
-	bool Complete();
+	bool Complete(bool bIgnoreResolveBarriers = false);
 
 	/**
 	 * Resolve the outcome of a completed/failed task; activate the next task, or complete/fail the quest if it's the last.
