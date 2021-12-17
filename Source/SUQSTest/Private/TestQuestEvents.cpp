@@ -5,6 +5,7 @@
 #include "CallbackCatcher.h"
 #include "SuqsTaskState.h"
 
+PRAGMA_DISABLE_OPTIMIZATION
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTopLevelEvents, "SUQSTest.QuestTopLevelEvents",
                                  EAutomationTestFlags::EditorContext |
@@ -110,6 +111,7 @@ bool FTestQuestTopLevelEvents::RunTest(const FString& Parameters)
 		
 		
 	}
+	CallbackObj->ProgressionEvents.Empty();
 	
 	Q->Reset();
 	if (TestEqual("Should have got another accept callback on reset", CallbackObj->AcceptedQuests.Num(), 2))
@@ -117,6 +119,34 @@ bool FTestQuestTopLevelEvents::RunTest(const FString& Parameters)
 
 	TestEqual("Should be no completed to start", CallbackObj->CompletedQuests.Num(), 0);
 
+	if (TestEqual("Should have received correct number of progress events", CallbackObj->ProgressionEvents.Num(), 5))
+	{
+		if (TestEqual("Event 0 should be quest accepted", CallbackObj->ProgressionEvents[0].EventType, ESuqsProgressionEventType::QuestAccepted))
+		{
+			TestEqual("Event 0 should be correct quest", CallbackObj->ProgressionEvents[0].Quest, Q);
+		}
+		TestEqual("Event 1 should be active quests changed", CallbackObj->ProgressionEvents[1].EventType, ESuqsProgressionEventType::ActiveQuestsChanged);
+		if (TestEqual("Event 2 should be current objective", CallbackObj->ProgressionEvents[2].EventType, ESuqsProgressionEventType::QuestCurrentObjectiveChanged))
+		{
+			TestEqual("Event 2 should be correct quest", CallbackObj->ProgressionEvents[2].Quest, Q);
+		}
+		if (TestEqual("Event 3 should be task added", CallbackObj->ProgressionEvents[3].EventType, ESuqsProgressionEventType::TaskAdded))
+		{
+			if (TestNotNull("Event 3 task should be not null", CallbackObj->ProgressionEvents[3].Task))
+			{
+				TestTrue("Event 3 task should be mandatory", CallbackObj->ProgressionEvents[3].Task->IsMandatory());
+				TestEqual("Event 3 task should be T_ReachThePlace", CallbackObj->ProgressionEvents[3].Task->GetIdentifier(), FName("T_ReachThePlace"));
+			}
+		}
+		if (TestEqual("Event 4 should be task added", CallbackObj->ProgressionEvents[4].EventType, ESuqsProgressionEventType::TaskAdded))
+		{
+			if (TestNotNull("Event 4 task should be not null", CallbackObj->ProgressionEvents[4].Task))
+			{
+				TestFalse("Event 4 task should not be mandatory", CallbackObj->ProgressionEvents[4].Task->IsMandatory());
+				TestEqual("Event 4 task should be T_CollectDoobries", CallbackObj->ProgressionEvents[4].Task->GetIdentifier(), FName("T_CollectDoobries"));
+			}
+		}
+	}
 	CallbackObj->ProgressionEvents.Empty();
 	
 	Q->Complete();
@@ -506,3 +536,5 @@ bool FTestQuestDetailEvents::RunTest(const FString& Parameters)
 	
 	return true;
 }
+
+PRAGMA_ENABLE_OPTIMIZATION
