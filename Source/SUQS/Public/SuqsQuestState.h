@@ -153,6 +153,8 @@ protected:
 	const FSuqsQuest* QuestDefinition;
 	TWeakObjectPtr<USuqsProgression> Progression;
 
+	bool bSuppressObjectiveChangeEvent = false;
+
 	void Initialise(const FSuqsQuest* Def, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsQuestStatus NewStatus);
