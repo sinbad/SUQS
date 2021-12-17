@@ -222,9 +222,15 @@ int USuqsTaskState::GetNumberOutstanding() const
 
 void USuqsTaskState::Reset()
 {
+	const bool bRaiseUpdate = Number > 0 || TimeRemaining < TaskDefinition->TimeLimit;
 	Number = 0;
 	TimeRemaining = TaskDefinition->TimeLimit;
 	ChangeStatus(ESuqsTaskStatus::NotStarted);
+
+	// There isn't an event for change status back to not started
+	if (bRaiseUpdate)
+		Progression->RaiseTaskUpdated(this);
+
 }
 
 bool USuqsTaskState::IsResolveBlocked() const
