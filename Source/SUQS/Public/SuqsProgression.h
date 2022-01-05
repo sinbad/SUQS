@@ -98,6 +98,7 @@ public:
 	FSuqsProgressionEventDetails(): EventType(), Quest(nullptr), Objective(nullptr), Task(nullptr)
 	{
 	}
+
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnProgressionEvent, const FSuqsProgressionEventDetails&, Details);
@@ -509,5 +510,12 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="SUQS")
 	static UDataTable* MakeQuestDataTableFromJSON(const FString& JsonString);
-
+	
+	/**
+	 * @brief Helper function to get the description of a progress event 
+	 * @param Evt The event
+	 * @return A string description
+	 */
+	UFUNCTION(BlueprintCallable, Category="SUQS")
+	static FString GetProgressEventDescription(const FSuqsProgressionEventDetails& Evt);
 };

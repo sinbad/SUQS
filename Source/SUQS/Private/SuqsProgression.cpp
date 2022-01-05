@@ -935,6 +935,13 @@ UDataTable* USuqsProgression::MakeQuestDataTableFromJSON(const FString& JsonStri
 	return QuestTable;
 }
 
+FString USuqsProgression::GetProgressEventDescription(const FSuqsProgressionEventDetails& Evt)
+{
+	const FString Empty("");
+	return FString::Printf(TEXT("%s : %s%s"), *StaticEnum<ESuqsProgressionEventType>()->GetValueAsString(Evt.EventType),
+	                       Evt.Quest ? *Evt.Quest->GetTitle().ToString() : *Empty, Evt.Task ? *Evt.Task->GetTitle().ToString() : *Empty);
+}
+
 // FTickableGameObject end
 
 void USuqsProgression::Serialize(FArchive& Ar)
