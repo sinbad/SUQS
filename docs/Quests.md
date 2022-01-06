@@ -153,6 +153,23 @@ You can also create blank DataTables based on the SuqsQuest row type, and create
 data directly in the editor instead. However, I strongly recommend using JSON
 and storing both the JSON and the imported datatable in source control.
 
+### Packaging: Cooking Quest Data
+
+Probably you're going to use `USuqsProgression::InitWithQuestDataTablesInPath[s]`
+to pull in these quest definitions (see [Progression](Progression.md)). 
+However, this means that your quest data assets won't be explicitly referenced,
+and therefore won't be cooked into packaged builds by default.
+
+The easiest way to fix this is:
+
+1. Open Project Settings
+1. Go to Project > Packaging
+1. Find "Additional Asset Directories To Cook" and add an entry
+1. Use the "..." button to locate the directory containing your quest data assets
+
+This way anything in that folder will be included in the package without it needing
+a direct reference.
+
 ## Quest attributes
 
 Here's a bit more information about the attributes at the top layer of every quest.
