@@ -26,23 +26,23 @@ enum class ESuqsProgressionEventType : uint8
 	/// Raised when the current objective on a quest changes, details include quest link
 	/// This implicitly resets the list of relevant tasks, you should assume that TaskAdded will be called for new ones
 	QuestCurrentObjectiveChanged,
-	/// Raised when an objective is completed, details include objective link
+	/// Raised when an objective is completed, details include objective link and quest
 	ObjectiveCompleted,
-	/// Raised when an objective is failed, details include objective link
+	/// Raised when an objective is failed, details include objective link and quest
 	ObjectiveFailed,
 	/// Raised when a new task has been added to the list of relevant ones to be displayed within the current objective
-	/// Details include  task
+	/// Details include  task and quest
 	TaskAdded,
 	/// Raised when some detail on the task changes - progress made, time changed etc. NOT raised for status changes e.g. completion (but changes may cause them)
 	TaskUpdated,
-	/// Raised when a task has been completed, details include task
+	/// Raised when a task has been completed, details include task and quest
 	TaskCompleted,
-	/// Raised when a task has failed, details include task
+	/// Raised when a task has failed, details include task and quest
 	TaskFailed,
 	/// Raised when a task has been removed from the list of relevant ones to be displayed within the current objective
 	/// This is not called for each task before CurrentObjectiveChanged, assume that means all tasks are gone
 	/// Really this only happens for sequential mandatory tasks, before the objective is changed
-	/// Details include  task
+	/// Details include  task and quest
 	TaskRemoved,
 	
 };
@@ -81,7 +81,7 @@ public:
 
 	FSuqsProgressionEventDetails(ESuqsProgressionEventType EventType, USuqsObjectiveState* Objective)
 		: EventType(EventType),
-		  Quest(nullptr),
+		  Quest(Objective ? Objective->GetParentQuest() : nullptr),
 		  Objective(Objective),
 		  Task(nullptr)
 	{
@@ -89,7 +89,7 @@ public:
 
 	FSuqsProgressionEventDetails(ESuqsProgressionEventType EventType, USuqsTaskState* Task)
 		: EventType(EventType),
-		  Quest(nullptr),
+		  Quest(Task ? Task->GetParentObjective()->GetParentQuest() : nullptr),
 		  Objective(nullptr),
 		  Task(Task)
 	{
