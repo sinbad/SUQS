@@ -373,7 +373,22 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 		if (PrevObjIndex != CurrentObjectiveIndex)
 		{
 			if (!bSuppressObjectiveChangeEvent)
+			{
+				// Raise task removed for any non-hidden, incomplete tasks from the previous objective
+				// This is for convenience
+				if (Objectives.IsValidIndex(PrevObjIndex))
+				{
+					auto PrevObj = Objectives[PrevObjIndex];
+					for (auto PrevTask : PrevObj->GetTasks())
+					{
+						if (!PrevTask->GetHidden() && PrevTask->IsIncomplete())
+						{
+							Progression->RaiseTaskRemoved(PrevTask);
+						}
+					}
+				}
 				Progression->RaiseCurrentObjectiveChanged(this);
+			}
 		}
 	}
 	

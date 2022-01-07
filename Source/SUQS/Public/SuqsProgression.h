@@ -24,7 +24,6 @@ enum class ESuqsProgressionEventType : uint8
 	/// Raised when a quest is failed, details include quest link
 	QuestFailed,
 	/// Raised when the current objective on a quest changes, details include quest link
-	/// This implicitly resets the list of relevant tasks, you should assume that TaskAdded will be called for new ones
 	QuestCurrentObjectiveChanged,
 	/// Raised when an objective is completed, details include objective link and quest
 	ObjectiveCompleted,
@@ -40,8 +39,7 @@ enum class ESuqsProgressionEventType : uint8
 	/// Raised when a task has failed, details include task and quest
 	TaskFailed,
 	/// Raised when a task has been removed from the list of relevant ones to be displayed within the current objective
-	/// This is not called for each task before CurrentObjectiveChanged, assume that means all tasks are gone
-	/// Really this only happens for sequential mandatory tasks, before the objective is changed
+	/// This could be because the task has been completed/failed, or that it's optional and the objective has changed without completing
 	/// Details include  task and quest
 	TaskRemoved,
 	
