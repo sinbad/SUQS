@@ -374,14 +374,16 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 		{
 			if (!bSuppressObjectiveChangeEvent)
 			{
-				// Raise task removed for any non-hidden, incomplete tasks from the previous objective
+				// Raise task removed for any non-hidden tasks, these would not have received a notification before,
+				// either because they're incomplete (optional), or non-sequential
+				// from the previous objective
 				// This is for convenience
 				if (Objectives.IsValidIndex(PrevObjIndex))
 				{
-					auto PrevObj = Objectives[PrevObjIndex];
-					for (auto PrevTask : PrevObj->GetTasks())
+					const auto PrevObj = Objectives[PrevObjIndex];
+					for (const auto PrevTask : PrevObj->GetTasks())
 					{
-						if (!PrevTask->GetHidden() && PrevTask->IsIncomplete())
+						if (!PrevTask->GetHidden())
 						{
 							Progression->RaiseTaskRemoved(PrevTask);
 						}

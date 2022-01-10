@@ -133,24 +133,6 @@ void USuqsTaskState::MaybeNotifyParentStatusChange()
 	
 	if (bCleared)
 	{
-		switch (Status)
-		{
-		case ESuqsTaskStatus::NotStarted:
-		case ESuqsTaskStatus::InProgress:
-		case ESuqsTaskStatus::Failed:
-			break;
-		case ESuqsTaskStatus::Completed: 
-			// Completed serial mandatory tasks are removed
-			// Optional tasks, non-serial tasks or failed tasks aren't, since complementary or there to explain failure
-			if (IsMandatory() &&
-				ParentObjective.IsValid() && ParentObjective->AreTasksSequential() &&
-				Progression.IsValid())
-				Progression->RaiseTaskRemoved(this);
-			break;
-			
-		default: ;
-		}
-
 		ParentObjective->NotifyTaskStatusChanged(this);
 		ResolveBarrier.bPending = false;
 	}
@@ -252,4 +234,9 @@ void USuqsTaskState::NotifyGateOpened(const FName& GateName)
 {
 	if (IsResolveBlockedOn(ESuqsResolveBarrierCondition::Gate) && ResolveBarrier.Gate == GateName)
 		MaybeNotifyParentStatusChange();
+}
+
+bool USuqsTaskState::IsHiddenOnCompleteOrFail() const
+{
+	return IsMandatory() && (ParentObjective.IsValid() && ParentObjective->AreTasksSequential());
 }

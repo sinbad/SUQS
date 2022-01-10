@@ -161,9 +161,13 @@ void USuqsObjectiveState::NotifyTaskStatusChanged(const USuqsTaskState* ChangedT
 			{
 			case ESuqsTaskStatus::Completed:
 				++MandatoryTasksComplete;
+				if (Task->IsHiddenOnCompleteOrFail())
+					Task->bHidden = true;
 				break;
 			case ESuqsTaskStatus::Failed:
 				++MandatoryTasksFailed;
+				if (Task->IsHiddenOnCompleteOrFail())
+					Task->bHidden = true;
 				break;
 			case ESuqsTaskStatus::NotStarted:
 			case ESuqsTaskStatus::InProgress:
@@ -180,11 +184,21 @@ void USuqsObjectiveState::NotifyTaskStatusChanged(const USuqsTaskState* ChangedT
 				break;
 			}
 		}
-		if (bPreviouslyHidden && !Task->bHidden)
+		if (bPreviouslyHidden != Task->bHidden)
 		{
-			// This task became visible during this update
-			if (Progression.IsValid())
-				Progression->RaiseTaskAdded(Task);
+			if (Task->bHidden)
+			{
+				// This task was hidden during this update
+				if (Progression.IsValid())
+					Progression->RaiseTaskRemoved(Task);
+				
+			}
+			else
+			{
+				// This task became visible during this update
+				if (Progression.IsValid())
+					Progression->RaiseTaskAdded(Task);
+			}
 		}
 	}
 	

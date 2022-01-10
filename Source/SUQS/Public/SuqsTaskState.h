@@ -75,7 +75,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FName& GetIdentifier() const { return TaskDefinition->Identifier; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsMandatory() { return TaskDefinition->bMandatory; }
+	bool IsMandatory() const { return TaskDefinition->bMandatory; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsTimeLimited() const { return TaskDefinition->TimeLimit > 0; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -156,4 +156,9 @@ public:
 	bool IsResolveBlocked() const;
 	
 	void NotifyGateOpened(const FName& GateName);
+	/**
+	 * Return whether this task will become hidden on completion/failure or not. Reasons not to are that it's optional
+	 * or the tasks are non-sequential, so stick around until the objective is completed/failed
+	 */
+	bool IsHiddenOnCompleteOrFail() const;
 };
