@@ -94,12 +94,20 @@ activated when the named "Gate" is opened on [Progression](Progression.md).
 Combines with Resolve Automatically and Resolve Delay - all must be cleared to resolve.
 
 
-
 ## Task Progression
 
 This covers how tasks are defined, see [Progression](Progression.md) for more 
 information on how tasks are progressed.
 
+## Waypoints
+
+It's possible to associate a world location (or locations) with a task, by
+using [Waypoints](Waypoints.md).
 
 
+## More Info
 
+* [Waypoints](Waypoints.md)
+* [Objectives](Objectives.md)
+* [Quest Progression](Progression.md)
+* [Changing Quest Definitions](ChangingQuestDefinitions.md)
