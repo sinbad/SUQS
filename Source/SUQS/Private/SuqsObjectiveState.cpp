@@ -14,7 +14,7 @@ void USuqsObjectiveState::Initialise(const FSuqsObjective* ObjDef, USuqsQuestSta
 
 	for (const auto& TaskDef : ObjDef->Tasks)
 	{
-		auto Task = NewObject<USuqsTaskState>(this);
+		auto Task = NewObject<USuqsTaskState>(GetOuter());
 		Task->Initialise(&TaskDef, this, Root);
 		Tasks.Add(Task);
 

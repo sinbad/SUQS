@@ -7,6 +7,16 @@ The core object you need to do this is `USuqsProgression`. This is just a `UObje
 so you can store it anywhere you like (in a `UPROPERTY`). Personally, I like to
 store mine in my `UGameInstance` subclass, because that always exists across levels.
 
+You should initialise it, if possible, passing an "Outer" parameter of something
+that has a world context. In this example, it's done from a `UGameInstance` subclass:
+
+```c++
+QuestProgression = NewObject<USuqsProgression>(this);
+```
+
+While you *can* construct without the outer context, if you do so you'll have no
+access to world waypoints.
+
 ## Initialising the Quest Library
 
 The first thing you ever need to do with progression is to tell it about the

@@ -8,6 +8,9 @@
 #include "SuqsObjectiveState.h"
 #include "SuqsQuestState.h"
 #include "SuqsTaskState.h"
+#include "SuqsWaypointComponent.h"
+#include "SuqsWaypointSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 void USuqsProgression::InitWithQuestDataTables(TArray<UDataTable*> Tables)
 {
@@ -219,7 +222,7 @@ bool USuqsProgression::AcceptQuest(FName QuestID, bool bResetIfFailed, bool bRes
 		else
 		{
 			// New quest
-			Quest = NewObject<USuqsQuestState>(this);
+			Quest = NewObject<USuqsQuestState>(GetOuter());
 			// The problem is that initialisation could trigger detail events while it sorts itself out, out of order
 			// Let's suppress that
 			const bool bPrevSuppressed = bSuppressEvents;
@@ -698,6 +701,13 @@ void USuqsProgression::RaiseTaskCompleted(USuqsTaskState* Task)
 		OnTaskCompleted.Broadcast(Task);
 		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskCompleted, Task));
 	}
+	// A task being completed means its waypoints are no longer needed
+	auto Waypoints = Task->GetWaypoints(false);
+	for (auto W : Waypoints)
+	{
+		W->SetEventsEnabled(false);
+	}
+	
 }
 
 void USuqsProgression::RaiseTaskAdded(USuqsTaskState* Task)
@@ -706,6 +716,25 @@ void USuqsProgression::RaiseTaskAdded(USuqsTaskState* Task)
 	{
 		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskAdded, Task));
 	}
+	// A task being added means its waypoints become relevant, so we should get events for them being changed
+	auto Waypoints = Task->GetWaypoints(false);
+	for (auto W : Waypoints)
+	{
+		W->SetEventsEnabled(true);
+
+		// Take this opportunity to sub to events
+		if (!bSubcribedToWaypointEvents)
+		{
+			const auto GI = UGameplayStatics::GetGameInstance(W);
+			if (IsValid(GI))
+			{
+				auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
+				Suqs->OnWaypointMoved.AddDynamic(this, &USuqsProgression::OnWaypointMoved);
+				Suqs->OnWaypointEnabledChanged.AddDynamic(this, &USuqsProgression::OnWaypointEnabledChanged);
+				bSubcribedToWaypointEvents = true;
+			}
+		}
+	}
 }
 
 void USuqsProgression::RaiseTaskRemoved(USuqsTaskState* Task)
@@ -713,6 +742,12 @@ void USuqsProgression::RaiseTaskRemoved(USuqsTaskState* Task)
 	if (!bSuppressEvents)
 	{
 		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskRemoved, Task));
+	}
+	// A task being removed means its waypoints are no longer relevant
+	auto Waypoints = Task->GetWaypoints(false);
+	for (auto W : Waypoints)
+	{
+		W->SetEventsEnabled(false);
 	}
 }
 
@@ -723,6 +758,13 @@ void USuqsProgression::RaiseTaskFailed(USuqsTaskState* Task)
 		OnTaskFailed.Broadcast(Task);
 		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskFailed, Task));
 	}
+	// A task being failed means its waypoints are no longer needed
+	auto Waypoints = Task->GetWaypoints(false);
+	for (auto W : Waypoints)
+	{
+		W->SetEventsEnabled(false);
+	}
+	
 }
 
 
@@ -803,7 +845,7 @@ void USuqsProgression::RaiseCurrentObjectiveChanged(USuqsQuestState* Quest)
 			Obj->GetAllRelevantTasks(Tasks);
 			for (const auto T : Tasks)
 			{
-				OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskAdded, T));
+				RaiseTaskAdded(T);
 			}
 		}
 		
@@ -981,7 +1023,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 	{
 		if (auto QDef = GetQuestDefinition(FName(QData.Identifier)))
 		{
-			auto Q = NewObject<USuqsQuestState>();
+			auto Q = NewObject<USuqsQuestState>(GetOuter());
 			// This will re-create the quest structure, including objectives and tasks, based on *current* definition
 			Q->Initialise(QDef, this);
 
@@ -1100,3 +1142,21 @@ void USuqsProgression::SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSav
 	}
 }
 
+void USuqsProgression::OnWaypointMoved(USuqsWaypointComponent* Waypoint)
+{
+	if (!bSuppressEvents)
+	{
+		const auto Task = GetTaskState(Waypoint->GetQuestID(), Waypoint->GetTaskID());
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::WaypointMoved, Waypoint, Task));
+	}
+	
+}
+
+void USuqsProgression::OnWaypointEnabledChanged(USuqsWaypointComponent* Waypoint)
+{
+	if (!bSuppressEvents)
+	{
+		const auto Task = GetTaskState(Waypoint->GetQuestID(), Waypoint->GetTaskID());
+		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::WaypointEnabledOrDisabled, Waypoint, Task));
+	}
+}

@@ -6,6 +6,7 @@
 #include "UObject/Object.h"
 #include "SuqsTaskState.generated.h"
 
+class USuqsWaypointComponent;
 UENUM(BlueprintType)
 enum class ESuqsTaskStatus : uint8
 {
@@ -161,4 +162,19 @@ public:
 	 * or the tasks are non-sequential, so stick around until the objective is completed/failed
 	 */
 	bool IsHiddenOnCompleteOrFail() const;
+
+	/**
+	 * @brief Get the first/next waypoint associated with this task
+	 * @param bOnlyEnabled Only report enabled waypoints
+	 */
+	UFUNCTION(BlueprintCallable)
+	USuqsWaypointComponent* GetWaypoint(bool bOnlyEnabled = true);
+
+	/**
+	 * @brief Get all world waypoint components associated with this task
+	 * @param bOnlyEnabled Only report enabled waypoints
+	 */
+	UFUNCTION(BlueprintCallable)
+	TArray<USuqsWaypointComponent*> GetWaypoints(bool bOnlyEnabled = true);
+	
 };

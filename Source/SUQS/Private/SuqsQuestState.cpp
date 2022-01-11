@@ -22,7 +22,7 @@ void USuqsQuestState::Initialise(const FSuqsQuest* Def, USuqsProgression* Root)
 
 	for (const auto& ObjDef : Def->Objectives)
 	{
-		auto Obj = NewObject<USuqsObjectiveState>(this);
+		auto Obj = NewObject<USuqsObjectiveState>(GetOuter());
 		Obj->Initialise(&ObjDef, this, Root);
 		Objectives.Add(Obj);
 

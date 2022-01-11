@@ -42,6 +42,16 @@ enum class ESuqsProgressionEventType : uint8
 	/// This could be because the task has been completed/failed, or that it's optional and the objective has changed without completing
 	/// Details include  task and quest
 	TaskRemoved,
+	/// Raised when a waypoint associated with a currently active task is moved
+	/// You may be interested in this if you retrieved the waypoints from a task that was added
+	/// Details include Waypoint
+	WaypointMoved,
+	/// Raised when a waypoint associated with a currently active task has its enabled state changed
+	/// You may be interested in this if you retrieved the waypoints from a task that was added
+	/// Details include Waypoint
+	WaypointEnabledOrDisabled,
+	
+	
 	
 };
 
@@ -63,9 +73,12 @@ public:
 	/// The relevant task; only present for applicable event types
 	UPROPERTY(BlueprintReadOnly)
 	class USuqsTaskState* Task;
+	/// The relevant waypoint; only present for applicable event types
+	UPROPERTY(BlueprintReadOnly)
+	class USuqsWaypointComponent* Waypoint;
 
 	explicit FSuqsProgressionEventDetails(ESuqsProgressionEventType EType)
-		: EventType(EType), Quest(nullptr), Objective(nullptr), Task(nullptr)
+		: EventType(EType), Quest(nullptr), Objective(nullptr), Task(nullptr), Waypoint(nullptr)
 	{
 	}
 
@@ -73,7 +86,8 @@ public:
 		: EventType(EventType),
 		  Quest(Quest),
 		  Objective(nullptr),
-		  Task(nullptr)
+		  Task(nullptr),
+		  Waypoint(nullptr)
 	{
 	}
 
@@ -81,7 +95,8 @@ public:
 		: EventType(EventType),
 		  Quest(Objective ? Objective->GetParentQuest() : nullptr),
 		  Objective(Objective),
-		  Task(nullptr)
+		  Task(nullptr),
+		  Waypoint(nullptr)
 	{
 	}
 
@@ -89,14 +104,26 @@ public:
 		: EventType(EventType),
 		  Quest(Task ? Task->GetParentObjective()->GetParentQuest() : nullptr),
 		  Objective(nullptr),
-		  Task(Task)
+		  Task(Task),
+		  Waypoint(nullptr)
 	{
+	}
+	FSuqsProgressionEventDetails(ESuqsProgressionEventType EventType, USuqsWaypointComponent* Waypoint, USuqsTaskState* Task)
+		: EventType(EventType),
+		  Quest(Task ? Task->GetParentObjective()->GetParentQuest() : nullptr),
+		  Objective(nullptr),
+		  Task(Task),
+		  Waypoint(Waypoint)
+	
+	{
+		
 	}
 
 	FSuqsProgressionEventDetails(): EventType(), Quest(nullptr), Objective(nullptr), Task(nullptr)
 	{
 	}
 
+	
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnProgressionEvent, const FSuqsProgressionEventDetails&, Details);
@@ -113,6 +140,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, 
 
 // C++ only because of non-const struct
 DECLARE_DELEGATE_TwoParams(FOnPreLoad, USuqsProgression*, FSuqsSaveData&);
+
+class USuqsWaypointComponent;
 
 /**
  * Progression holds all the state relating to all quests and their objectives/tasks for a single player.
@@ -150,7 +179,7 @@ protected:
 	bool bSuppressEvents = false;
 	float DefaultQuestResolveTimeDelay = 0;
 	float DefaultTaskResolveTimeDelay = 0;
-	
+	bool bSubcribedToWaypointEvents = false;	
 
 	USuqsQuestState* FindQuestState(const FName& QuestID);
 	const USuqsQuestState* FindQuestState(const FName& QuestID) const;
@@ -159,6 +188,11 @@ protected:
 	void RebuildAllQuestData();
 	bool AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed);
 	static void SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSaveData& Data);
+
+	UFUNCTION()
+	void OnWaypointMoved(USuqsWaypointComponent* Waypoint);
+	UFUNCTION()
+	void OnWaypointEnabledChanged(USuqsWaypointComponent* Waypoint);
 
 public:
 

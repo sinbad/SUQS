@@ -3,6 +3,8 @@
 #include <algorithm>
 #include "Suqs.h"
 #include "SuqsProgression.h"
+#include "SuqsWaypointSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 void USuqsTaskState::Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsProgression* Root)
 {
@@ -239,4 +241,34 @@ void USuqsTaskState::NotifyGateOpened(const FName& GateName)
 bool USuqsTaskState::IsHiddenOnCompleteOrFail() const
 {
 	return IsMandatory() && (ParentObjective.IsValid() && ParentObjective->AreTasksSequential());
+}
+
+USuqsWaypointComponent* USuqsTaskState::GetWaypoint(bool bOnlyEnabled)
+{
+	if (IsValid(GetWorld()))
+	{
+		const auto GI = UGameplayStatics::GetGameInstance(this);
+		if (IsValid(GI))
+		{
+			auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
+			return Suqs->GetWaypoint(GetParentObjective()->GetParentQuest()->GetIdentifier(), GetIdentifier(), bOnlyEnabled);
+		}
+	}
+
+	return nullptr;
+}
+
+TArray<USuqsWaypointComponent*> USuqsTaskState::GetWaypoints(bool bOnlyEnabled)
+{
+	TArray<USuqsWaypointComponent*> Ret;
+	if (IsValid(GetWorld()))
+	{
+		const auto GI = UGameplayStatics::GetGameInstance(this);
+		if (IsValid(GI))
+		{
+			auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
+			Suqs->GetWaypoints(GetParentObjective()->GetParentQuest()->GetIdentifier(), GetIdentifier(), bOnlyEnabled, Ret);
+		}
+	}
+	return Ret;
 }
