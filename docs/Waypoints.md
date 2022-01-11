@@ -73,6 +73,13 @@ callback is the easiest way; based on the event type (`ESuqsProgressionEventType
 1. `WaypointEnabledOrDisabled`: and the passed in waypoint `IsEnabled()` returns false
 1. `TaskCompleted`, `TaskFailed` or `TaskRemoved`: remove any waypoints associated with this task. All 3 can happen independently, since `TaskRemoved` can occur for incomplete, optional tasks.
 
+    You *could* just remove waypoints on `TaskRemoved`, since that will happen
+    after complete/fail as well. However, it may be delayed depending on
+    the setting of `USuqsProgression::SetDefaultProgressionTimeDelays`, and you
+    don't really want the waypoints to still show in this gap between being
+    marked complete/failed and being removed.
+
+
 ## More Info
 
 * [Tasks](Tasks.md)
