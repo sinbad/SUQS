@@ -119,11 +119,9 @@ public:
 		
 	}
 
-	FSuqsProgressionEventDetails(): EventType(), Quest(nullptr), Objective(nullptr), Task(nullptr)
+	FSuqsProgressionEventDetails(): EventType(), Quest(nullptr), Objective(nullptr), Task(nullptr), Waypoint(nullptr)
 	{
 	}
-
-	
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnProgressionEvent, const FSuqsProgressionEventDetails&, Details);
