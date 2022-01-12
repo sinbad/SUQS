@@ -21,7 +21,7 @@
  *
  * See the USuqsProgression class for details on how to query for waypoints and to get events about waypoint changes.
 */
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(SUQS), meta=(BlueprintSpawnableComponent))
 class SUQS_API USuqsWaypointComponent : public USceneComponent
 {
 	GENERATED_BODY()
