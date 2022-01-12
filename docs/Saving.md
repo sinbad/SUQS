@@ -1,7 +1,13 @@
-# Saving Quest progression
+# Saving Quest State
 
-Being able to [progress quests](Progression.md) is fine, but you also need to
-save this progress along with your save games.
+There are potentially 2 parts to saving quest state:
+
+1. Saving progression
+1. Saving waypoint state
+
+## Saving Progression
+
+[Quest Progression](Progression.md) is stored in a self-contained set of data.
 
 The `USuqsProgression` class performs its own serialisation, you can use its
 `Serialize` method to save or load data to an archive of your choice.
@@ -164,3 +170,99 @@ void USnukaGameInstance::Init()
 
 After that you don't have to think about it, every time you save/load a game in 
 SPUD, the quest progression will go along with it.
+
+## Saving Waypoint state
+
+If you're using [Waypoints](Waypoints.md), then they have a little bit of state
+themselves which needs to be saved. The properties of the component that need
+saving are marked as `SaveGame`. 
+
+Depending on how you save actor state, you'll need to ensure this gets picked up.
+Here's how you would do it with [SPUD](https://github.com/sinbad/SPUD):
+
+### Saving Waypoints with SPUD
+
+As at the time of writing, SPUD only saves actor state, and doesn't cascade into 
+components automatically. This may be added in future, but for now you'll need
+to do it manually. Here's a minimal example, with a waypoint actor:
+
+WaypointActor.h:
+```c++
+#pragma once
+
+#include "CoreMinimal.h"
+#include "ISpudObject.h"
+#include "GameFramework/Actor.h"
+#include "WaypointActor.generated.h"
+
+class USuqsWaypointComponent;
+// A waypoint actor
+UCLASS(Blueprintable, ClassGroup=(Snuka))
+class SNUKA_API AWaypointActor : public AActor, public ISpudObject, public ISpudObjectCallback
+{
+	GENERATED_BODY()
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	USuqsWaypointComponent* WaypointComponent;
+	static constexpr int CurrentSavedVersion = 1;
+	
+public:
+	AWaypointActor();
+
+	virtual void SpudStoreCustomData_Implementation(const USpudState* State, USpudStateCustomData* CustomData) override;
+	virtual void SpudRestoreCustomData_Implementation(USpudState* State, USpudStateCustomData* CustomData) override;
+};
+```
+
+WaypointActor.cpp:
+```c++
+#include "WaypointActor.h"
+#include "SuqsWaypointComponent.h"
+
+AWaypointActor::AWaypointActor()
+{
+	PrimaryActorTick.bCanEverTick = false;
+
+	auto Root = CreateDefaultSubobject<USceneComponent>("Root");
+	SetRootComponent(Root);
+	WaypointComponent = CreateDefaultSubobject<USuqsWaypointComponent>("WaypointComponent");
+	WaypointComponent->SetupAttachment(Root);
+
+}
+
+void AWaypointActor::SpudStoreCustomData_Implementation(const USpudState* State, USpudStateCustomData* CustomData)
+{
+	// For now since SPUD doesn't store component data, let's store the waypoint component manually
+	CustomData->WriteInt(CurrentSavedVersion);
+
+	CustomData->WriteByte((uint8)WaypointComponent->IsEnabled());
+	CustomData->WriteByte((uint8)WaypointComponent->GetEventsEnabled());
+	
+	
+}
+
+void AWaypointActor::SpudRestoreCustomData_Implementation(USpudState* State, USpudStateCustomData* CustomData)
+{
+	int SavedVersion;
+	CustomData->ReadInt(SavedVersion);
+
+	if (SavedVersion == CurrentSavedVersion)
+	{
+		uint8 BoolData;
+		CustomData->ReadByte(BoolData);
+		WaypointComponent->SetEnabled(BoolData != 0);
+		CustomData->ReadByte(BoolData);
+		WaypointComponent->SetEventsEnabled(BoolData != 0);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Unable to restore Waypoint actor %s, saved data has unknown version"), *GetName());
+	}
+	
+}
+```
+
+Now, any instances of AWaypointActor you create in a level will be saved along
+with any quest progression, ensuring they stay in sync. If you don't use SPUD,
+you'll need to implement something similar for whatever system you use.

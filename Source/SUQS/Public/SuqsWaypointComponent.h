@@ -69,7 +69,9 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	/// Internal use only
 	virtual void SetEventsEnabled(bool bNewEnabled);
+	bool GetEventsEnabled() const { return bEventsEnabled; }
 
 protected:
 	// Called when the game starts
