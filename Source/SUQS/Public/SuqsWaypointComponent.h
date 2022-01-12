@@ -49,6 +49,7 @@ protected:
 	 * Events will only be raised when requested of this waypoint; this avoids movement events for tasks that
 	 * aren't currently of interest swamping the system
 	 */
+	UPROPERTY(SaveGame)
 	bool bEventsEnabled;
 public:
 	// Sets default values for this component's properties
