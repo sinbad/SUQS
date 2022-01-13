@@ -6,6 +6,11 @@
 #include "Components/SceneComponent.h"
 #include "SuqsWaypointComponent.generated.h"
 
+class USuqsWaypointComponent;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnWaypointMoved, USuqsWaypointComponent*, Waypoint);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnWaypointEnabledChanged, USuqsWaypointComponent*, Waypoint);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnWaypointIsCurrentChanged, USuqsWaypointComponent*, Waypoint);
+
 
 /**
  * Component which represents a world waypoint for a quest task. They are loosely associated with quest data but at
@@ -44,16 +49,29 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintSetter=SetEnabled, SaveGame, BlueprintGetter=IsEnabled)
 	bool bEnabled = true;
 
+	/// Whether this waypoint should raise move events when current
+	/// Default false since you don't need this if you attach this waypoint component and visual to the same actor
+	UPROPERTY(EditAnywhere, BlueprintGetter=IsEnabled)
+	bool bRaiseMoveEvents = false;
 
 	/**
-	 * Events will only be raised when requested of this waypoint; this avoids movement events for tasks that
-	 * aren't currently of interest swamping the system
+	 * Whether this waypoint is "current" ie associated with a currently relevant task
 	 */
 	UPROPERTY(SaveGame)
-	bool bEventsEnabled;
+	bool bIsCurrent = false;
 public:
 	// Sets default values for this component's properties
 	USuqsWaypointComponent();
+
+	/// Event raised when this waypoint moves, but only if bRaiseMoveEvents is true, and it's current (to avoid message spam)
+	UPROPERTY(BlueprintAssignable)
+	FSuqsOnWaypointMoved OnWaypointMoved;
+	/// Event raised when the enabled status of this waypoint changes
+	UPROPERTY(BlueprintAssignable)
+	FSuqsOnWaypointEnabledChanged OnWaypointEnabledChanged;
+	/// Event raised when the waypoint becomes or stops being current (associated with an active task)
+	UPROPERTY(BlueprintAssignable)
+	FSuqsOnWaypointEnabledChanged OnWaypointIsCurrentChanged;
 
 	UFUNCTION(BlueprintCallable)
 	virtual FName GetQuestID() const { return QuestID; }
@@ -70,8 +88,8 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	/// Internal use only
-	virtual void SetEventsEnabled(bool bNewEnabled);
-	bool GetEventsEnabled() const { return bEventsEnabled; }
+	virtual void SetIsCurrent(bool bNewIsCurrent);
+	bool GetIsCurrent() const { return bIsCurrent; }
 
 protected:
 	// Called when the game starts

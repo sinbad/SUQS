@@ -705,7 +705,7 @@ void USuqsProgression::RaiseTaskCompleted(USuqsTaskState* Task)
 	auto Waypoints = Task->GetWaypoints(false);
 	for (auto W : Waypoints)
 	{
-		W->SetEventsEnabled(false);
+		W->SetIsCurrent(false);
 	}
 	
 }
@@ -720,7 +720,7 @@ void USuqsProgression::RaiseTaskAdded(USuqsTaskState* Task)
 	auto Waypoints = Task->GetWaypoints(false);
 	for (auto W : Waypoints)
 	{
-		W->SetEventsEnabled(true);
+		W->SetIsCurrent(true);
 
 		// Take this opportunity to sub to events
 		if (!bSubcribedToWaypointEvents)
@@ -729,8 +729,8 @@ void USuqsProgression::RaiseTaskAdded(USuqsTaskState* Task)
 			if (IsValid(GI))
 			{
 				auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
-				Suqs->OnWaypointMoved.AddDynamic(this, &USuqsProgression::OnWaypointMoved);
-				Suqs->OnWaypointEnabledChanged.AddDynamic(this, &USuqsProgression::OnWaypointEnabledChanged);
+				Suqs->OnAnyWaypointMoved.AddDynamic(this, &USuqsProgression::OnWaypointMoved);
+				Suqs->OnAnyWaypointEnabledChanged.AddDynamic(this, &USuqsProgression::OnWaypointEnabledChanged);
 				bSubcribedToWaypointEvents = true;
 			}
 		}
@@ -747,7 +747,7 @@ void USuqsProgression::RaiseTaskRemoved(USuqsTaskState* Task)
 	auto Waypoints = Task->GetWaypoints(false);
 	for (auto W : Waypoints)
 	{
-		W->SetEventsEnabled(false);
+		W->SetIsCurrent(false);
 	}
 }
 
@@ -762,7 +762,7 @@ void USuqsProgression::RaiseTaskFailed(USuqsTaskState* Task)
 	auto Waypoints = Task->GetWaypoints(false);
 	for (auto W : Waypoints)
 	{
-		W->SetEventsEnabled(false);
+		W->SetIsCurrent(false);
 	}
 	
 }

@@ -36,7 +36,17 @@ void USuqsWaypointSubsystem::RegisterWaypoint(USuqsWaypointComponent* Waypoint)
 	}
 
 	if (!bInserted)
+	{
 		List.Add(Waypoint);
+		bInserted = true;
+	}
+
+	if (bInserted)
+	{
+		Waypoint->OnWaypointMoved.AddDynamic(this, &USuqsWaypointSubsystem::OnWaypointMoved);
+		Waypoint->OnWaypointEnabledChanged.AddDynamic(this, &USuqsWaypointSubsystem::OnWaypointEnabledChanged);
+		Waypoint->OnWaypointIsCurrentChanged.AddDynamic(this, &USuqsWaypointSubsystem::OnWaypointIsCurrentChanged);
+	}
 }
 
 void USuqsWaypointSubsystem::UnregisterWaypoint(USuqsWaypointComponent* Waypoint)
@@ -45,6 +55,10 @@ void USuqsWaypointSubsystem::UnregisterWaypoint(USuqsWaypointComponent* Waypoint
 	if (pList)
 	{
 		pList->RemoveSingle(Waypoint);
+		Waypoint->OnWaypointMoved.RemoveDynamic(this, &USuqsWaypointSubsystem::OnWaypointMoved);
+		Waypoint->OnWaypointEnabledChanged.RemoveDynamic(this, &USuqsWaypointSubsystem::OnWaypointEnabledChanged);
+		Waypoint->OnWaypointIsCurrentChanged.RemoveDynamic(this, &USuqsWaypointSubsystem::OnWaypointIsCurrentChanged);
+		
 	}
 	
 }
@@ -104,14 +118,20 @@ bool USuqsWaypointSubsystem::GetWaypoints(const FName& QuestID,
 	return bAnyFound;
 }
 
-void USuqsWaypointSubsystem::NotifyWaypointMoved(USuqsWaypointComponent* Waypoint) const
+void USuqsWaypointSubsystem::OnWaypointMoved(USuqsWaypointComponent* Waypoint)
 {
 	// Just relay
-	OnWaypointMoved.Broadcast(Waypoint);
+	OnAnyWaypointMoved.Broadcast(Waypoint);
 }
 
-void USuqsWaypointSubsystem::NotifyWaypointEnabledChanged(USuqsWaypointComponent* Waypoint) const
+void USuqsWaypointSubsystem::OnWaypointEnabledChanged(USuqsWaypointComponent* Waypoint)
 {
 	// Just relay
-	OnWaypointEnabledChanged.Broadcast(Waypoint);
+	OnAnyWaypointEnabledChanged.Broadcast(Waypoint);
+}
+
+void USuqsWaypointSubsystem::OnWaypointIsCurrentChanged(USuqsWaypointComponent* Waypoint)
+{
+	// Just relay
+	OnAnyWaypointIsCurrentChanged.Broadcast(Waypoint);
 }

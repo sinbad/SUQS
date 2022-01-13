@@ -5,8 +5,9 @@
 #include "SuqsWaypointSubsystem.generated.h"
 
 class USuqsWaypointComponent;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWaypointMoved, USuqsWaypointComponent*, Waypoint);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWaypointEnabledChanged, USuqsWaypointComponent*, Waypoint);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnAnyWaypointMoved, USuqsWaypointComponent*, Waypoint);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnAnyWaypointEnabledChanged, USuqsWaypointComponent*, Waypoint);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnAnyWaypointIsCurrentChanged, USuqsWaypointComponent*, Waypoint);
 
 /**
  * SUQS subsystem to manage the presence of quest waypoints in the current level.
@@ -25,12 +26,16 @@ protected:
 	
 public:
 
-	/// Raised when a currently registered waypoint moves
+	/// Raised when a currently registered waypoint moves, if it has movement events enabled and is current
+	/// It's generally better to attach a visual to the same actor as the waypoint component instead, but you might need this
 	UPROPERTY(BlueprintAssignable)
-	FOnWaypointMoved OnWaypointMoved;
-	/// Raised when a currently registered waypoint is enabled / disabled
+	FSuqsOnAnyWaypointMoved OnAnyWaypointMoved;
+	/// Raised when any currently registered waypoint is enabled / disabled
 	UPROPERTY(BlueprintAssignable)
-	FOnWaypointEnabledChanged OnWaypointEnabledChanged;
+	FSuqsOnAnyWaypointEnabledChanged OnAnyWaypointEnabledChanged;
+	/// Raised when any currently registered waypoint becomes or stops being current (associated with an active task)
+	UPROPERTY(BlueprintAssignable)
+	FSuqsOnAnyWaypointEnabledChanged OnAnyWaypointIsCurrentChanged;
 	
 	void RegisterWaypoint(USuqsWaypointComponent* Waypoint);
 	void UnregisterWaypoint(USuqsWaypointComponent* Waypoint);
@@ -52,7 +57,9 @@ public:
 	 * @param OutWaypoints Array to append to with waypoints (will not be cleared first) 
 	 */
 	bool GetWaypoints(const FName& QuestID, const FName& TaskID, bool bOnlyEnabled, TArray<USuqsWaypointComponent*>& OutWaypoints);
-	
-	void NotifyWaypointMoved(USuqsWaypointComponent* Waypoint) const;
-	void NotifyWaypointEnabledChanged(USuqsWaypointComponent* Waypoint) const;
+
+protected:
+	void OnWaypointMoved(USuqsWaypointComponent* Waypoint);
+	void OnWaypointEnabledChanged(USuqsWaypointComponent* Waypoint);
+	void OnWaypointIsCurrentChanged(USuqsWaypointComponent* Waypoint);
 };

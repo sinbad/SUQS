@@ -8,9 +8,7 @@
 USuqsWaypointComponent::USuqsWaypointComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	// needed for OnUpdateTransform
-	bWantsOnUpdateTransform = true;
-	bEventsEnabled = false;
+	bIsCurrent = false;
 }
 
 
@@ -18,6 +16,9 @@ USuqsWaypointComponent::USuqsWaypointComponent()
 void USuqsWaypointComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// needed for movement events
+	bWantsOnUpdateTransform = bRaiseMoveEvents;
 
 	// If quest / task missing, ignore
 	if (!QuestID.IsNone() && !TaskID.IsNone() && IsValid(GetWorld()))
@@ -41,14 +42,9 @@ void USuqsWaypointComponent::OnUpdateTransform(EUpdateTransformFlags UpdateTrans
 	Super::OnUpdateTransform(UpdateTransformFlags, Teleport);
 
 	// Notify 
-	if (bEventsEnabled && IsValid(GetWorld()))
+	if (bIsCurrent && bRaiseMoveEvents)
 	{
-		const auto GI = UGameplayStatics::GetGameInstance(this);
-		if (IsValid(GI))
-		{
-			auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
-			Suqs->NotifyWaypointMoved(this);
-		}
+		OnWaypointMoved.Broadcast(this);
 	}
 	
 }
@@ -70,9 +66,14 @@ void USuqsWaypointComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	
 }
 
-void USuqsWaypointComponent::SetEventsEnabled(bool bNewEnabled)
+void USuqsWaypointComponent::SetIsCurrent(bool bNewIsCurrent)
 {
-	bEventsEnabled = bNewEnabled;
+	if (bIsCurrent != bNewIsCurrent)
+	{
+		bIsCurrent = bNewIsCurrent;
+		OnWaypointIsCurrentChanged.Broadcast(this);
+		
+	}
 }
 
 void USuqsWaypointComponent::SetEnabled(bool bNewEnabled)
@@ -80,15 +81,6 @@ void USuqsWaypointComponent::SetEnabled(bool bNewEnabled)
 	if (bEnabled != bNewEnabled)
 	{
 		bEnabled = bNewEnabled;
-
-		if (bEventsEnabled && IsValid(GetWorld()))
-		{
-			auto GI = UGameplayStatics::GetGameInstance(this);
-			if (IsValid(GI))
-			{
-				auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
-				Suqs->NotifyWaypointEnabledChanged(this);
-			}
-		}
+		OnWaypointEnabledChanged.Broadcast(this);
 	}
 }
