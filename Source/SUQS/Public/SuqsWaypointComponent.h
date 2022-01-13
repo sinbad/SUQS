@@ -89,7 +89,7 @@ public:
 
 	/// Internal use only
 	virtual void SetIsCurrent(bool bNewIsCurrent);
-	bool GetIsCurrent() const { return bIsCurrent; }
+	bool IsCurrent() const { return bIsCurrent; }
 
 protected:
 	// Called when the game starts
