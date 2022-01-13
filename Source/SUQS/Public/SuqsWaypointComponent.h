@@ -33,25 +33,25 @@ class SUQS_API USuqsWaypointComponent : public USceneComponent
 
 protected:
 	/// The ID of the quest this waypoint belongs to (required)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetQuestID)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetQuestID, Category="Waypoint")
 	FName QuestID;
 
 	/// The ID of the task within the quest that this waypoint belongs to (required)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetTaskID)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetTaskID, Category="Waypoint")
 	FName TaskID;
 	
 	/// If > 1 waypoint is registered for a task, the sequence index can imply an order (e.g. along a path)
 	/// You may wish to SetEnabled(false) on waypoints that are no longer relevant
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetSequenceIndex)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetSequenceIndex, Category="Waypoint")
 	uint8 SequenceIndex = 0;
 	
 	/// Whether this waypoint is currently enabled
-	UPROPERTY(EditAnywhere, BlueprintSetter=SetEnabled, SaveGame, BlueprintGetter=IsEnabled)
+	UPROPERTY(EditAnywhere, BlueprintSetter=SetEnabled, SaveGame, BlueprintGetter=IsEnabled, Category="Waypoint")
 	bool bEnabled = true;
 
 	/// Whether this waypoint should raise move events when current
 	/// Default false since you don't need this if you attach this waypoint component and visual to the same actor
-	UPROPERTY(EditAnywhere, BlueprintGetter=IsEnabled)
+	UPROPERTY(EditAnywhere, BlueprintGetter=IsEnabled, Category="Waypoint")
 	bool bRaiseMoveEvents = false;
 
 	/**
