@@ -18,7 +18,22 @@ Here's how you configure it:
 ![Waypoint Config](img/waypointdetails.png)
 
 You need to supply a Quest ID and Task ID at a minimum, neither of which can be
-changed at runtime.
+changed at runtime. You can associate multiple waypoints with a single task.
+
+## Waypoint Actors
+
+You can attach a waypoint component to any actor, but for convenience SUQS provides
+a base class called `ASuqsWaypointActor`, which contains both a waypoint component,
+and a `UWidgetComponent` which will display the location of the waypoint on screen.
+
+You only have to provide the QuestID, TaskID and provide a user widget of your 
+choice to represent the waypoint visually. Everything else is done for you;
+`ASuqsWaypointActor` is smart enough to only display the waypoint when the task
+it's associated with becomes active, and when the waypoint itself is enabled. 
+So you can place these actors in the world, attach them to other actors etc, 
+and they will start showing up in the UI when the task they reference becomes relevant.
+
+Alternatively, you can retrieve waypoints manually.
 
 ## Getting Waypoints
 
@@ -47,37 +62,11 @@ any more complicated than just describing a path.
 
 ## Waypoint enable/disable
 
-Waypoints can also be enabled / disabled, in case you want to temporarily hide or
-show them. `GetWaypoints` can include or exclude disabled waypoints, and if you
-listen in to `USuqsProgression::OnProgressionEvent`, you will receive an event 
-of type `ESuqsProgressionEventType::WaypointEnabledOrDisabled` when that changes
-dynamically.
-
-## Movable Waypoints
-
-The actor that the waypoint component is attached to can move, and if it does
-while the task it's associated with is current, `USuqsProgression::OnProgressionEvent`
-will raise an event of type `ESuqsProgressionEventType::WaypointMoved`.
-
-This means you don't have to do your own monitoring of the position of waypoint
-actors. You can just read the position on task addition, and only worry about
-changes via the event above - they will only be sent while the task is current and
-incomplete.
-
-
-## Removing waypoints
-
-How do you know when to stop displaying waypoints? Again, the `USuqsProgression::OnProgressionEvent`
-callback is the easiest way; based on the event type (`ESuqsProgressionEventType`):
-
-1. `WaypointEnabledOrDisabled`: and the passed in waypoint `IsEnabled()` returns false
-1. `TaskCompleted`, `TaskFailed` or `TaskRemoved`: remove any waypoints associated with this task. All 3 can happen independently, since `TaskRemoved` can occur for incomplete, optional tasks.
-
-    You *could* just remove waypoints on `TaskRemoved`, since that will happen
-    after complete/fail as well. However, it may be delayed depending on
-    the setting of `USuqsProgression::SetDefaultProgressionTimeDelays`, and you
-    don't really want the waypoints to still show in this gap between being
-    marked complete/failed and being removed.
+Waypoints can also be enabled / disabled, in case you want to hide or
+show them independently of the task state. This can be useful for example if
+you have multiple waypoints for a single count-based task, like "Collect 10 nuts".
+Once a nut has been collected, the task isn't complete, but this specific waypoint
+should be disabled.
 
 
 ## More Info

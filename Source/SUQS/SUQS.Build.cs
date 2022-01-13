@@ -23,7 +23,8 @@ public class SUQS : ModuleRules
 			{
 				"Core",
 				"CoreUObject",
-				"Engine"
+				"Engine",
+				"UMG"
 			}
 			);
 			
