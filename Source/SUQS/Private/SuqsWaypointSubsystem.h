@@ -59,7 +59,10 @@ public:
 	bool GetWaypoints(const FName& QuestID, const FName& TaskID, bool bOnlyEnabled, TArray<USuqsWaypointComponent*>& OutWaypoints);
 
 protected:
+	UFUNCTION()
 	void OnWaypointMoved(USuqsWaypointComponent* Waypoint);
+	UFUNCTION()
 	void OnWaypointEnabledChanged(USuqsWaypointComponent* Waypoint);
+	UFUNCTION()
 	void OnWaypointIsCurrentChanged(USuqsWaypointComponent* Waypoint);
 };
