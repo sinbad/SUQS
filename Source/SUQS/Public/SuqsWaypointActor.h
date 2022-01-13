@@ -14,11 +14,9 @@ class SUQS_API ASuqsWaypointActor : public AActor
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USuqsWaypointComponent* WaypointComponent;
-	static constexpr int CurrentSavedVersion = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UWidgetComponent* VisualWidget;
-	
 public:
 	ASuqsWaypointActor();
 

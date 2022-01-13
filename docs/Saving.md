@@ -147,7 +147,7 @@ overrode above), you need to hook them up:
 
 YourGameInstance.cpp:
 ```c++
-void USnukaGameInstance::Init()
+void UYourGameInstance::Init()
 {
 	Super::Init();
 
@@ -184,7 +184,7 @@ Here's how you would do it with [SPUD](https://github.com/sinbad/SPUD):
 
 As at the time of writing, SPUD only saves actor state, and doesn't cascade into 
 components automatically. This may be added in future, but for now you'll need
-to do it manually. Here's a minimal example, with a waypoint actor:
+to do it manually. Here's a minimal example, with a waypoint actor subclass:
 
 WaypointActor.h:
 ```c++
@@ -192,23 +192,20 @@ WaypointActor.h:
 
 #include "CoreMinimal.h"
 #include "ISpudObject.h"
-#include "GameFramework/Actor.h"
+#include "SuqsWaypointActor.h"
 #include "WaypointActor.generated.h"
 
 class USuqsWaypointComponent;
 // A waypoint actor
-UCLASS(Blueprintable, ClassGroup=(Snuka))
-class SNUKA_API AWaypointActor : public AActor, public ISpudObject, public ISpudObjectCallback
+UCLASS(Blueprintable, ClassGroup=(Custom))
+class YOUR_API AWaypointActor : public ASuqsWaypointActor, public ISpudObject, public ISpudObjectCallback
 {
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(BlueprintReadOnly)
-	USuqsWaypointComponent* WaypointComponent;
 	static constexpr int CurrentSavedVersion = 1;
 	
 public:
-	AWaypointActor();
 
 	virtual void SpudStoreCustomData_Implementation(const USpudState* State, USpudStateCustomData* CustomData) override;
 	virtual void SpudRestoreCustomData_Implementation(USpudState* State, USpudStateCustomData* CustomData) override;
@@ -219,17 +216,6 @@ WaypointActor.cpp:
 ```c++
 #include "WaypointActor.h"
 #include "SuqsWaypointComponent.h"
-
-AWaypointActor::AWaypointActor()
-{
-	PrimaryActorTick.bCanEverTick = false;
-
-	auto Root = CreateDefaultSubobject<USceneComponent>("Root");
-	SetRootComponent(Root);
-	WaypointComponent = CreateDefaultSubobject<USuqsWaypointComponent>("WaypointComponent");
-	WaypointComponent->SetupAttachment(Root);
-
-}
 
 void AWaypointActor::SpudStoreCustomData_Implementation(const USpudState* State, USpudStateCustomData* CustomData)
 {
