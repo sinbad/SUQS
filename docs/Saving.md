@@ -182,9 +182,11 @@ Here's how you would do it with [SPUD](https://github.com/sinbad/SPUD):
 
 ### Saving Waypoints with SPUD
 
-As at the time of writing, SPUD only saves actor state, and doesn't cascade into 
-components automatically. This may be added in future, but for now you'll need
-to do it manually. Here's a minimal example, with a waypoint actor subclass:
+`ASuqsWaypointActor` already marks the waypoint component as being saved, and
+because of that SPUD will cascade into it and save the required fields. 
+However, we do need a post-restore hook to synchronise the visual component.
+
+Here's a minimal example, with a waypoint actor subclass:
 
 WaypointActor.h:
 ```c++
@@ -202,50 +204,18 @@ class YOUR_API AWaypointActor : public ASuqsWaypointActor, public ISpudObject, p
 {
 	GENERATED_BODY()
 
-protected:
-	static constexpr int CurrentSavedVersion = 1;
-	
 public:
-
-	virtual void SpudStoreCustomData_Implementation(const USpudState* State, USpudStateCustomData* CustomData) override;
-	virtual void SpudRestoreCustomData_Implementation(USpudState* State, USpudStateCustomData* CustomData) override;
+	virtual void SpudPostRestore_Implementation(const USpudState* State) override;
 };
 ```
 
 WaypointActor.cpp:
 ```c++
 #include "WaypointActor.h"
-#include "SuqsWaypointComponent.h"
 
-void AWaypointActor::SpudStoreCustomData_Implementation(const USpudState* State, USpudStateCustomData* CustomData)
+void AWaypointActor::SpudPostRestore_Implementation(const USpudState* State)
 {
-	// For now since SPUD doesn't store component data, let's store the waypoint component manually
-	CustomData->WriteInt(CurrentSavedVersion);
-
-	CustomData->WriteByte((uint8)WaypointComponent->IsEnabled());
-	CustomData->WriteByte((uint8)WaypointComponent->GetEventsEnabled());
-	
-	
-}
-
-void AWaypointActor::SpudRestoreCustomData_Implementation(USpudState* State, USpudStateCustomData* CustomData)
-{
-	int SavedVersion;
-	CustomData->ReadInt(SavedVersion);
-
-	if (SavedVersion == CurrentSavedVersion)
-	{
-		uint8 BoolData;
-		CustomData->ReadByte(BoolData);
-		WaypointComponent->SetEnabled(BoolData != 0);
-		CustomData->ReadByte(BoolData);
-		WaypointComponent->SetEventsEnabled(BoolData != 0);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Unable to restore Waypoint actor %s, saved data has unknown version"), *GetName());
-	}
-	
+	UpdateWaypointVisibility();
 }
 ```
 
