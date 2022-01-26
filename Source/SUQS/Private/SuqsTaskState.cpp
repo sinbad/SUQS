@@ -281,3 +281,25 @@ TArray<USuqsWaypointComponent*> USuqsTaskState::GetWaypoints(bool bOnlyEnabled)
 	}
 	return Ret;
 }
+
+void USuqsTaskState::FinishLoad()
+{
+	// Derive hidden from other state, since it's not saved
+	bHidden = false;
+	if (IsMandatory())
+	{
+		if (IsHiddenOnCompleteOrFail() && (IsCompleted() || IsFailed()))
+		{
+			bHidden = true;
+		}
+		else
+		{
+			// If incomplete, then this is hidden if objective is set to sequential tasks and this isn't the next one
+			auto Obj = GetParentObjective();
+			if (Obj->AreTasksSequential() && Obj->GetNextMandatoryTask() != this)
+			{
+				bHidden = true;
+			}
+		}
+	}
+}

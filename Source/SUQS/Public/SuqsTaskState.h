@@ -180,5 +180,5 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	TArray<USuqsWaypointComponent*> GetWaypoints(bool bOnlyEnabled = true);
-	
+	void FinishLoad();
 };

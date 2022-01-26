@@ -26,6 +26,14 @@ void USuqsObjectiveState::Initialise(const FSuqsObjective* ObjDef, USuqsQuestSta
 	
 }
 
+void USuqsObjectiveState::FinishLoad()
+{
+	for (auto T : Tasks)
+	{
+		T->FinishLoad();
+	}
+}
+
 void USuqsObjectiveState::Tick(float DeltaTime)
 {
 	for (auto& Task : Tasks)

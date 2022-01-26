@@ -128,4 +128,5 @@ public:
 	
 	void NotifyTaskStatusChanged(const USuqsTaskState* ChangedTaskOrNull);
 	void NotifyGateOpened(const FName& GateName);
+	void FinishLoad();
 };

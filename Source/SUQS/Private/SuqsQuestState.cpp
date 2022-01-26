@@ -338,6 +338,14 @@ void USuqsQuestState::SetResolveBarrier(const FSuqsResolveBarrierStateData& Barr
 	MaybeNotifyStatusChange();
 }
 
+void USuqsQuestState::FinishLoad()
+{
+	for (auto O : Objectives)
+	{
+		O->FinishLoad();
+	}
+}
+
 void USuqsQuestState::NotifyObjectiveStatusChanged()
 {
 	// Re-scan the objectives from top to bottom (this allows ANY change to have been made, including backtracking)

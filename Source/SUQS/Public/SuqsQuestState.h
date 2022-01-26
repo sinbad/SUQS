@@ -340,4 +340,6 @@ public:
 	void NotifyGateOpened(const FName& GateName);
 	// Manually override the barrier data
 	void SetResolveBarrier(const FSuqsResolveBarrierStateData& Barrier);
+	
+	void FinishLoad();
 };

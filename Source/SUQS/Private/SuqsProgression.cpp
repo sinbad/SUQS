@@ -1069,6 +1069,8 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 			// Again, set the resolve barrier last to ensure we overwrite any new generated one
 			Q->SetResolveBarrier(QData.ResolveBarrier);
 
+			Q->FinishLoad();
+
             if (QData.Status == ESuqsQuestDataStatus::Incomplete)
             	ActiveQuests.Add(QDef->Identifier, Q);
 			else
