@@ -243,6 +243,15 @@ bool USuqsTaskState::IsHiddenOnCompleteOrFail() const
 	return IsMandatory() && (ParentObjective.IsValid() && ParentObjective->AreTasksSequential());
 }
 
+bool USuqsTaskState::IsRelevant() const
+{
+	return
+		IsIncomplete() &&
+		!bHidden &&
+		GetParentObjective() == GetParentObjective()->GetParentQuest()->GetCurrentObjective() &&
+		GetParentObjective()->GetParentQuest()->IsIncomplete();
+}
+
 USuqsWaypointComponent* USuqsTaskState::GetWaypoint(bool bOnlyEnabled)
 {
 	if (IsValid(GetWorld()))

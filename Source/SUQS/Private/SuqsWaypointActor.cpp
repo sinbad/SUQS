@@ -18,10 +18,15 @@ ASuqsWaypointActor::ASuqsWaypointActor()
 
 	WaypointComponent->OnWaypointEnabledChanged.AddDynamic(this, &ASuqsWaypointActor::OnWaypointVisibilityPotentiallyChanged);
 	WaypointComponent->OnWaypointIsCurrentChanged.AddDynamic(this, &ASuqsWaypointActor::OnWaypointVisibilityPotentiallyChanged);
-
-	UpdateWaypointVisibility();
 }
 
+void ASuqsWaypointActor::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UpdateWaypointVisibility();
+	
+}
 
 void ASuqsWaypointActor::OnWaypointVisibilityPotentiallyChanged(USuqsWaypointComponent* Waypoint)
 {

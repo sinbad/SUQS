@@ -296,6 +296,10 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsTaskFailed(const FName& TaskID) const;
 
+	/// Return whether a task is "Relevant" i.e. current and incomplete
+	UFUNCTION(BlueprintCallable)
+	bool IsTaskRelevant(const FName& TaskID) const;
+	
 	/// Reset a single task in the quest
 	UFUNCTION(BlueprintCallable)
     void ResetTask(FName TaskID);

@@ -148,6 +148,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     bool IsFailed() const { return Status == ESuqsTaskStatus::Failed; }
 
+	/// Return whether this task is "relevant" i.e. it's on the current objective, incomplete and next in line
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsRelevant() const;
+
 	/// Reset the progress on this task back to the initial state
 	UFUNCTION(BlueprintCallable)
     void Reset();

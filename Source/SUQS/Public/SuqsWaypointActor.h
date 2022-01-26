@@ -25,6 +25,6 @@ public:
 protected:
 	UFUNCTION()
 	virtual void OnWaypointVisibilityPotentiallyChanged(USuqsWaypointComponent* Waypoint);
-	
+	virtual void BeginPlay() override;
 	virtual void UpdateWaypointVisibility() const;
 };

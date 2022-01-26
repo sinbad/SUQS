@@ -136,6 +136,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestCompleted, USuqsQuestState*,
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestFailed, USuqsQuestState*, Quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, Quest);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnProgressionLoaded, USuqsProgression*, Progression);
+
 // C++ only because of non-const struct
 DECLARE_DELEGATE_TwoParams(FOnPreLoad, USuqsProgression*, FSuqsSaveData&);
 
@@ -145,6 +147,7 @@ class USuqsWaypointComponent;
  * Progression holds all the state relating to all quests and their objectives/tasks for a single player.
  * Add this somewhere that's useful to you, e.g. your PlayerState or GameInstance.
  * And of course, you'll want to include it in your save games.
+ * You MUST only ever have one instance of this in your game.
  */
 UCLASS(BlueprintType, Blueprintable)
 class SUQS_API USuqsProgression : public UObject, public FTickableGameObject
@@ -258,6 +261,9 @@ public:
 	/// Fired whenever the active quest list changes
 	UPROPERTY(BlueprintAssignable)
 	FOnActiveQuestsListChanged OnActiveQuestsListChanged;
+	/// Raised when this progression object has been completely re-initialised via loading
+	UPROPERTY(BlueprintAssignable)
+	FOnProgressionLoaded OnProgressionLoaded;
 
 	/// Use this from C++ to receive access to the loaded quest data before it's applied to this progression
 	/// You can therefore change the quest data if you need to adapt it due to quest changes
@@ -445,6 +451,10 @@ public:
 	UFUNCTION(BlueprintCallable)
     bool IsTaskFailed(FName QuestID, FName TaskID) const;
 
+	/// Return whether a task is "Relevant" i.e. current and incomplete
+	UFUNCTION(BlueprintCallable)
+	bool IsTaskRelevant(FName QuestID, FName TaskID) const;
+	
 	/// Shortcut to getting the whole task state for a specific quest
 	UFUNCTION(BlueprintCallable)
 	USuqsTaskState* GetTaskState(FName QuestID, FName TaskID) const;

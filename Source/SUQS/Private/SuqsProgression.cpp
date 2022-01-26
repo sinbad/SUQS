@@ -103,6 +103,14 @@ void USuqsProgression::RebuildAllQuestData()
             });
 		}
 	}
+
+	const auto GI = UGameplayStatics::GetGameInstance(this);
+	if (IsValid(GI))
+	{
+		auto WaypointsSubSys = GI->GetSubsystem<USuqsWaypointSubsystem>();
+		WaypointsSubSys->SetProgression(this);
+	}
+	
 }
 
 const TMap<FName, FSuqsQuest>& USuqsProgression::GetQuestDefinitions(bool bForceRebuild)
@@ -534,6 +542,16 @@ bool USuqsProgression::IsTaskFailed(FName QuestID, FName TaskID) const
 		return Q->IsTaskFailed(TaskID);
 	}
 	return false;
+}
+
+bool USuqsProgression::IsTaskRelevant(FName QuestID, FName TaskID) const
+{
+	if (auto Q = FindQuestState(QuestID))
+	{
+		return Q->IsTaskRelevant(TaskID);
+	}
+	return false;
+	
 }
 
 USuqsTaskState* USuqsProgression::GetTaskState(FName QuestID, FName TaskID) const
@@ -998,6 +1016,9 @@ void USuqsProgression::Serialize(FArchive& Ar)
 		OnPreLoad.ExecuteIfBound(this, Data);
 
 		LoadFromData(Data);
+
+		OnProgressionLoaded.Broadcast(this);
+		
 	}
 	else
 	{

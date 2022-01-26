@@ -1,4 +1,5 @@
 ﻿#include "SuqsWaypointSubsystem.h"
+#include "SuqsProgression.h"
 #include "SuqsWaypointComponent.h"
 
 void USuqsWaypointSubsystem::RegisterWaypoint(USuqsWaypointComponent* Waypoint)
@@ -43,6 +44,13 @@ void USuqsWaypointSubsystem::RegisterWaypoint(USuqsWaypointComponent* Waypoint)
 
 	if (bInserted)
 	{
+		// Initialise the waypoint IsCurrent state from quest progression
+		// This isn't saved in the waypoint savegame data because it's derived from quest progression and
+		// may be out of date from when it was last saved (making progress while the level is unloaded)
+		if (Progression.IsValid())
+		{
+			Waypoint->SetIsCurrent(Progression->IsTaskRelevant(Waypoint->GetQuestID(), Waypoint->GetTaskID()));
+		}
 		Waypoint->OnWaypointMoved.AddDynamic(this, &USuqsWaypointSubsystem::OnWaypointMoved);
 		Waypoint->OnWaypointEnabledChanged.AddDynamic(this, &USuqsWaypointSubsystem::OnWaypointEnabledChanged);
 		Waypoint->OnWaypointIsCurrentChanged.AddDynamic(this, &USuqsWaypointSubsystem::OnWaypointIsCurrentChanged);
@@ -116,6 +124,33 @@ bool USuqsWaypointSubsystem::GetWaypoints(const FName& QuestID,
 		}
 	}
 	return bAnyFound;
+}
+
+void USuqsWaypointSubsystem::SetProgression(USuqsProgression* Prog)
+{
+	if (IsValid(Prog))
+		Prog->OnProgressionLoaded.RemoveDynamic(this, &USuqsWaypointSubsystem::OnProgressionLoaded);
+	
+	Progression = Prog;
+	
+	if (IsValid(Prog))
+		Prog->OnProgressionLoaded.AddDynamic(this, &USuqsWaypointSubsystem::OnProgressionLoaded);
+}
+
+void USuqsWaypointSubsystem::OnProgressionLoaded(USuqsProgression* Prog)
+{
+	if (Progression.Get() == Prog)
+	{
+		// Refresh all waypoints currently loaded
+		for (auto Pair : WaypointsByQuest)
+		{
+			auto Waypoints = Pair.Value;
+			for (auto W : Waypoints)
+			{
+				W->SetIsCurrent(Progression->IsTaskRelevant(W->GetQuestID(), W->GetTaskID()));
+			}
+		}
+	}
 }
 
 void USuqsWaypointSubsystem::OnWaypointMoved(USuqsWaypointComponent* Waypoint)

@@ -57,7 +57,6 @@ protected:
 	/**
 	 * Whether this waypoint is "current" ie associated with a currently relevant task
 	 */
-	UPROPERTY(SaveGame)
 	bool bIsCurrent = false;
 public:
 	// Sets default values for this component's properties

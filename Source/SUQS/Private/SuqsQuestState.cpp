@@ -258,6 +258,16 @@ bool USuqsQuestState::IsTaskFailed(const FName& TaskID) const
 	return false;
 }
 
+bool USuqsQuestState::IsTaskRelevant(const FName& TaskID) const
+{
+	if (auto T = GetTask(TaskID))
+	{
+		return T->IsRelevant();
+	}
+	return false;
+	
+}
+
 void USuqsQuestState::ResetTask(FName TaskID)
 {
 	if (auto T = GetTask(TaskID))

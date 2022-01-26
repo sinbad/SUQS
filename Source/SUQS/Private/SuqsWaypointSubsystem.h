@@ -4,6 +4,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "SuqsWaypointSubsystem.generated.h"
 
+class USuqsProgression;
 class USuqsWaypointComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnAnyWaypointMoved, USuqsWaypointComponent*, Waypoint);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnAnyWaypointEnabledChanged, USuqsWaypointComponent*, Waypoint);
@@ -23,6 +24,8 @@ class USuqsWaypointSubsystem : public UGameInstanceSubsystem
 protected:
 	// Indexed by QuestID, then a list grouped by TaskID, ordered within that by SequenceIndex
 	TMap<FName, TArray<USuqsWaypointComponent*>> WaypointsByQuest;
+
+	TWeakObjectPtr<USuqsProgression> Progression;
 	
 public:
 
@@ -39,6 +42,8 @@ public:
 	
 	void RegisterWaypoint(USuqsWaypointComponent* Waypoint);
 	void UnregisterWaypoint(USuqsWaypointComponent* Waypoint);
+
+	void SetProgression(USuqsProgression* Prog);
 
 	/**
 	 * @brief Get a single waypoint for a task
@@ -65,4 +70,6 @@ protected:
 	void OnWaypointEnabledChanged(USuqsWaypointComponent* Waypoint);
 	UFUNCTION()
 	void OnWaypointIsCurrentChanged(USuqsWaypointComponent* Waypoint);
+	UFUNCTION()
+	void OnProgressionLoaded(USuqsProgression* Progression);
 };
