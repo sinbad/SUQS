@@ -54,6 +54,7 @@ protected:
 	TWeakObjectPtr<USuqsObjectiveState> ParentObjective;
 	TWeakObjectPtr<USuqsProgression> Progression;
 
+	bool bTitleNeedsFormatting;
 	
 	void Initialise(const FSuqsTask* TaskDef, USuqsObjectiveState* ObjState, USuqsProgression* Root);
 	void Tick(float DeltaTime);
@@ -82,7 +83,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetTimeLimit() const { return TaskDefinition->TimeLimit; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	const FText& GetTitle() const { return TaskDefinition->Title; }
+	FText GetTitle() const;
 	/// The target number of things to be achieved
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetTargetNumber() const { return TaskDefinition->TargetNumber; }

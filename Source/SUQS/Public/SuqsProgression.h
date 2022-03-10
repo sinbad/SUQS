@@ -7,6 +7,7 @@
 #include "UObject/Object.h"
 #include "SuqsSaveData.h"
 #include "SuqsTaskState.h"
+#include "SuqsTextFormatter.h"
 #include "SuqsProgression.generated.h"
 
 /// Identifies the type of quest event that has occurred, for those who want to listen in to a single event source
@@ -176,6 +177,9 @@ protected:
 	TMultiMap<FName, FName> QuestCompletionDeps;
 	// Name of quest completed -> names of other quests that depend on its failure
 	TMultiMap<FName, FName> QuestFailureDeps;
+
+	UPROPERTY()
+	TArray<UObject*> Formatters;
 
 	bool bSuppressEvents = false;
 	float DefaultQuestResolveTimeDelay = 0;
@@ -508,6 +512,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool QuestDependenciesMet(const FName& QuestID);
 
+	/**
+	 * Add an object which can format quest system text to add parameter values.
+	 * @param Fmt Formatter object; must implement ISuqsTextFormatter
+	 */
+	UFUNCTION(BlueprintCallable)
+	void AddFormatter(UObject* Fmt);	
+	UFUNCTION(BlueprintCallable)
+	void RemoveFormatter(UObject* Fmt);	
+	UFUNCTION(BlueprintCallable)
+	void RemoveAllFormatters();	
+
+
 	void RaiseTaskUpdated(USuqsTaskState* Task);
 	void RaiseTaskFailed(USuqsTaskState* Task);
 	void RaiseTaskCompleted(USuqsTaskState* Task);
@@ -520,7 +536,10 @@ public:
 	void RaiseQuestReset(USuqsQuestState* Quest);
 	void RaiseCurrentObjectiveChanged(USuqsQuestState* Quest);
 
-
+	FText FormatQuestTitle(const FName& QuestID, const FText& FormatText);
+	FText FormatQuestDescription(const FName& QuestID, const FText& FormatText);
+	FText FormatTaskTitle(const FName& QuestID, const FName& TaskID, const FText& FormatText);
+	
 	void ProcessQuestStatusChange(USuqsQuestState* Quest);
 
 	const FSuqsQuest* GetQuestDefinition(const FName& QuestID);
@@ -558,4 +577,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="SUQS")
 	static FString GetProgressEventDescription(const FSuqsProgressionEventDetails& Evt);
+
+	/// Determine if some text needs formatting (has parameters)
+	static bool GetTextNeedsFormatting(const FText& Text);
 };

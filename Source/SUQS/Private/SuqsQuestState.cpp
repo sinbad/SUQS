@@ -20,6 +20,10 @@ void USuqsQuestState::Initialise(const FSuqsQuest* Def, USuqsProgression* Root)
 	FastTaskLookup.Empty();
 	ActiveBranches.Empty();
 
+	bTitleNeedsFormatting = USuqsProgression::GetTextNeedsFormatting(QuestDefinition->Title);
+	bActiveDescriptionNeedsFormatting = USuqsProgression::GetTextNeedsFormatting(QuestDefinition->DescriptionWhenActive);
+	bCompletedDescriptionNeedsFormatting = USuqsProgression::GetTextNeedsFormatting(QuestDefinition->DescriptionWhenCompleted);
+
 	for (const auto& ObjDef : Def->Objectives)
 	{
 		auto Obj = NewObject<USuqsObjectiveState>(GetOuter());
@@ -135,18 +139,28 @@ int USuqsQuestState::ProgressTask(FName TaskID, int Delta)
 	return 0;
 }
 
-const FText& USuqsQuestState::GetDescription() const
+FText USuqsQuestState::GetTitle() const
 {
-	switch (Status)
-	{
-	case ESuqsQuestStatus::Incomplete:
-	case ESuqsQuestStatus::Failed: 
-	case ESuqsQuestStatus::Unavailable: 
-	default:
-		return QuestDefinition->DescriptionWhenActive;
-	case ESuqsQuestStatus::Completed:
-		return QuestDefinition->DescriptionWhenCompleted.IsEmpty() ? QuestDefinition->DescriptionWhenActive : QuestDefinition->DescriptionWhenCompleted;
-	}
+	if (bTitleNeedsFormatting)
+		return GetRootProgression()->FormatQuestTitle(GetIdentifier(), QuestDefinition->Title);
+	else
+		return QuestDefinition->Title;
+}
+
+FText USuqsQuestState::GetDescription() const
+{
+	const bool bUseCompleted = (Status == ESuqsQuestStatus::Completed && !QuestDefinition->DescriptionWhenCompleted.IsEmpty());
+
+	if (bUseCompleted)
+		return bCompletedDescriptionNeedsFormatting
+			       ? GetRootProgression()->FormatQuestDescription(GetIdentifier(),
+			                                                      QuestDefinition->DescriptionWhenCompleted)
+			       : QuestDefinition->DescriptionWhenCompleted;
+	else
+		return bActiveDescriptionNeedsFormatting
+			       ? GetRootProgression()->FormatQuestDescription(GetIdentifier(),
+			                                                      QuestDefinition->DescriptionWhenActive)
+			       : QuestDefinition->DescriptionWhenActive;
 }
 
 USuqsObjectiveState* USuqsQuestState::GetCurrentObjective() const

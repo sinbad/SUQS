@@ -702,6 +702,44 @@ bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
 	
 }
 
+void USuqsProgression::AddFormatter(UObject* Fmt)
+{
+	if (IsValid(Fmt) && Fmt->Implements<USuqsTextFormatter>())
+	{
+		Formatters.Add(Fmt);
+	}
+	else
+	{
+		UE_LOG(LogSUQS, Error, TEXT("Formatter passed to AddFormatter is either invalid or doesn't implement ISuqsTextFormatter, ignoring."))
+	}
+}
+
+void USuqsProgression::RemoveFormatter(UObject* Fmt)
+{
+	Formatters.Remove(Fmt);
+}
+
+void USuqsProgression::RemoveAllFormatters()
+{
+	Formatters.Empty();
+}
+
+FText USuqsProgression::FormatQuestTitle(const FName& QuestID, const FText& FormatText)
+{
+}
+
+FText USuqsProgression::FormatQuestDescription(const FName& QuestID, const FText& FormatText)
+{
+}
+
+FText USuqsProgression::FormatTaskTitle(const FName& QuestID, const FName& TaskID, const FText& FormatText)
+{
+}
+
+bool USuqsProgression::GetTextNeedsFormatting(const FText& Text)
+{
+}
+
 void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)
 {
 	// might be worth queuing these up and raising combined?
