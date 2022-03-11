@@ -726,18 +726,50 @@ void USuqsProgression::RemoveAllFormatters()
 
 FText USuqsProgression::FormatQuestTitle(const FName& QuestID, const FText& FormatText)
 {
+	FText OutText;
+	for (auto F : Formatters)
+	{
+		if (ISuqsTextFormatter::Execute_FormatQuestTitle(F, QuestID, FormatText, OutText))
+			return OutText;
+	}
+
+	// No formatter implemented, return the original
+	return FormatText;
 }
 
 FText USuqsProgression::FormatQuestDescription(const FName& QuestID, const FText& FormatText)
 {
+	FText OutText;
+	for (auto F : Formatters)
+	{
+		if (ISuqsTextFormatter::Execute_FormatQuestDescription(F, QuestID, FormatText, OutText))
+			return OutText;
+	}
+
+	// No formatter implemented, return the original
+	return FormatText;
 }
 
 FText USuqsProgression::FormatTaskTitle(const FName& QuestID, const FName& TaskID, const FText& FormatText)
 {
+	FText OutText;
+	for (auto F : Formatters)
+	{
+		if (ISuqsTextFormatter::Execute_FormatTaskTitle(F, QuestID, TaskID, FormatText, OutText))
+			return OutText;
+	}
+
+	// No formatter implemented, return the original
+	return FormatText;
 }
 
 bool USuqsProgression::GetTextNeedsFormatting(const FText& Text)
 {
+	// Determine whether there are any parameters in the text, ordered or named
+	TArray<FString> Params;
+	FText::GetFormatPatternParameters(Text, Params);
+
+	return Params.Num() > 0;
 }
 
 void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)
