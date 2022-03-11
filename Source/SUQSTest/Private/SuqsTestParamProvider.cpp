@@ -2,6 +2,7 @@
 
 void USuqsTestParamProvider::GetQuestParameters_Implementation(const FName& QuestID, USuqsNamedFormatParams* Params)
 {
+	++NumberOfTimesCalled;
 	SetAllParams(Params);
 }
 
@@ -9,6 +10,7 @@ void USuqsTestParamProvider::GetTaskParameters_Implementation(const FName& Quest
 	const FName& TaskID,
 	USuqsNamedFormatParams* Params)
 {
+	++NumberOfTimesCalled;
 	SetAllParams(Params);
 }
 

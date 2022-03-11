@@ -20,6 +20,8 @@ public:
 	int64 Int64Value;
 	float FloatValue;
 	ETextGender GenderValue;
+
+	int NumberOfTimesCalled = 0;
 	
 	virtual void GetQuestParameters_Implementation(const FName& QuestID, USuqsNamedFormatParams* Params) override;
 	virtual void GetTaskParameters_Implementation(const FName& QuestID,

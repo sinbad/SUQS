@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "SuqsProgression.h"
 #include "SuqsTestParamProvider.h"
+#include "TestQuestData.h"
 
 
 #define LOCTEXT_NAMESPACE "TestQuests"
@@ -82,5 +83,40 @@ bool FTestQuestFormatParams::RunTest(const FString& Parameters)
 	TestTrue("Task 3 Title should include params", TaskTitle.EqualTo(
 		LOCTEXT("T2Title", "The number 3.142 is feminine")));
 
+	return true;
+}
+
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestNoParams, "SUQSTest.QuestNoParams",
+								 EAutomationTestFlags::EditorContext |
+								 EAutomationTestFlags::ClientContext |
+								 EAutomationTestFlags::ProductFilter)
+
+bool FTestQuestNoParams::RunTest(const FString& Parameters)
+{
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	Progression->InitWithQuestDataTables(
+		TArray<UDataTable*> {
+			USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson)
+		}
+	);
+
+	auto Provider = NewObject<USuqsTestParamProvider>();
+	
+	Progression->AddParameterProvider(Provider);
+
+	Progression->AcceptQuest("Q_Main1");
+	auto Q = Progression->GetQuest("Q_Main1");
+	Provider->NumberOfTimesCalled = 0;
+	auto TestText = Q->GetTitle();
+	TestEqual("Should not have called parameter provider for quest title because no parameters", Provider->NumberOfTimesCalled, 0);
+	Provider->NumberOfTimesCalled = 0;
+	TestText = Q->GetDescription();
+	TestEqual("Should not have called parameter provider for quest description because no parameters", Provider->NumberOfTimesCalled, 0);
+	Provider->NumberOfTimesCalled = 0;
+	auto T = Q->GetTask("T_ReachThePlace");
+	TestText = T->GetTitle();
+	TestEqual("Should not have called parameter provider for task title because no parameters", Provider->NumberOfTimesCalled, 0);
+	
 	return true;
 }
