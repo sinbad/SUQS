@@ -702,70 +702,77 @@ bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
 	
 }
 
-void USuqsProgression::AddFormatter(UObject* Fmt)
+void USuqsProgression::AddParameterProvider(UObject* Fmt)
 {
-	if (IsValid(Fmt) && Fmt->Implements<USuqsTextFormatter>())
+	if (IsValid(Fmt) && Fmt->Implements<USuqsParameterProvider>())
 	{
-		Formatters.Add(Fmt);
+		ParameterProviders.Add(Fmt);
 	}
 	else
 	{
-		UE_LOG(LogSUQS, Error, TEXT("Formatter passed to AddFormatter is either invalid or doesn't implement ISuqsTextFormatter, ignoring."))
+		UE_LOG(LogSUQS, Error, TEXT("Provider passed to AddFormatter is either invalid or doesn't implement ISuqsParameterProvider, ignoring."))
 	}
 }
 
-void USuqsProgression::RemoveFormatter(UObject* Fmt)
+void USuqsProgression::RemoveParameterProvider(UObject* Fmt)
 {
-	Formatters.Remove(Fmt);
+	ParameterProviders.Remove(Fmt);
 }
 
-void USuqsProgression::RemoveAllFormatters()
+void USuqsProgression::RemoveAllParameterProviders()
 {
-	Formatters.Empty();
+	ParameterProviders.Empty();
 }
 
-FText USuqsProgression::FormatQuestTitle(const FName& QuestID, const FText& FormatText)
+FText USuqsProgression::FormatQuestText(const FName& QuestID, const FText& FormatText)
 {
-	FText OutText;
-	for (auto F : Formatters)
+	if (!IsValid(FormatParams))
+		FormatParams = NewObject<USuqsNamedFormatParams>();
+	else
+		FormatParams->Empty();
+	
+	for (int i = 0; i < ParameterProviders.Num(); ++i)
 	{
-		if (ISuqsTextFormatter::Execute_FormatQuestTitle(F, QuestID, FormatText, OutText))
-			return OutText;
+		auto F = ParameterProviders[i];
+		if (F.IsValid())
+		{
+			ISuqsParameterProvider::Execute_GetQuestParameters(F.Get(), QuestID, FormatParams);
+		}
+		else
+		{
+			// Weak pointer to deleted object, tidy up so these don't accumulate
+			ParameterProviders.RemoveAt(i);
+			--i;
+		}
 	}
 
-	// No formatter implemented, return the original
-	return FormatText;
+	return FormatParams->Format(FormatText);
 }
 
-FText USuqsProgression::FormatQuestDescription(const FName& QuestID, const FText& FormatText)
+FText USuqsProgression::FormatTaskText(const FName& QuestID, const FName& TaskID, const FText& FormatText)
 {
-	FText OutText;
-	for (auto F : Formatters)
+	for (int i = 0; i < ParameterProviders.Num(); ++i)
 	{
-		if (ISuqsTextFormatter::Execute_FormatQuestDescription(F, QuestID, FormatText, OutText))
-			return OutText;
+		auto F = ParameterProviders[i];
+		if (F.IsValid())
+		{
+			ISuqsParameterProvider::Execute_GetTaskParameters(F.Get(), QuestID, TaskID, FormatParams);
+		}
+		else
+		{
+			// Weak pointer to deleted object, tidy up so these don't accumulate
+			ParameterProviders.RemoveAt(i);
+			--i;
+		}
 	}
-
-	// No formatter implemented, return the original
-	return FormatText;
-}
-
-FText USuqsProgression::FormatTaskTitle(const FName& QuestID, const FName& TaskID, const FText& FormatText)
-{
-	FText OutText;
-	for (auto F : Formatters)
-	{
-		if (ISuqsTextFormatter::Execute_FormatTaskTitle(F, QuestID, TaskID, FormatText, OutText))
-			return OutText;
-	}
-
-	// No formatter implemented, return the original
-	return FormatText;
+	
+	return FormatParams->Format(FormatText);
 }
 
 bool USuqsProgression::GetTextNeedsFormatting(const FText& Text)
 {
-	// Determine whether there are any parameters in the text, ordered or named
+	// Determine whether there are any parameters in the text
+	// This picks up both ordered and named, but we don't support ordered for simplicity (and it's generally a bad idea)
 	TArray<FString> Params;
 	FText::GetFormatPatternParameters(Text, Params);
 

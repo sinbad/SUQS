@@ -39,7 +39,7 @@ void USuqsTaskState::Tick(float DeltaTime)
 FText USuqsTaskState::GetTitle() const
 {
 	if (bTitleNeedsFormatting)
-		return GetRootProgression()->FormatTaskTitle(GetParentObjective()->GetParentQuest()->GetIdentifier(),
+		return GetRootProgression()->FormatTaskText(GetParentObjective()->GetParentQuest()->GetIdentifier(),
 													 GetIdentifier(),
 													 TaskDefinition->Title);
 	else

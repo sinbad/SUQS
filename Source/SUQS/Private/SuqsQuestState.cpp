@@ -142,7 +142,7 @@ int USuqsQuestState::ProgressTask(FName TaskID, int Delta)
 FText USuqsQuestState::GetTitle() const
 {
 	if (bTitleNeedsFormatting)
-		return GetRootProgression()->FormatQuestTitle(GetIdentifier(), QuestDefinition->Title);
+		return GetRootProgression()->FormatQuestText(GetIdentifier(), QuestDefinition->Title);
 	else
 		return QuestDefinition->Title;
 }
@@ -153,12 +153,12 @@ FText USuqsQuestState::GetDescription() const
 
 	if (bUseCompleted)
 		return bCompletedDescriptionNeedsFormatting
-			       ? GetRootProgression()->FormatQuestDescription(GetIdentifier(),
+			       ? GetRootProgression()->FormatQuestText(GetIdentifier(),
 			                                                      QuestDefinition->DescriptionWhenCompleted)
 			       : QuestDefinition->DescriptionWhenCompleted;
 	else
 		return bActiveDescriptionNeedsFormatting
-			       ? GetRootProgression()->FormatQuestDescription(GetIdentifier(),
+			       ? GetRootProgression()->FormatQuestText(GetIdentifier(),
 			                                                      QuestDefinition->DescriptionWhenActive)
 			       : QuestDefinition->DescriptionWhenActive;
 }
