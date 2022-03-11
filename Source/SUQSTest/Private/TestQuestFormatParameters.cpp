@@ -27,7 +27,7 @@ const FString QuestsWithParamsJson = R"RAWJSON([
 					},
 					{
 						"Identifier": "T2FloatAndGender",
-						"Title": "NSLOCTEXT(\"TestQuests\", \"TFloatGenderParamsDesc\", \"The number {FloatParam} is {GenderParam}\")"
+						"Title": "NSLOCTEXT(\"TestQuests\", \"TFloatGenderParamsDesc\", \"The number {FloatParam} is {GenderParam}|gender(masculine,feminine)\")"
 					}
 				]
 			}
@@ -55,7 +55,7 @@ bool FTestQuestFormatParams::RunTest(const FString& Parameters)
 	Provider->IntValue = 12345;
 	Provider->Int64Value = -9223372036854775800;
 	Provider->FloatValue = 3.142f;
-	Provider->GenderValue = ETextGender::Neuter;
+	Provider->GenderValue = ETextGender::Feminine;
 	
 	Progression->AddParameterProvider(Provider);
 
@@ -69,8 +69,18 @@ bool FTestQuestFormatParams::RunTest(const FString& Parameters)
 	TestTrue("Quest Description should include params", QuestDesc.EqualTo(
 		LOCTEXT("Q1Desc", "Remember that Steve's favourite number is -9,223,372,036,854,775,800 within 3.142")));
 
-	// TODO: Test Task titles
+	auto T1 = Q1->GetTask("T1Text");
+	FText TaskTitle = T1->GetTitle();
+	TestTrue("Task 1 Title should include params", TaskTitle.EqualTo(
+		LOCTEXT("T1Title", "Go to Steve and Steve")));
+	auto T2 = Q1->GetTask("T2Ints");
+	TaskTitle = T2->GetTitle();
+	TestTrue("Task 2 Title should include params", TaskTitle.EqualTo(
+		LOCTEXT("T2Title", "12,345 to -9,223,372,036,854,775,800")));
+	auto T3 = Q1->GetTask("T2FloatAndGender");
+	TaskTitle = T3->GetTitle();
+	TestTrue("Task 3 Title should include params", TaskTitle.EqualTo(
+		LOCTEXT("T2Title", "The number 3.142 is feminine")));
 
-	// TODO: Test that Provider is NOT called for items without any params
 	return true;
 }
