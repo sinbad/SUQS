@@ -35,6 +35,10 @@ attributes, you can localise this with the NSLOCTEXT macro:
 "Title": "NSLOCTEXT(\"Namespace\", \"Key\", \"Default Text\")",
 ```
 
+Your text can include named variable parameters if you like, see 
+[Parameters](Parameters.md) for more information.
+
+
 ### bMandatory
 
 Whether this task is mandatory or not (default true). If false, this task does 
@@ -109,5 +113,6 @@ using [Waypoints](Waypoints.md).
 
 * [Waypoints](Waypoints.md)
 * [Objectives](Objectives.md)
+* [Text Parameters](Parameters.md)
 * [Quest Progression](Progression.md)
 * [Changing Quest Definitions](ChangingQuestDefinitions.md)

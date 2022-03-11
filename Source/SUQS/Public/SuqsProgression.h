@@ -514,13 +514,13 @@ public:
 	bool QuestDependenciesMet(const FName& QuestID);
 
 	/**
-	 * Add an object which can format quest system text to add parameter values.
-	 * @param Fmt Formatter object; must implement ISuqsTextFormatter
+	 * Add an object which can provide parameter values
+	 * @param Provider An object which implements ISuqsParameterProvider. Will be held by WEAK pointer!
 	 */
 	UFUNCTION(BlueprintCallable)
-	void AddParameterProvider(UObject* Fmt);	
+	void AddParameterProvider(UObject* Provider);	
 	UFUNCTION(BlueprintCallable)
-	void RemoveParameterProvider(UObject* Fmt);	
+	void RemoveParameterProvider(UObject* Provider);	
 	UFUNCTION(BlueprintCallable)
 	void RemoveAllParameterProviders();	
 

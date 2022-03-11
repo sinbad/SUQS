@@ -702,11 +702,11 @@ bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
 	
 }
 
-void USuqsProgression::AddParameterProvider(UObject* Fmt)
+void USuqsProgression::AddParameterProvider(UObject* Provider)
 {
-	if (IsValid(Fmt) && Fmt->Implements<USuqsParameterProvider>())
+	if (IsValid(Provider) && Provider->Implements<USuqsParameterProvider>())
 	{
-		ParameterProviders.Add(Fmt);
+		ParameterProviders.Add(Provider);
 	}
 	else
 	{
@@ -714,9 +714,9 @@ void USuqsProgression::AddParameterProvider(UObject* Fmt)
 	}
 }
 
-void USuqsProgression::RemoveParameterProvider(UObject* Fmt)
+void USuqsProgression::RemoveParameterProvider(UObject* Provider)
 {
-	ParameterProviders.Remove(Fmt);
+	ParameterProviders.Remove(Provider);
 }
 
 void USuqsProgression::RemoveAllParameterProviders()

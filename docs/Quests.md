@@ -224,11 +224,17 @@ you need to ensure it's unique, if it's not you'll end up with the same text as
 the other place you used that key. You can also generate some unique string,
 such as a GUID from your editor.
 
+Your title text can include named variable parameters if you like, see 
+[Parameters](Parameters.md) for more information.
+
 ### Description When Active
 
 This is the description of the quest when it's not completed. Localisable text.
 The description of a quest can change as it progresses by using the description 
 attributes on [Objectives](Objectives.md).
+
+Your description text can include named variable parameters if you like, see 
+[Parameters](Parameters.md) for more information.
 
 ### Description When Completed
 
@@ -297,6 +303,7 @@ The list of [Objectives](Objectives.md) which make up this quest.
 * [Objectives](Objectives.md)
 * [Tasks](Tasks.md)
 * [Quest Progression](Progression.md)
+* [Text Parameters](Parameters.md)
 * [Saving Data](Saving.md)
 * [Changing Quest Definitions](ChangingQuestDefinitions.md)
 
