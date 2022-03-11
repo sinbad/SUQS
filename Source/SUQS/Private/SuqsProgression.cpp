@@ -702,6 +702,83 @@ bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
 	
 }
 
+void USuqsProgression::AddParameterProvider(UObject* Fmt)
+{
+	if (IsValid(Fmt) && Fmt->Implements<USuqsParameterProvider>())
+	{
+		ParameterProviders.Add(Fmt);
+	}
+	else
+	{
+		UE_LOG(LogSUQS, Error, TEXT("Provider passed to AddFormatter is either invalid or doesn't implement ISuqsParameterProvider, ignoring."))
+	}
+}
+
+void USuqsProgression::RemoveParameterProvider(UObject* Fmt)
+{
+	ParameterProviders.Remove(Fmt);
+}
+
+void USuqsProgression::RemoveAllParameterProviders()
+{
+	ParameterProviders.Empty();
+}
+
+FText USuqsProgression::FormatQuestText(const FName& QuestID, const FText& FormatText)
+{
+	if (!IsValid(FormatParams))
+		FormatParams = NewObject<USuqsNamedFormatParams>();
+	else
+		FormatParams->Empty();
+	
+	for (int i = 0; i < ParameterProviders.Num(); ++i)
+	{
+		auto F = ParameterProviders[i];
+		if (F.IsValid())
+		{
+			ISuqsParameterProvider::Execute_GetQuestParameters(F.Get(), QuestID, FormatParams);
+		}
+		else
+		{
+			// Weak pointer to deleted object, tidy up so these don't accumulate
+			ParameterProviders.RemoveAt(i);
+			--i;
+		}
+	}
+
+	return FormatParams->Format(FormatText);
+}
+
+FText USuqsProgression::FormatTaskText(const FName& QuestID, const FName& TaskID, const FText& FormatText)
+{
+	for (int i = 0; i < ParameterProviders.Num(); ++i)
+	{
+		auto F = ParameterProviders[i];
+		if (F.IsValid())
+		{
+			ISuqsParameterProvider::Execute_GetTaskParameters(F.Get(), QuestID, TaskID, FormatParams);
+		}
+		else
+		{
+			// Weak pointer to deleted object, tidy up so these don't accumulate
+			ParameterProviders.RemoveAt(i);
+			--i;
+		}
+	}
+	
+	return FormatParams->Format(FormatText);
+}
+
+bool USuqsProgression::GetTextNeedsFormatting(const FText& Text)
+{
+	// Determine whether there are any parameters in the text
+	// This picks up both ordered and named, but we don't support ordered for simplicity (and it's generally a bad idea)
+	TArray<FString> Params;
+	FText::GetFormatPatternParameters(Text, Params);
+
+	return Params.Num() > 0;
+}
+
 void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)
 {
 	// might be worth queuing these up and raising combined?

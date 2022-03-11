@@ -155,12 +155,20 @@ protected:
 
 	bool bSuppressObjectiveChangeEvent = false;
 
+	// Whether we need to format the text is calculated at startup
+	bool bTitleNeedsFormatting;
+	bool bActiveDescriptionNeedsFormatting;
+	bool bCompletedDescriptionNeedsFormatting;
+
 	void Initialise(const FSuqsQuest* Def, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsQuestStatus NewStatus);
 	void QueueStatusChangeNotification();
 	bool IsResolveBlockedOn(ESuqsResolveBarrierCondition Barrier) const;
 	void MaybeNotifyStatusChange();
+
+	bool TitleNeedsFormatting() const;
+	bool DescriptionNeedsFormatting() const;
 	
 public:
 	ESuqsQuestStatus GetStatus() const { return Status; }
@@ -174,11 +182,11 @@ public:
     const FName& GetIdentifier() const { return QuestDefinition->Identifier; }
 	/// Get the quest title
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-    const FText& GetTitle() const { return QuestDefinition->Title; }
+	FText GetTitle() const;
 	/// Get the current description for this quest (just the top-level description)
 	/// For any additional objective description, see GetCurrentObjective()->GetDescription();
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-    const FText& GetDescription() const;
+	FText GetDescription() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsProgression* GetRootProgression() const { return Progression.Get(); }
 	
