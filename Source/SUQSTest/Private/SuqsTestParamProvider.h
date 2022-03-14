@@ -27,6 +27,4 @@ public:
 		const FName& TaskID,
 		USuqsNamedFormatParams* Params) override;
 
-protected:
-	void SetAllParams(USuqsNamedFormatParams* Params);
 };
