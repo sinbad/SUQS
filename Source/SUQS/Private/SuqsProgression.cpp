@@ -725,34 +725,13 @@ void USuqsProgression::RemoveAllParameterProviders()
 	ParameterProviders.Empty();
 }
 
-FText USuqsProgression::FormatQuestText(const FName& QuestID, const FText& FormatText)
+FText USuqsProgression::FormatQuestOrTaskText(const FName& QuestID, const FName& TaskID, const FText& FormatText)
 {
 	if (!IsValid(FormatParams))
 		FormatParams = NewObject<USuqsNamedFormatParams>();
 	else
 		FormatParams->Empty();
 
-	for (int i = 0; i < ParameterProviders.Num(); ++i)
-	{
-		auto F = ParameterProviders[i];
-		if (F.IsValid())
-		{
-			static FName NoTaskID;
-			ISuqsParameterProvider::Execute_GetQuestParameters(F.Get(), QuestID, NoTaskID, FormatParams);
-		}
-		else
-		{
-			// Weak pointer to deleted object, tidy up so these don't accumulate
-			ParameterProviders.RemoveAt(i);
-			--i;
-		}
-	}
-
-	return FormatParams->Format(FormatText);
-}
-
-FText USuqsProgression::FormatTaskText(const FName& QuestID, const FName& TaskID, const FText& FormatText)
-{
 	for (int i = 0; i < ParameterProviders.Num(); ++i)
 	{
 		auto F = ParameterProviders[i];
@@ -767,8 +746,20 @@ FText USuqsProgression::FormatTaskText(const FName& QuestID, const FName& TaskID
 			--i;
 		}
 	}
-	
+
 	return FormatParams->Format(FormatText);
+}
+
+FText USuqsProgression::FormatQuestText(const FName& QuestID, const FText& FormatText)
+{
+	static FName NoTaskID;
+	return FormatQuestOrTaskText(QuestID, NoTaskID, FormatText);
+
+}
+
+FText USuqsProgression::FormatTaskText(const FName& QuestID, const FName& TaskID, const FText& FormatText)
+{
+	return FormatQuestOrTaskText(QuestID, TaskID, FormatText);
 }
 
 bool USuqsProgression::GetTextNeedsFormatting(const FText& Text)

@@ -194,6 +194,7 @@ protected:
 	void RebuildAllQuestData();
 	bool AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed);
 	static void SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSaveData& Data);
+	FText FormatQuestOrTaskText(const FName& QuestID, const FName& TaskID, const FText& FormatText);
 
 	UFUNCTION()
 	void OnWaypointMoved(USuqsWaypointComponent* Waypoint);
