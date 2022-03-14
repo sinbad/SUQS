@@ -64,19 +64,11 @@ public:
 	/**
 	 * Callback to provide named parameters for a given top-level Quest title or description. This callback will
 	 * only be called if named parameters are needed. 
-	 * @param QuestID The quest ID
+	 * @param QuestID The quest ID; will always be provided
+	 * @param TaskID The task ID: may be None if this is for the root quest, or a task ID if it's for a specific task
 	 * @param Params Use this object to set the named parameters you need
 	 */
 	UFUNCTION(BlueprintNativeEvent)
-	void GetQuestParameters(const FName& QuestID, USuqsNamedFormatParams* Params);
-	/**
-	 * Callback to provide named parameters for a Task title. This callback will
-	 * only be called if named parameters are needed. 
-	 * @param QuestID The quest ID
-	 * @param TaskID The task ID
-	 * @param Params Use this object to set the named parameters you need
-	 */
-	UFUNCTION(BlueprintNativeEvent)
-	void GetTaskParameters(const FName& QuestID, const FName& TaskID, USuqsNamedFormatParams* Params);
+	void GetQuestParameters(const FName& QuestID, const FName& TaskID, USuqsNamedFormatParams* Params);
 	
 };

@@ -730,13 +730,14 @@ FText USuqsProgression::FormatQuestText(const FName& QuestID, const FText& Forma
 		FormatParams = NewObject<USuqsNamedFormatParams>();
 	else
 		FormatParams->Empty();
-	
+
 	for (int i = 0; i < ParameterProviders.Num(); ++i)
 	{
 		auto F = ParameterProviders[i];
 		if (F.IsValid())
 		{
-			ISuqsParameterProvider::Execute_GetQuestParameters(F.Get(), QuestID, FormatParams);
+			static FName NoTaskID;
+			ISuqsParameterProvider::Execute_GetQuestParameters(F.Get(), QuestID, NoTaskID, FormatParams);
 		}
 		else
 		{
@@ -756,7 +757,7 @@ FText USuqsProgression::FormatTaskText(const FName& QuestID, const FName& TaskID
 		auto F = ParameterProviders[i];
 		if (F.IsValid())
 		{
-			ISuqsParameterProvider::Execute_GetTaskParameters(F.Get(), QuestID, TaskID, FormatParams);
+			ISuqsParameterProvider::Execute_GetQuestParameters(F.Get(), QuestID, TaskID, FormatParams);
 		}
 		else
 		{

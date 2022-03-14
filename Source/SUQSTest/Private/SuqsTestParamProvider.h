@@ -23,8 +23,7 @@ public:
 
 	int NumberOfTimesCalled = 0;
 	
-	virtual void GetQuestParameters_Implementation(const FName& QuestID, USuqsNamedFormatParams* Params) override;
-	virtual void GetTaskParameters_Implementation(const FName& QuestID,
+	virtual void GetQuestParameters_Implementation(const FName& QuestID,
 		const FName& TaskID,
 		USuqsNamedFormatParams* Params) override;
 
