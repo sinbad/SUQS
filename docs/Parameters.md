@@ -28,23 +28,27 @@ the state objects on `USuqsProgression`.
 
 ## How Parameters Are Replaced With Values
 
+### Implementing ISuqsParameterProvider
 To provide parameter values, you should implement the `ISuqsParameterProvider`
 interface on one or more of your objects. 
 
-You need to implement one of both of the methods, `GetQuestParameters` and 
-`GetTaskParameters`, used to populate each type respectively. 
-In each case you're given the identifier(s) of the quest
-and task, and a `Params` object which you can populate with values. Here's a 
-simple version in Blueprints:
+The implementation requires a single function, `GetQuestParameters`. 
+You're given the identifier of the quest, and optionally the
+identifier of the task that the text relates to (might be None if it's the
+top-level quest). You also get a `Params` object, which you can populate with 
+values. Here's a simple version in Blueprints:
 
 ![Implement Parameter Provider](img/implementparamprovider.png)
 
-In this case I'm not bothering to check the IDs of the quest/task, unused 
-values are ignored. But if you need to provide different values for different
-quests/tasks and use a single provider to do it all, you can switch on those
-values if you want. 
+In this case I'm not bothering to check the IDs of the quest/task, I'm just setting
+up some parameters. It doesn't actually matter whether the text uses all these
+parameters or not, they're just available if referenced. But, if you need to 
+provide different values for different quests/tasks and use a single provider to
+do it all, you can make parameter setting conditional on Quest/Task ID if you want. 
 
-To actually get these calls, you need to register your provider with the
+### Registering your parameter provider
+
+To actually receive the `GetQuestParameters` call, you need to register your provider with the
 `USuqsProgression` object you use for tracking quest progress (see [Progression](Progression.md)):
 
 ![Add Parameter Provider](img/addparamprovider.png)
