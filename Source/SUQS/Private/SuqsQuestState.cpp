@@ -62,7 +62,10 @@ void USuqsQuestState::Tick(float DeltaTime)
 
 USuqsTaskState* USuqsQuestState::GetTask(const FName& Identifier) const
 {
-	return FastTaskLookup.FindChecked(Identifier);
+	const auto ppT = FastTaskLookup.Find(Identifier);
+	if (ppT)
+		return *ppT;
+	return nullptr;
 }
 
 

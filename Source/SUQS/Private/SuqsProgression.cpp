@@ -12,6 +12,7 @@
 #include "SuqsWaypointSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
+//PRAGMA_DISABLE_OPTIMIZATION
 void USuqsProgression::InitWithQuestDataTables(TArray<UDataTable*> Tables)
 {
 	QuestDataTables = Tables;
@@ -1261,3 +1262,4 @@ void USuqsProgression::OnWaypointEnabledChanged(USuqsWaypointComponent* Waypoint
 		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::WaypointEnabledOrDisabled, Waypoint, Task));
 	}
 }
+//PRAGMA_ENABLE_OPTIMIZATION
