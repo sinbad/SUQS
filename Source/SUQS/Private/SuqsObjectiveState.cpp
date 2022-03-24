@@ -32,6 +32,7 @@ void USuqsObjectiveState::FinishLoad()
 	{
 		T->FinishLoad();
 	}
+	NotifyTaskStatusChanged(nullptr);
 }
 
 void USuqsObjectiveState::Tick(float DeltaTime)

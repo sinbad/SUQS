@@ -160,6 +160,9 @@ protected:
 	bool bActiveDescriptionNeedsFormatting;
 	bool bCompletedDescriptionNeedsFormatting;
 
+	// When loading, we ignore some validation
+	bool bIsLoading = false;
+
 	void Initialise(const FSuqsQuest* Def, USuqsProgression* Root);
 	void Tick(float DeltaTime);
 	void ChangeStatus(ESuqsQuestStatus NewStatus);
@@ -349,5 +352,7 @@ public:
 	// Manually override the barrier data
 	void SetResolveBarrier(const FSuqsResolveBarrierStateData& Barrier);
 	
+	void StartLoad();
 	void FinishLoad();
+	bool IsLoading() const { return bIsLoading; }
 };

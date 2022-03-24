@@ -355,12 +355,20 @@ void USuqsQuestState::SetResolveBarrier(const FSuqsResolveBarrierStateData& Barr
 	MaybeNotifyStatusChange();
 }
 
+void USuqsQuestState::StartLoad()
+{
+	bIsLoading = true;
+}
+
 void USuqsQuestState::FinishLoad()
 {
 	for (auto O : Objectives)
 	{
 		O->FinishLoad();
 	}
+	NotifyObjectiveStatusChanged();
+
+	bIsLoading = false;
 }
 
 void USuqsQuestState::NotifyObjectiveStatusChanged()

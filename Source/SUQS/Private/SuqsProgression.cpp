@@ -1119,6 +1119,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 			auto Q = NewObject<USuqsQuestState>(GetOuter());
 			// This will re-create the quest structure, including objectives and tasks, based on *current* definition
 			Q->Initialise(QDef, this);
+			Q->StartLoad();
 
 			for (FString Branch : QData.ActiveBranches)
 			{

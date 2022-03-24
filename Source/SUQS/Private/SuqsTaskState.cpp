@@ -160,23 +160,26 @@ bool USuqsTaskState::Complete(bool bIgnoreResolveBarriers)
 {
 	if (Status != ESuqsTaskStatus::Completed)
 	{
-		// Check sequencing
-		if (ParentObjective->GetParentQuest()->GetCurrentObjective() != ParentObjective)
+		// Skip validation when loading
+		if (!ParentObjective->GetParentQuest()->IsLoading())
 		{
-			UE_LOG(LogSUQS, Verbose, TEXT("Tried to complete task %s but parent objective %s is not current, ignoring"),
-				*GetIdentifier().ToString(), *ParentObjective->GetIdentifier().ToString())
-			return false;
-		}
-		if (ParentObjective->AreTasksSequential())
-		{
-			// Only allowed if optional or next in sequence
-			if (IsMandatory() && ParentObjective->GetNextMandatoryTask() != this)
+			// Check sequencing
+			if (ParentObjective->GetParentQuest()->GetCurrentObjective() != ParentObjective)
 			{
-				UE_LOG(LogSUQS, Verbose, TEXT("Tried to complete mandatory task %s out of order, ignoring"), *GetIdentifier().ToString())
+				UE_LOG(LogSUQS, Verbose, TEXT("Tried to complete task %s but parent objective %s is not current, ignoring"),
+					*GetIdentifier().ToString(), *ParentObjective->GetIdentifier().ToString())
 				return false;
 			}
-		}
-		
+			if (ParentObjective->AreTasksSequential())
+			{
+				// Only allowed if optional or next in sequence
+				if (IsMandatory() && ParentObjective->GetNextMandatoryTask() != this)
+				{
+					UE_LOG(LogSUQS, Warning, TEXT("Tried to complete mandatory task %s out of order, ignoring"), *GetIdentifier().ToString())
+					return false;
+				}
+			}
+		}		
 		Number = TaskDefinition->TargetNumber;
 		ChangeStatus(ESuqsTaskStatus::Completed, bIgnoreResolveBarriers);
 	}
