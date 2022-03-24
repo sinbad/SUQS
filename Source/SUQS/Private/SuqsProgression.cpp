@@ -707,7 +707,7 @@ void USuqsProgression::AddParameterProvider(UObject* Provider)
 {
 	if (IsValid(Provider) && Provider->Implements<USuqsParameterProvider>())
 	{
-		ParameterProviders.Add(Provider);
+		ParameterProviders.AddUnique(Provider);
 	}
 	else
 	{
