@@ -12,6 +12,8 @@
 #include "SuqsWaypointSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
+#define SuqsCurrentDataVersion 1
+
 //PRAGMA_DISABLE_OPTIMIZATION
 void USuqsProgression::InitWithQuestDataTables(TArray<UDataTable*> Tables)
 {
@@ -1175,6 +1177,7 @@ void USuqsProgression::LoadFromData(const FSuqsSaveData& Data)
 
 void USuqsProgression::SaveToData(FSuqsSaveData& Data) const
 {
+	Data.Version = SuqsCurrentDataVersion;
 	Data.QuestData.Empty();
 	Data.GlobalActiveBranches.Empty();
 	Data.OpenGates.Empty();
