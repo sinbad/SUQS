@@ -73,6 +73,9 @@ public:
     bool AreAllMandatoryTasksRequired() const { return ObjectiveDefinition->NumberOfMandatoryTasksRequired == -1; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     int NumberOfMandatoryTasksRequired() const { return MandatoryTasksNeededToComplete; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetContinueOnFail() { return ObjectiveDefinition->bContinueOnFail; }
+
 	/// Get the additional description to be added to quest description for this objective, if any
 	UFUNCTION(BlueprintCallable, BlueprintPure)
     const FText& GetDescription() const;

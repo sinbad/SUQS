@@ -103,6 +103,11 @@
                   "type": "integer",
                   "default": -1
                 },
+                "bContinueOnFail": {
+                  "description": "Whether to continue the quest even if the objective fails. Default is to fail the quest on objective failure.",
+                  "type": "boolean",
+                  "default": false
+                },
                 "Branch": {
                   "description": "The quest branch this objective is on. If blank, objective is always included. If you specify a branch, this objective will be ignored unless the Quest has that branch enabled.",
                   "type": "string"

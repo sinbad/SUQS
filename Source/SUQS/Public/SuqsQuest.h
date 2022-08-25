@@ -91,6 +91,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
 	int NumberOfMandatoryTasksRequired = -1;
 
+	/// The default behaviour is when an objective fails, it fails the entire quest. Set this to true to allow the
+	/// quest to continue on failure. For example you could make a task "stealth-optional" with this feature, or
+	/// respond to failure by setting a branch active to change where the quest goes.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Objective")
+	bool bContinueOnFail = false;
+
 	/// Quest branch which this objective appears on. To support branching quests, if an objective is assigned
 	/// to a branch, that objective is only active if that quest branch is active. No branches
 	/// are active by default so you have to activate quest branches to activate these objectives.

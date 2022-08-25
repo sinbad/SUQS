@@ -437,3 +437,95 @@ bool FTestDescriptions::RunTest(const FString& Parameters)
 	
 	return true;
 }
+
+
+
+const FString ContinueOnFailJson = R"RAWJSON([
+	{
+		"Identifier": "Q_QuestContinue",
+		"Title": "NSLOCTEXT(\"TestQuests\", \"ContinueOnFailTitle\", \"Quest which continues on objective fail\")",
+		"Objectives": [
+			{
+				"Identifier": "O1",
+				"bContinueOnFail": true,
+				"Tasks": [
+					{
+						"Identifier": "T1",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"TFirstDesc\", \"First task\")"
+					}
+				]
+			},
+			{
+				"Identifier": "O2",
+				"Tasks": [
+					{
+						"Identifier": "T2",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"TSecondDesc\", \"Second task\")"
+					}
+				]
+			}
+		]
+	},
+	{
+		"Identifier": "Q_QuestFail",
+		"Title": "NSLOCTEXT(\"TestQuests\", \"ContinueOnFailTitle\", \"Quest which continues on objective fail\")",
+		"Objectives": [
+			{
+				"Identifier": "O1",
+				"Tasks": [
+					{
+						"Identifier": "T1",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"TFirstDesc\", \"First task\")"
+					}
+				]
+			},
+			{
+				"Identifier": "O2",
+				"Tasks": [
+					{
+						"Identifier": "T2",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"TSecondDesc\", \"Second task\")"
+					}
+				]
+			}
+		]
+	}
+
+])RAWJSON";
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestContinueOnFailObjective, "SUQSTest.ContinueOnFailObjective",
+	EAutomationTestFlags::EditorContext |
+	EAutomationTestFlags::ClientContext |
+	EAutomationTestFlags::ProductFilter)
+
+bool FTestContinueOnFailObjective::RunTest(const FString& Parameters)
+{
+	USuqsProgression* Progression = NewObject<USuqsProgression>();
+	Progression->InitWithQuestDataTables(
+		TArray<UDataTable*> {
+			USuqsProgression::MakeQuestDataTableFromJSON(ContinueOnFailJson)
+		}
+	);
+
+	// Continue case
+	TestTrue("Accept continue quest OK", Progression->AcceptQuest("Q_QuestContinue"));
+	TestFalse("Quest should start incomplete", Progression->IsQuestFailed("Q_QuestContinue"));
+
+	Progression->FailTask("Q_QuestContinue", "T1");
+	TestTrue("Task should be failed", Progression->IsTaskFailed("Q_QuestContinue", "T1"));	
+	TestTrue("Objective should be failed", Progression->IsObjectiveFailed("Q_QuestContinue", "O1"));
+	TestFalse("Quest should not be failed", Progression->IsQuestFailed("Q_QuestContinue"));
+	TestNotNull("Next Objective should be active", Progression->GetCurrentObjective("Q_QuestContinue"));
+
+
+	// Fail case
+	TestTrue("Accept fail quest OK", Progression->AcceptQuest("Q_QuestFail"));
+	TestFalse("Fail Quest should start incomplete", Progression->IsQuestFailed("Q_QuestFail"));
+
+	Progression->FailTask("Q_QuestFail", "T1");
+	TestTrue("Task should be failed", Progression->IsTaskFailed("Q_QuestFail", "T1"));	
+	TestTrue("Objective should be failed", Progression->IsObjectiveFailed("Q_QuestFail", "O1"));
+	TestTrue("Quest should be failed", Progression->IsQuestFailed("Q_QuestFail"));
+
+	return true;	
+}

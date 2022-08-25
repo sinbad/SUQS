@@ -33,16 +33,22 @@ tasks required to complete it. At the simplest level, that means if an objective
 requires all mandatory tasks to be completed (the default), then failing *any* mandatory
 task fails the objective.
 
-When the current objective fails, the quest fails. How you handle that is up to
+When the current objective fails, by default the quest fails. How you handle that is up to
 you; that could be the end of it, or you could have other fallback quests 
 automatically be accepted (see Auto-Accept in [Quests](Quests.md)). Or you could
 reset the quest back to the beginning, or even activate another [quest branch](Branching.md)
 within the same quest.
 
+You can optionally set the `bContinueOnFail` option to `true` on an objective, which means that
+even if the objective fails, this quest is allowed to continue to the next objective.
+This could be used for tasks that are "stealth optional", in order to structure
+the quest better, or you could respond to the failure by setting a Branch on the
+quest, sending it down an alternative path.
+
 
 ## Sequential and Non-sequential Tasks
 
-One option on Objective is whether the mandatory tasks contained within it need to be
+One option on Objective is `bSequentialTasks`; whether the mandatory tasks contained within it need to be
 completed in order (default true). Calls to complete sequential tasks out of order 
 will be ignored. This can let you simplify your world triggers so that they can
 always send the message to complete a task, but it won't actually progress the 

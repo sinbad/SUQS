@@ -381,7 +381,7 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 	// If there is no next objective, then the quest is complete.
 	int PrevObjIndex = CurrentObjectiveIndex;
 	CurrentObjectiveIndex = -1;
-	bool ObjectivesFailed = false;
+	bool FailQuest = false;
 
 	for (int i = 0; i < Objectives.Num(); ++i)
 	{
@@ -398,13 +398,14 @@ void USuqsQuestState::NotifyObjectiveStatusChanged()
 			}
 			else if (Obj->IsFailed())
 			{
-				ObjectivesFailed = true;
+				// Failed objective may fail quest
+				FailQuest = !Obj->GetContinueOnFail();
 			}
 		}
 	}
 
 	// If any unfiltered objectives failed, we lose
-	if (ObjectivesFailed)
+	if (FailQuest)
 		ChangeStatus(ESuqsQuestStatus::Failed);
 	else if (CurrentObjectiveIndex == -1)
 	{
