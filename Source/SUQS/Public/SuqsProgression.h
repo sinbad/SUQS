@@ -138,6 +138,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestFailed, USuqsQuestState*, Qu
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestAccepted, USuqsQuestState*, Quest);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnProgressionLoaded, USuqsProgression*, Progression);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnProgressParameterProvidersChanged, USuqsProgression*, Progression);
 
 // C++ only because of non-const struct
 DECLARE_DELEGATE_TwoParams(FOnPreLoad, USuqsProgression*, FSuqsSaveData&);
@@ -268,11 +269,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnActiveQuestsListChanged OnActiveQuestsListChanged;
 	/// Raised when this progression object has been completely re-initialised via loading
-	/// Note: at this point parameter providers probably won't have been re-attached yet
-	/// So if you use parameter providers, you should probably delay a frame before querying any text to give your
-	/// providers a chance to re-attach
+	/// Note: because of timing issues around parameter providers, you probably also want to subscribe to
+	/// the OnParameterProvidersChanged event as well, since that can change text depending on when you query
 	UPROPERTY(BlueprintAssignable)
 	FOnProgressionLoaded OnProgressionLoaded;
+	/// Raised when the set of parameter providers is changed, which can affect text substitution
+	UPROPERTY(BlueprintAssignable)
+	FOnProgressParameterProvidersChanged OnParameterProvidersChanged;
 
 	/// Use this from C++ to receive access to the loaded quest data before it's applied to this progression
 	/// You can therefore change the quest data if you need to adapt it due to quest changes

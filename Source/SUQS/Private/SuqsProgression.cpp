@@ -709,7 +709,13 @@ void USuqsProgression::AddParameterProvider(UObject* Provider)
 {
 	if (IsValid(Provider) && Provider->Implements<USuqsParameterProvider>())
 	{
-		ParameterProviders.AddUnique(Provider);
+		const int PrevNum = ParameterProviders.Num();
+		const int NewIdx = ParameterProviders.AddUnique(Provider);
+		if (NewIdx >= PrevNum)
+		{
+			// This might cause active tasks to change their text
+			OnParameterProvidersChanged.Broadcast(this);
+		}
 	}
 	else
 	{
