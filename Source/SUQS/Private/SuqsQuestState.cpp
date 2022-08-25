@@ -368,6 +368,9 @@ void USuqsQuestState::FinishLoad()
 	}
 	NotifyObjectiveStatusChanged();
 
+	// Also need to determine if the title needs formatting, since Initialise() is not called
+	bTitleNeedsFormatting = USuqsProgression::GetTextNeedsFormatting(QuestDefinition->Title); 
+
 	bIsLoading = false;
 }
 

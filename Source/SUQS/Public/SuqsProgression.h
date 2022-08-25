@@ -268,6 +268,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnActiveQuestsListChanged OnActiveQuestsListChanged;
 	/// Raised when this progression object has been completely re-initialised via loading
+	/// Note: at this point parameter providers probably won't have been re-attached yet
+	/// So if you use parameter providers, you should probably delay a frame before querying any text to give your
+	/// providers a chance to re-attach
 	UPROPERTY(BlueprintAssignable)
 	FOnProgressionLoaded OnProgressionLoaded;
 

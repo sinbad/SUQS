@@ -316,4 +316,7 @@ void USuqsTaskState::FinishLoad()
 			}
 		}
 	}
+
+	// Also need to determine if the title needs formatting, since Initialise() is not called
+	bTitleNeedsFormatting = USuqsProgression::GetTextNeedsFormatting(TaskDefinition->Title); 
 }
