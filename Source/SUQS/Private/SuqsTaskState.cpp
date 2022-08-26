@@ -146,8 +146,8 @@ void USuqsTaskState::MaybeNotifyParentStatusChange()
 	
 	if (bCleared)
 	{
-		ParentObjective->NotifyTaskStatusChanged(this);
 		ResolveBarrier.bPending = false;
+		ParentObjective->NotifyTaskStatusChanged(this);
 	}
 }
 

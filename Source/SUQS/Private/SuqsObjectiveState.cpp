@@ -32,6 +32,7 @@ void USuqsObjectiveState::FinishLoad()
 	{
 		T->FinishLoad();
 	}
+	
 	NotifyTaskStatusChanged(nullptr);
 }
 
@@ -169,7 +170,8 @@ void USuqsObjectiveState::NotifyTaskStatusChanged(const USuqsTaskState* ChangedT
 			switch(Task->Status)
 			{
 			case ESuqsTaskStatus::Completed:
-				++MandatoryTasksComplete;
+				if (!Task->GetResolveBarrier().bPending)
+					++MandatoryTasksComplete;
 				if (Task->IsHiddenOnCompleteOrFail())
 					Task->bHidden = true;
 				break;
