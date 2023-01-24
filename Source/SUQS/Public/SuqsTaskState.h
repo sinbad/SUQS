@@ -87,6 +87,9 @@ public:
 	/// The target number of things to be achieved
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetTargetNumber() const { return TaskDefinition->TargetNumber; }
+	/// Return whether or not this task has a number of things to achieve rather than just 1 discrete completion
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HasTargetNumber() const { return GetTargetNumber() > 1; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsObjectiveState* GetParentObjective() const { return ParentObjective.Get(); }
