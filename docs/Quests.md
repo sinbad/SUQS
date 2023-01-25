@@ -194,7 +194,7 @@ const FName Q_MainQuest("Q_MainQuest");
 Progression->AcceptQuest(Q_MainQuest);
 ```
 
-In Blueprints UE4 uses FNames optimally for you. But, it can still be useful to 
+In Blueprints Unreal uses FNames optimally for you. But, it can still be useful to 
 predefine the names somewhere, so that if you rename something it's easier to fix
 everywhere.
 

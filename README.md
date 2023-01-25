@@ -2,10 +2,10 @@
 
 ## What Is It?
 
-SUQS is a simple, data-driven quest system for UE4. It helps you define quest structures for your game, 
+SUQS is a simple, data-driven quest system for Unreal Engine. It helps you define quest structures for your game, 
 and track progress against those quests for a player in a simple way. 
 
-All quests are defined in static asset datatables, which can either be edited directly in UE4, or written
+All quests are defined in static asset datatables, which can either be edited directly in UE, or written
 as JSON - a schema is provided to provide handy autocomplete and validation in most editors 
 (see [Editor Setup](docs/EditorSetup.md)).
 
@@ -79,7 +79,7 @@ That doesn't mean you can't have branching quests. Branching within a quest is s
 are predefined in the data), and also quests can be dependent on each other's success or failure. 
 
 
-While you can edit quest data tables in the UE4 editor, let's see a JSON example 
+While you can edit quest data tables in the UE5 editor, let's see a JSON example 
 because it's the easiest to see easily. You can configure your editor to
 provide auto-complete and documentation, see [Editor Setup](docs/EditorSetup.md). 
 There are lots of optional features, so here is the simplest possible quest:
