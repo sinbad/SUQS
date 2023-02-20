@@ -46,7 +46,7 @@ struct FSuqsResolveBarrier
 	GENERATED_BODY()
 
 	/// Bitflags identifying the conditional barriers to progression
-	UPROPERTY(BlueprintReadOnly, meta = (Bitmask, BitmaskEnum = ESuqsProgressionBarrierCondition))
+	UPROPERTY(BlueprintReadOnly, meta = (Bitmask, BitmaskEnum = "/Script/SUQS.ESuqsResolveBarrierCondition"))
 	int32 Conditions;
 
 	/// The time remaining if the barrier includes time
