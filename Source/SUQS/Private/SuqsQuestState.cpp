@@ -473,7 +473,7 @@ void USuqsQuestState::ChangeStatus(ESuqsQuestStatus NewStatus)
 		case ESuqsQuestStatus::Completed: 
 			Progression->RaiseQuestCompleted(this);
 			break;
-		case ESuqsObjectiveStatus::Failed:
+		case ESuqsQuestStatus::Failed:
 			Progression->RaiseQuestFailed(this);
 			break;
 		case ESuqsQuestStatus::Incomplete:
