@@ -5,7 +5,7 @@
 #include "CallbackCatcher.h"
 #include "SuqsTaskState.h"
 
-PRAGMA_DISABLE_OPTIMIZATION
+UE_DISABLE_OPTIMIZATION_SHIP
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTopLevelEvents, "SUQSTest.QuestTopLevelEvents",
                                  EAutomationTestFlags::EditorContext |
@@ -615,4 +615,4 @@ bool FTestQuestDetailEvents::RunTest(const FString& Parameters)
 	return true;
 }
 
-PRAGMA_ENABLE_OPTIMIZATION
+UE_ENABLE_OPTIMIZATION_SHIP
