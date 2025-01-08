@@ -4,7 +4,7 @@
 #include "Components/WidgetComponent.h"
 
 
-ASuqsWaypointActor::ASuqsWaypointActor()
+ASuqsWaypointActorBase::ASuqsWaypointActorBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -13,29 +13,37 @@ ASuqsWaypointActor::ASuqsWaypointActor()
 	WaypointComponent = CreateDefaultSubobject<USuqsWaypointComponent>("WaypointComponent");
 	WaypointComponent->AttachToComponent(Root, FAttachmentTransformRules::KeepRelativeTransform);
 
-	VisualWidget = CreateDefaultSubobject<UWidgetComponent>("Visual");
-	VisualWidget->AttachToComponent(Root, FAttachmentTransformRules::KeepRelativeTransform);
-
-	WaypointComponent->OnWaypointEnabledChanged.AddDynamic(this, &ASuqsWaypointActor::OnWaypointVisibilityPotentiallyChanged);
-	WaypointComponent->OnWaypointIsCurrentChanged.AddDynamic(this, &ASuqsWaypointActor::OnWaypointVisibilityPotentiallyChanged);
+	WaypointComponent->OnWaypointEnabledChanged.AddDynamic(
+		this, &ASuqsWaypointActorBase::OnWaypointVisibilityPotentiallyChanged);
+	WaypointComponent->OnWaypointIsCurrentChanged.AddDynamic(
+		this, &ASuqsWaypointActorBase::OnWaypointVisibilityPotentiallyChanged);
 }
 
-void ASuqsWaypointActor::BeginPlay()
+void ASuqsWaypointActorBase::BeginPlay()
 {
 	Super::BeginPlay();
 
 	UpdateWaypointVisibility();
-	
 }
 
-void ASuqsWaypointActor::OnWaypointVisibilityPotentiallyChanged(USuqsWaypointComponent* Waypoint)
+void ASuqsWaypointActorBase::OnWaypointVisibilityPotentiallyChanged(USuqsWaypointComponent* Waypoint)
 {
 	UpdateWaypointVisibility();
 }
 
-void ASuqsWaypointActor::UpdateWaypointVisibility() const
+void ASuqsWaypointActorBase::UpdateWaypointVisibility() const
 {
 	const bool bVisible = WaypointComponent->IsEnabled() && WaypointComponent->IsCurrent();
-	VisualWidget->SetVisibility(bVisible);
+	UpdateWaypointWidget(bVisible);
 }
 
+ASuqsWaypointActor::ASuqsWaypointActor()
+{
+	VisualWidget = CreateDefaultSubobject<UWidgetComponent>("Visual");
+	VisualWidget->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+}
+
+void ASuqsWaypointActor::UpdateWaypointWidget_Implementation(bool bVisible) const
+{
+	VisualWidget->SetVisibility(bVisible);
+}
