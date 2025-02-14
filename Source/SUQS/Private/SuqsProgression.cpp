@@ -1016,28 +1016,24 @@ FSuqsResolveBarrier USuqsProgression::GetResolveBarrierForQuest(const FSuqsQuest
 {
 	FSuqsResolveBarrier Barrier;
 
-	if (Status == ESuqsQuestStatus::Completed ||
-		Status == ESuqsQuestStatus::Failed)
+	if (DefaultQuestResolveTimeDelay > 0)
 	{
-		if (DefaultQuestResolveTimeDelay > 0)
-		{
-			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
-			Barrier.TimeRemaining = DefaultQuestResolveTimeDelay;
-		}
-		if (Quest->ResolveDelay >= 0) // >= because default is -1, so that 0 can override >0 default
-		{
-			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
-			Barrier.TimeRemaining = Quest->ResolveDelay;
-		}
-		if (!Quest->ResolveGate.IsNone())
-		{
-			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
-			Barrier.Gate = Quest->ResolveGate;
-		}
-		if (!Quest->bResolveAutomatically)
-		{
-			Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Explicit);
-		}
+		Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+		Barrier.TimeRemaining = DefaultQuestResolveTimeDelay;
+	}
+	if (Quest->ResolveDelay >= 0) // >= because default is -1, so that 0 can override >0 default
+	{
+		Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Time);
+		Barrier.TimeRemaining = Quest->ResolveDelay;
+	}
+	if (!Quest->ResolveGate.IsNone())
+	{
+		Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Gate);
+		Barrier.Gate = Quest->ResolveGate;
+	}
+	if (!Quest->bResolveAutomatically)
+	{
+		Barrier.Conditions |= static_cast<int>(ESuqsResolveBarrierCondition::Explicit);
 	}
 
 	// Always pending, even if no condition, since need to raise event once
