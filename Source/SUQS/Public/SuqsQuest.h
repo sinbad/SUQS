@@ -177,7 +177,7 @@ public:
 	/// If true (default), after this quest is completed / failed, the knock-on effects such as activating a dependent quest,
 	/// removing this from the active quests, will happen automatically. If set to false, the knock-on effects will only
 	/// happen when explicitly requested via ResolveQuest
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Quest")
 	bool bResolveAutomatically = true;
 	
 	/// An optional time delay so that after this quest is completed / failed, this much time must pass before the
