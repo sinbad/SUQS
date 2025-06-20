@@ -222,6 +222,12 @@ public:
 	UFUNCTION(BlueprintCallable)
     void InitWithQuestDataTablesInPaths(const TArray<FString>& Paths);
 
+	/// Get a copy of a Quest Definition. This is mostly so that you can modify it and register it
+	/// as a new runtime quest
+	UFUNCTION(BlueprintCallable)
+	FSuqsQuest GetQuestDefinitionCopy(FName QuestID);
+
+
 	/**
 	 * Change the default time delays between completing / failing a quest item, and the knock-on effects of that
 	 * (the next task/objective/quest being activated).

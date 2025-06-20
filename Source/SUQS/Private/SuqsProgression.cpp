@@ -49,6 +49,17 @@ void USuqsProgression::InitWithQuestDataTablesInPaths(const TArray<FString>& Pat
 	InitWithQuestDataTables(DataTables);
 }
 
+FSuqsQuest USuqsProgression::GetQuestDefinitionCopy(FName QuestID)
+{
+	auto QDef = QuestDefinitions.Find(QuestID);
+	if (QDef)
+	{
+		return *QDef;
+	}
+
+	return FSuqsQuest();
+}
+
 void USuqsProgression::SetDefaultProgressionTimeDelays(float QuestDelay, float TaskDelay)
 {
 	DefaultQuestResolveTimeDelay = QuestDelay;
