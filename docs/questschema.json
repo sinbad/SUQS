@@ -143,6 +143,11 @@
                           "type": "number",
                           "default": 0
                         },
+                        "TimeLimitCompleteOnExpiry": {
+                          "description": "If TimeLimit is > 0, whether the task auto-completes on expiry, or fails (default)",
+                          "type": "boolean",
+                          "default": false
+                        },
                         "bResolveAutomatically": {
                           "description": "Whether to resolve the outcomes of completion / failure automatically (default true) or to require explicit ResolveTask call.",
                           "type": "boolean",

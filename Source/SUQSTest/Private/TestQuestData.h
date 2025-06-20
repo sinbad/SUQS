@@ -599,10 +599,11 @@ const FString TimeLimitQuestJson = R"RAWJSON([
 					},
 					{
 						"Identifier": "T_SecondTimeLimited",
-						"Title": "NSLOCTEXT(\"TestQuests\", \"TTimeLimited\", \"This is time limited\")",
+						"Title": "NSLOCTEXT(\"TestQuests\", \"TTimeLimited\", \"This is time limited and auto-completes\")",
 						"bMandatory": true,
 						"TargetNumber": 1,
-						"TimeLimit": 50
+						"TimeLimit": 50,
+						"TimeLimitCompleteOnExpiry": true
 					},
 					{
 						"Identifier": "T_NonTimeLimited2",

@@ -58,7 +58,14 @@ void USuqsTaskState::SetTimeRemaining(float T)
 		if (TimeRemaining <= 0)
 		{
 			TimeRemaining = 0;
-			Fail();
+			if (TaskDefinition->TimeLimitCompleteOnExpiry)
+			{
+				Complete();
+			}
+			else
+			{
+				Fail();
+			}
 		}
 	}	
 }

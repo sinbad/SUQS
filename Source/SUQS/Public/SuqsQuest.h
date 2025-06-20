@@ -31,9 +31,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	int TargetNumber = 1;
 
-	/// An optional time limit for the task. Once a task is started, it will be auto-failed if this time limit expires
+	/// An optional time limit for the task. Once a task is started, it will be auto-closed if this time limit expires.
+	/// By default tasks fail on time limit expiry, but if you set TimeLimitCompleteOnExpiry=true then the task completes on timeout
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
 	float TimeLimit = 0;
+
+	/// If this task has a TimeLimit, whether the time expiring means completion rather than failure.
+	/// Useful for "wait for something" tasks that aren't handled externally
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Task")
+	bool TimeLimitCompleteOnExpiry = false;
 
 	/// If true (default), after this task is completed / failed, the knock-on effects such as activating the next task etc
 	/// will happen automatically. If set to false, the knock-on effects will only happen when explicitly requested

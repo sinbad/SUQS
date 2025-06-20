@@ -40,12 +40,12 @@ bool FTestQuestTimeLimitSimple::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitNotFirstTask, "SUQSTest.QuestTimeLimitNotFirstTask",
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestQuestTimeLimitNotFirstTaskCompleteOnExpiry, "SUQSTest.QuestTimeLimitNotFirstTaskCompleteOnExpiry",
                                  EAutomationTestFlags::EditorContext |
                                  EAutomationTestFlags::ClientContext |
                                  EAutomationTestFlags::ProductFilter)
 
-bool FTestQuestTimeLimitNotFirstTask::RunTest(const FString& Parameters)
+bool FTestQuestTimeLimitNotFirstTaskCompleteOnExpiry::RunTest(const FString& Parameters)
 {
 	USuqsProgression* Progression = NewObject<USuqsProgression>();
 	Progression->InitWithQuestDataTables(
@@ -73,8 +73,9 @@ bool FTestQuestTimeLimitNotFirstTask::RunTest(const FString& Parameters)
 	TestTrue("Second task should be reducing time limit now", T->GetTimeRemaining() < (OrigTimeLeft - 9.9));
 	TestFalse("Quest should not be failed yet", Progression->IsQuestFailed("Q_TimeLimits"));
 	Progression->Tick(50); // Total 60 now
-	TestEqual("Second task should bhave run out of time", T->GetTimeRemaining(), 0.f);
-	TestTrue("Quest should have failed now", Progression->IsQuestFailed("Q_TimeLimits"));
+	TestEqual("Second task should have run out of time", T->GetTimeRemaining(), 0.f);
+	TestTrue("Quest should have completed now", Progression->IsTaskCompleted("Q_TimeLimits", "T_SecondTimeLimited"));
+	TestFalse("Quest should not have failed due to timeout", Progression->IsQuestFailed("Q_TimeLimits"));
 
 	// Reset so we can test having completed within time limit
 	T->Reset();
@@ -83,7 +84,7 @@ bool FTestQuestTimeLimitNotFirstTask::RunTest(const FString& Parameters)
 	Progression->Tick(15); // Tick a little within limit
 	float TimeRemainingAtCompletion = T->GetTimeRemaining();
 	TestEqual("Time remaining should be correct", TimeRemainingAtCompletion, T->GetTimeLimit() - 15);
-	// Complete the tiem limited task
+	// Complete the time limited task
 	T->Complete();
 	// Same objective should still be active, but now moved on to last task
 	// now tick again, and make sure this didn't affect the completed task
