@@ -140,6 +140,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Quest")
 	FName Identifier;
 
+	/// Optional list of labels to associate with the quest. Could be used for categorisation etc 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Quest")
+	TArray<FName> Labels;
+
 	/// Whether this quest is intended for the player to see, or whether it's just an internal state tracker
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Quest")
 	bool bPlayerVisible = true;

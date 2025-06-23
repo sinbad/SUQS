@@ -62,12 +62,16 @@ the task, which automatically completes when it hits this target number.
 ### Time Limit
 
 Use this to set time limits on tasks. The timer ticks automatically, and if it
-expires the task will be automatically failed. 
+expires the task will be automatically failed by default, or possibly completed. 
 
 The timer starts as soon as the Task becomes available to complete. For sequential
 tasks, this will be when the task becomes the next in the list, or for non-sequential
 tasks it will be when the parent Objective becomes current. You can reset the
 timer by resetting the task.
+
+### Time Limit Complete On Expiry
+
+If true, when the Time Limit expires the task will be completed instead of failed.
 
 ### Resolve Automatically
 

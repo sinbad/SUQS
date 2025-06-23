@@ -198,6 +198,12 @@ In Blueprints Unreal uses FNames optimally for you. But, it can still be useful 
 predefine the names somewhere, so that if you rename something it's easier to fix
 everywhere.
 
+### Labels
+
+Optionally you can provide a list of labels for a quest. These are only for your use,
+SUQS doesn't do anything with them. You might want to use Labels if you want
+to categorise the quests in your system.
+
 ### Player Visible
 
 This is a hint to any quest UI that this quest should or should not be displayed

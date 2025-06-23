@@ -12,6 +12,13 @@
           "description": "Identifier of this quest. Required. Must be globally unique across all quests in all data files",
           "type": "string"
         },
+        "Labels": {
+          "description": "Optional list of labels to associate with the quest. Could be used for categorisation etc",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "bPlayerVisible": {
           "description": "Whether it's suggested to display this quest to players, or whether it's for internal tracking only.",
           "type": "boolean",
