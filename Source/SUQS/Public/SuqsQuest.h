@@ -23,7 +23,7 @@ public:
 
 	/// Whether this task is mandatory to complete the objective
 	/// NOTE: Non-mandatory objectives are always available even in sequential task lists (they are out of sequence)
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Objective")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Task")
 	bool bMandatory = true;
 
 
