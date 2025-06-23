@@ -151,6 +151,16 @@ FText USuqsQuestState::GetTitle() const
 		return QuestDefinition->Title;
 }
 
+const TArray<FName>& USuqsQuestState::GetLabels() const
+{
+	return QuestDefinition->Labels;
+}
+
+bool USuqsQuestState::IsPlayerVisible() const
+{
+	return QuestDefinition->bPlayerVisible;
+}
+
 FText USuqsQuestState::GetDescription() const
 {
 	const bool bUseCompleted = (Status == ESuqsQuestStatus::Completed && !QuestDefinition->DescriptionWhenCompleted.IsEmpty());
