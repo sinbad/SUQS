@@ -15,7 +15,7 @@ the aim and structure of the quest is the same but the details are variable.
 
 ## Definitions vs Progression Text
 
-Quest definitions are static, so whenever you retrieve the title or description
+Quest definitions are mostly static, so whenever you retrieve the title or description
 directly from the definitions, the parameters will still be as written in the
 original definition, e.g. `{ItemName}`.
 

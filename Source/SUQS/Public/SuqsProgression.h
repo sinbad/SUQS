@@ -193,6 +193,7 @@ protected:
 	USuqsTaskState* FindTaskStatus(const FName& QuestID, const FName& TaskID);
 
 	void RebuildAllQuestData();
+	void AddQuestDefinitionInternal(const FSuqsQuest& Quest);
 	bool AutoAcceptQuests(const FName& FinishedQuestID, bool bFailed);
 	static void SaveToData(TMap<FName, USuqsQuestState*> Quests, FSuqsSaveData& Data);
 	FText FormatQuestOrTaskText(const FName& QuestID, const FName& TaskID, const FText& FormatText);
@@ -222,6 +223,34 @@ public:
 	UFUNCTION(BlueprintCallable)
     void InitWithQuestDataTablesInPaths(const TArray<FString>& Paths);
 
+	/// Get a copy of a Quest Definition. This is mostly so that you can modify it and register it
+	/// as a new runtime quest
+	UFUNCTION(BlueprintCallable)
+	FSuqsQuest GetQuestDefinitionCopy(FName QuestID);
+
+	
+	/**
+	 * Create a new runtime created quest to the system. 
+	 * @param NewQuest The new quest to add. This will be copied into the quest database. 
+	 * @param bOverwriteIfExists If a quest with this ID already exists, overwrite it if this is true.
+	 * Otherwise, report an error and do nothing.
+	 * @return Whether the quest was added
+	 * @note If you overwrite an existing quest, stored progression against it will be reset.
+	 * @note Quest definitions added at runtime will be lost by calling any of the Init..() functions, or by
+	 * forcing a quest system rebuild with the optional parameter to GetQuestDefinitions
+	 */
+	UFUNCTION(BlueprintCallable)
+	bool CreateQuestDefinition(const FSuqsQuest& NewQuest, bool bOverwriteIfExists = false);
+
+	/**
+	 * Delete an existing quest definition from the system
+	 * @param QuestID The identifier of the quest
+	 * @return Whether the quest was removed
+	 * @note Removing a quest definition will erase any progress against it
+	 */
+	UFUNCTION(BlueprintCallable)
+	bool DeleteQuestDefinition(FName QuestID);
+	
 	/**
 	 * Change the default time delays between completing / failing a quest item, and the knock-on effects of that
 	 * (the next task/objective/quest being activated).
