@@ -1,6 +1,6 @@
 # Branching Quests
 
-Although quests are entirely statically defined, that doesn't mean that every
+Although quests are mostly statically defined, that doesn't mean that every
 player has to follow the same route through a quest. 
 
 [Objectives](Objectives.md) represent the sequential path through the quest, 

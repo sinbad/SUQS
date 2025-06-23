@@ -5,7 +5,7 @@
 SUQS is a simple, data-driven quest system for Unreal Engine. It helps you define quest structures for your game, 
 and track progress against those quests for a player in a simple way. 
 
-All quests are defined in static asset datatables, which can either be edited directly in UE, or written
+Quests are mainly defined in static asset datatables, which can either be edited directly in UE, or written
 as JSON - a schema is provided to provide handy autocomplete and validation in most editors 
 (see [Editor Setup](docs/EditorSetup.md)).
 
@@ -71,13 +71,15 @@ Studio Project Files".
 
 ### Defining Quests
 
-Quests are static data tables stored in assets. They can't be altered dynamically, and this is deliberate;
-not only does it keep the implementation simpler, it means you always have a single source of truth for
-your quest structure.
+Quests are mainly data tables stored in assets. They shouldn't really be altered dynamically,
+because you're tracking progress against them and saving that data so it probably shouldn't be altered 
+after the fact. 
 
-That doesn't mean you can't have branching quests. Branching within a quest is supported (the branches
-are predefined in the data), and also quests can be dependent on each other's success or failure. 
+> However, you can add and remove quests at runtime if you wish, this can be useful for games with procedural
+> missions where the quests are temporary and don't need to be kept forever.
 
+Static quest data doesn't mean you can't have branching quests. Branching within a quest is supported (the branches
+are predefined in the data), and also quests can be dependent on each other's success or failure.
 
 While you can edit quest data tables in the UE5 editor, let's see a JSON example 
 because it's the easiest to see easily. You can configure your editor to
@@ -117,7 +119,7 @@ More details on the specifics can be found in [Quests](docs/Quests.md).
 
 ### Quest Progression
 
-Quest definitions are static, but of course your players will progress through
+Quest definitions are mostly static, but of course your players will progress through
 them over time. The main object you'll interact with in SUQS is `USuqsProgression`,
 which tracks this, and holds the quest definition library as well. 
 
