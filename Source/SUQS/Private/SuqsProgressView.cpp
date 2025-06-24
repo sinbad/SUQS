@@ -100,7 +100,7 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 				bAnyChanges = true;
 				
 			}
-			else if (PrevQ->IsModifiedIgnoreStatus(NewQ))
+			else if (PrevQ->IsModified(NewQ))
 			{
 				auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
 				Entry.Category = ESuqsProgressViewDiffCategory::Quest;
@@ -137,7 +137,7 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 						bAnyChanges = true;
 				
 					}
-					else if (PrevT->IsModifiedIgnoreStatus(NewT))
+					else if (PrevT->IsModified(NewT))
 					{
 						auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
 						Entry.Category = ESuqsProgressViewDiffCategory::Task;

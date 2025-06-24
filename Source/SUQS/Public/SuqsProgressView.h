@@ -50,10 +50,11 @@ struct SUQS_API FSuqsTaskStateView
 	FSuqsTaskStateView();
 	void FromUObject(USuqsTaskState* State);
 
-	bool IsModifiedIgnoreStatus(const FSuqsTaskStateView& Rhs) const
+	bool IsModified(const FSuqsTaskStateView& Rhs) const
 	{
-		// Only compare things that can change at runtime, and not status
-		return 
+		// Only compare things that can change at runtime
+		return
+			Status != Rhs.Status ||
 			CompletedNumber != Rhs.CompletedNumber ||
 			TimeRemaining != Rhs.TimeRemaining ||
 			bHidden != Rhs.bHidden;
@@ -106,10 +107,11 @@ struct SUQS_API FSuqsQuestStateView
 	FSuqsQuestStateView();
 	void FromUObject(USuqsQuestState* State);
 	
-	bool IsModifiedIgnoreStatus(const FSuqsQuestStateView& Rhs) const
+	bool IsModified(const FSuqsQuestStateView& Rhs) const
 	{
-		// Only compare things that can change at runtime, and not status
-		return 
+		// Only compare things that can change at runtime
+		return
+			Status != Rhs.Status ||
 			Description.CompareTo(Rhs.Description) != 0 ||
 			CurrentObjectiveIdentifier != Rhs.CurrentObjectiveIdentifier ||
 			CurrentObjectiveDescription.CompareTo(Rhs.CurrentObjectiveDescription) != 0;
