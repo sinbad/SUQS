@@ -31,16 +31,25 @@ void FSuqsQuestStateView::FromUObject(USuqsQuestState* State)
 	Title = State->GetTitle();
 
 	Description = State->GetDescription();
-	CurrentObjectiveIdentifier = State->GetCurrentObjective()->GetIdentifier();
-	CurrentObjectiveDescription = State->GetCurrentObjective()->GetDescription();
-
-	auto& Tasks = State->GetCurrentObjective()->GetTasks();
-	CurrentTasks.Reset(Tasks.Num());
-	for (USuqsTaskState* TaskState : Tasks)
+	if (State->GetCurrentObjective())
 	{
-		auto& Task = CurrentTasks.AddDefaulted_GetRef();
-		Task.FromUObject(TaskState);
+		CurrentObjectiveIdentifier = State->GetCurrentObjective()->GetIdentifier();
+		CurrentObjectiveDescription = State->GetCurrentObjective()->GetDescription();
+		auto& Tasks = State->GetCurrentObjective()->GetTasks();
+		CurrentTasks.Reset(Tasks.Num());
+		for (USuqsTaskState* TaskState : Tasks)
+		{
+			auto& Task = CurrentTasks.AddDefaulted_GetRef();
+			Task.FromUObject(TaskState);
+		}
 	}
+	else
+	{
+		CurrentObjectiveIdentifier = NAME_None;
+		CurrentObjectiveDescription = FText::GetEmpty();
+		CurrentTasks.Reset(0);
+	}
+
 }
 
 FSuqsProgressView::FSuqsProgressView()
