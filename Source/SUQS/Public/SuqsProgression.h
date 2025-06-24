@@ -150,6 +150,9 @@ class USuqsWaypointComponent;
  * Add this somewhere that's useful to you, e.g. your PlayerState or GameInstance.
  * And of course, you'll want to include it in your save games.
  * You MUST only ever have one instance of this in your game.
+ * NOTE: in multiplayer games it is not advisable to build your UI around this class directly. Only
+ * use it directly on the server to change state, and use it via USuqsGameStateComponent. On
+ * clients and server, use the FSuqsProgressView to drive your UI instead, which will work everywhere.
  */
 UCLASS(BlueprintType, Blueprintable)
 class SUQS_API USuqsProgression : public UObject, public FTickableGameObject

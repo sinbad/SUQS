@@ -89,7 +89,7 @@
                   "type": "string"
                 },
                 "Title": {
-                  "description": "Player-viaible title for the objective. Can be blank if you only have one task or do not wish to display this level",
+                  "description": "Player-viable title for the objective. Can be blank if you only have one task or do not wish to display this level",
                   "type": "string"
                 },
                 "DescriptionWhenActive": {
