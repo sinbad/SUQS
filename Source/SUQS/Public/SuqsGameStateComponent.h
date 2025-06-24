@@ -26,6 +26,8 @@ protected:
 	UPROPERTY()
 	USuqsProgression* ServerProgression = nullptr;
 
+	bool bServerPendingChanges = false;
+
 	/// View on the current progress state, available everywhere
 	UPROPERTY(ReplicatedUsing=OnRep_Progress)
 	FSuqsProgressView ProgressView;
@@ -65,4 +67,8 @@ public:
 	UFUNCTION()
 	void OnRep_Progress();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void TickComponent(float DeltaTime,
+		ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction) override;
 };
