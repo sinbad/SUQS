@@ -94,8 +94,8 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 					ESuqsQuestStatus::Failed))
 			{
 				auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
-				Entry.Category = FSuqsProgressViewDiffCategory::Quest;
-				Entry.ChangeType = NewQ.Status == ESuqsQuestStatus::Completed ? FSuqsProgressViewDiffChangeType::Completed : FSuqsProgressViewDiffChangeType::Failed;
+				Entry.Category = ESuqsProgressViewDiffCategory::Quest;
+				Entry.ChangeType = NewQ.Status == ESuqsQuestStatus::Completed ? ESuqsProgressViewDiffChangeType::Completed : ESuqsProgressViewDiffChangeType::Failed;
 				Entry.QuestID = NewQ.Identifier;
 				bAnyChanges = true;
 				
@@ -103,8 +103,8 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 			else if (PrevQ->IsModifiedIgnoreStatus(NewQ))
 			{
 				auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
-				Entry.Category = FSuqsProgressViewDiffCategory::Quest;
-				Entry.ChangeType = FSuqsProgressViewDiffChangeType::Modified;
+				Entry.Category = ESuqsProgressViewDiffCategory::Quest;
+				Entry.ChangeType = ESuqsProgressViewDiffChangeType::Modified;
 				Entry.QuestID = NewQ.Identifier;
 				bAnyChanges = true;
 			}
@@ -112,7 +112,7 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 			// Now check task changes
 			for (const auto& NewT : NewQ.CurrentTasks)
 			{
-				const FSuqsTaskStateView* PrevT = nullptr; 
+				const FSuqsTaskStateView* PrevT = nullptr;
 				for (const auto& OldT : PrevQ->CurrentTasks)
 				{
 					if (OldT.Identifier == NewT.Identifier)
@@ -130,8 +130,8 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 						(NewT.Status == ESuqsTaskStatus::Completed || NewT.Status == ESuqsTaskStatus::Failed))
 					{
 						auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
-						Entry.Category = FSuqsProgressViewDiffCategory::Task;
-						Entry.ChangeType = NewT.Status == ESuqsTaskStatus::Completed ? FSuqsProgressViewDiffChangeType::Completed : FSuqsProgressViewDiffChangeType::Failed;
+						Entry.Category = ESuqsProgressViewDiffCategory::Task;
+						Entry.ChangeType = NewT.Status == ESuqsTaskStatus::Completed ? ESuqsProgressViewDiffChangeType::Completed : ESuqsProgressViewDiffChangeType::Failed;
 						Entry.QuestID = NewQ.Identifier;
 						Entry.TaskID = NewT.Identifier;
 						bAnyChanges = true;
@@ -140,8 +140,8 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 					else if (PrevT->IsModifiedIgnoreStatus(NewT))
 					{
 						auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
-						Entry.Category = FSuqsProgressViewDiffCategory::Task;
-						Entry.ChangeType = FSuqsProgressViewDiffChangeType::Modified;
+						Entry.Category = ESuqsProgressViewDiffCategory::Task;
+						Entry.ChangeType = ESuqsProgressViewDiffChangeType::Modified;
 						Entry.QuestID = NewQ.Identifier;
 						Entry.TaskID = NewT.Identifier;
 						bAnyChanges = true;
@@ -152,8 +152,8 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 				{
 					// New task
 					auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
-					Entry.Category = FSuqsProgressViewDiffCategory::Task;
-					Entry.ChangeType = FSuqsProgressViewDiffChangeType::Added;
+					Entry.Category = ESuqsProgressViewDiffCategory::Task;
+					Entry.ChangeType = ESuqsProgressViewDiffChangeType::Added;
 					Entry.QuestID = NewQ.Identifier;
 					Entry.TaskID = NewT.Identifier;
 
@@ -179,8 +179,8 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 				{
 					// Removed task
 					auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
-					Entry.Category = FSuqsProgressViewDiffCategory::Task;
-					Entry.ChangeType = FSuqsProgressViewDiffChangeType::Removed;
+					Entry.Category = ESuqsProgressViewDiffCategory::Task;
+					Entry.ChangeType = ESuqsProgressViewDiffChangeType::Removed;
 					Entry.QuestID = PrevQ->Identifier;
 					Entry.TaskID = OldT.Identifier;
 			
@@ -192,10 +192,23 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 		else
 		{
 			// New quest
-			auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
-			Entry.Category = FSuqsProgressViewDiffCategory::Quest;
-			Entry.ChangeType = FSuqsProgressViewDiffChangeType::Added;
-			Entry.QuestID = NewQ.Identifier;
+			{
+				auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
+				Entry.Category = ESuqsProgressViewDiffCategory::Quest;
+				Entry.ChangeType = ESuqsProgressViewDiffChangeType::Added;
+				Entry.QuestID = NewQ.Identifier;
+			}
+
+			// Also add each task, for consistency
+			for (const FSuqsTaskStateView& NewT : NewQ.CurrentTasks)
+			{
+				// New task
+				auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
+				Entry.Category = ESuqsProgressViewDiffCategory::Task;
+				Entry.ChangeType = ESuqsProgressViewDiffChangeType::Added;
+				Entry.QuestID = NewQ.Identifier;
+				Entry.TaskID = NewT.Identifier;
+			}
 
 			bAnyChanges = true;
 		}
@@ -219,8 +232,8 @@ bool USuqsProgressViewHelpers::GetProgressViewDifferences(const FSuqsProgressVie
 		{
 			// Removed quest
 			auto& Entry = OutDiff.Entries.AddDefaulted_GetRef();
-			Entry.Category = FSuqsProgressViewDiffCategory::Quest;
-			Entry.ChangeType = FSuqsProgressViewDiffChangeType::Removed;
+			Entry.Category = ESuqsProgressViewDiffCategory::Quest;
+			Entry.ChangeType = ESuqsProgressViewDiffChangeType::Removed;
 			Entry.QuestID = OldQ.Identifier;
 			
 			bAnyChanges = true;

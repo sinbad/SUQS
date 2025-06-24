@@ -133,14 +133,14 @@ struct SUQS_API FSuqsProgressView
 };
 
 UENUM(BlueprintType)
-enum class FSuqsProgressViewDiffCategory : uint8
+enum class ESuqsProgressViewDiffCategory : uint8
 {
 	Quest,
 	Task
 };
 
 UENUM(BlueprintType)
-enum class FSuqsProgressViewDiffChangeType : uint8
+enum class ESuqsProgressViewDiffChangeType : uint8
 {
 	Added,
 	/// Some details OTHER than completed/failed changed; e.g. description
@@ -158,10 +158,10 @@ struct SUQS_API FSuqsProgressViewDiffEntry
 
 	/// What category of change this is (quest, task)
 	UPROPERTY(BlueprintReadOnly)
-	FSuqsProgressViewDiffCategory Category;
+	ESuqsProgressViewDiffCategory Category = ESuqsProgressViewDiffCategory::Quest;
 
 	/// What has changed in that category
-	FSuqsProgressViewDiffChangeType ChangeType;
+	ESuqsProgressViewDiffChangeType ChangeType = ESuqsProgressViewDiffChangeType::Added;
 
 	/// Identifier of the quest (always present). Use USuqsProgressViewHelpers to locate this in the progress view
 	UPROPERTY(BlueprintReadOnly)
