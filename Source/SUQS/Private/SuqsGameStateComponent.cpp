@@ -23,9 +23,24 @@ void USuqsGameStateComponent::InitServerProgress()
 		ServerProgression = NewObject<USuqsProgression>(this, "ServerProgression");
 		ProgressView.FromUObject(ServerProgression);
 		ServerProgression->OnProgressionEvent.AddDynamic(this, &USuqsGameStateComponent::OnProgressionEvent);
-		OnProgressChanged.Broadcast(this, ProgressView);
+
+		FireChangedEvent();
+
 	}
 
+}
+
+void USuqsGameStateComponent::FireChangedEvent()
+{
+	OnProgressChanged.Broadcast(this, ProgressView);
+	if (OnProgressChangedWithDiff.IsBound())
+	{
+		// Generate diff
+		if (USuqsProgressViewHelpers::GetProgressViewDifferences(PreviousProgressView, ProgressView, ProgressDiff))
+		{
+			OnProgressChangedWithDiff.Broadcast(this, ProgressView, ProgressDiff);
+		}	
+	}
 }
 
 USuqsProgression* USuqsGameStateComponent::GetServerProgression()
@@ -39,13 +54,15 @@ USuqsProgression* USuqsGameStateComponent::GetServerProgression()
 
 void USuqsGameStateComponent::OnProgressionEvent(const FSuqsProgressionEventDetails& Details)
 {
+	// We don't actually use the event details, because when replicating we won't have them, so for
+	// consistency and simplicity just re-populate the entire thing and generate diffs after
 	ProgressView.FromUObject(GetServerProgression());
-	OnProgressChanged.Broadcast(this, ProgressView);
+	FireChangedEvent();
 }
 
 void USuqsGameStateComponent::OnRep_Progress()
 {
-	OnProgressChanged.Broadcast(this, ProgressView);
+	FireChangedEvent();
 }
 
 void USuqsGameStateComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

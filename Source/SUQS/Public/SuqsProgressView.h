@@ -10,7 +10,7 @@
 /// A "view" on the underlying task state. This is primarily used for multiplayer games, where it's
 /// simpler to replicate just a view on the state rather than the real SUQS progress objects. 
 USTRUCT(BlueprintType)
-struct FSuqsTaskStateView
+struct SUQS_API FSuqsTaskStateView
 {
 	GENERATED_BODY()
 
@@ -32,22 +32,33 @@ struct FSuqsTaskStateView
 	int TargetNumber = 1;
 	
 	/// Current number completed (vs target number)
-	UPROPERTY(BlueprintReadOnly, Category="Task State")
+	UPROPERTY(BlueprintReadOnly, Category="Task")
 	int CompletedNumber;
 	
 	/// Current time remaining, if task has a time limit
-	UPROPERTY(BlueprintReadOnly, Category="Task State")
+	UPROPERTY(BlueprintReadOnly, Category="Task")
 	float TimeRemaining = 0;
 	/// Whether this task has been started, completed, failed
-	UPROPERTY(BlueprintReadOnly, Category="Task State")
+	UPROPERTY(BlueprintReadOnly, Category="Task")
 	ESuqsTaskStatus Status = ESuqsTaskStatus::NotStarted;
+	
 	/// Whether we suggest that this task is hidden from the player right now
 	/// This is the case for mandatory, sequential, incomplete tasks beyond the first one
-	UPROPERTY(BlueprintReadOnly, Category="Task State")
+	UPROPERTY(BlueprintReadOnly, Category="Task")
 	bool bHidden;
 
 	FSuqsTaskStateView();
 	void FromUObject(USuqsTaskState* State);
+
+	bool IsModifiedIgnoreStatus(const FSuqsTaskStateView& Rhs) const
+	{
+		// Only compare things that can change at runtime, and not status
+		return 
+			CompletedNumber == Rhs.CompletedNumber &&
+			TimeRemaining == Rhs.TimeRemaining &&
+			bHidden != Rhs.bHidden;
+	}
+
 	
 };
 
@@ -57,7 +68,7 @@ struct FSuqsTaskStateView
 /// the current objective. The text associated with the current objective is here, but otherwise it's
 /// just a 2-level structure as opposed to a 3-level one in the real quest structure.
 USTRUCT(BlueprintType)
-struct FSuqsQuestStateView
+struct SUQS_API FSuqsQuestStateView
 {
 	GENERATED_BODY()
 
@@ -76,6 +87,9 @@ struct FSuqsQuestStateView
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Quest")
 	FText Description;
 
+	UPROPERTY(BlueprintReadOnly, Category="Quest")
+	ESuqsQuestStatus Status = ESuqsQuestStatus::Incomplete;	
+
 	/// Identifier of the current objective. This can be helpful to know whether the whole group of tasks
 	/// has reset.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Quest")
@@ -91,12 +105,21 @@ struct FSuqsQuestStateView
 
 	FSuqsQuestStateView();
 	void FromUObject(USuqsQuestState* State);
+	
+	bool IsModifiedIgnoreStatus(const FSuqsQuestStateView& Rhs) const
+	{
+		// Only compare things that can change at runtime, and not status
+		return 
+			Description.CompareTo(Rhs.Description) == 0 &&
+			CurrentObjectiveIdentifier == Rhs.CurrentObjectiveIdentifier &&
+			CurrentObjectiveDescription.CompareTo(Rhs.CurrentObjectiveDescription) == 0;
+	}
 };
 
 /// A "view" on the underlying state of all quest progress. This is primarily used for multiplayer games, where it's
 /// simpler to replicate just a view on the state rather than the real SUQS progress objects.
 USTRUCT(BlueprintType)
-struct FSuqsProgressView
+struct SUQS_API FSuqsProgressView
 {
 	GENERATED_BODY()
 
@@ -106,5 +129,109 @@ struct FSuqsProgressView
 
 	FSuqsProgressView();
 	void FromUObject(USuqsProgression* State);
+
+};
+
+UENUM(BlueprintType)
+enum class FSuqsProgressViewDiffCategory : uint8
+{
+	Quest,
+	Task
+};
+
+UENUM(BlueprintType)
+enum class FSuqsProgressViewDiffChangeType : uint8
+{
+	Added,
+	/// Some details OTHER than completed/failed changed; e.g. description
+	Modified,
+	Completed,
+	Failed,
+	Removed
+};
+
+
+USTRUCT(BlueprintType)
+struct SUQS_API FSuqsProgressViewDiffEntry
+{
+	GENERATED_BODY()
+
+	/// What category of change this is (quest, task)
+	UPROPERTY(BlueprintReadOnly)
+	FSuqsProgressViewDiffCategory Category;
+
+	/// What has changed in that category
+	FSuqsProgressViewDiffChangeType ChangeType;
+
+	/// Identifier of the quest (always present). Use USuqsProgressViewHelpers to locate this in the progress view
+	UPROPERTY(BlueprintReadOnly)
+	FName QuestID = NAME_None;
+
+	/// Identifier of the task, if this difference concerns a task. Use USuqsProgressViewHelpers to locate this in the progress view
+	UPROPERTY(BlueprintReadOnly)
+	FName TaskID = NAME_None;
+
+};
+
+USTRUCT(BlueprintType)
+struct SUQS_API FSuqsProgressViewDiff
+{
+	GENERATED_BODY()
+
+	/// The list of changes that have occurred
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FSuqsProgressViewDiffEntry> Entries;
+	
+};
+
+
+UCLASS()
+class SUQS_API USuqsProgressViewHelpers : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	/**
+	 * Given a before & after view on progress, generate a differences structure which helps perform
+	 * delta updates in a UI rather than re-creating everything.
+	 * @param Before The progress view before the changes
+	 * @param After The progress view after the changes
+	 * @param OutDiff The differences between them
+	 * @return Whether there were any differences
+	 */
+	static bool GetProgressViewDifferences(const FSuqsProgressView& Before, const FSuqsProgressView& After, FSuqsProgressViewDiff& OutDiff);
+
+	/**
+	 * Given a before & after view on progress, generate a differences structure which helps perform
+	 * delta updates in a UI rather than re-creating everything.
+	 * @param Before The progress view before the changes
+	 * @param After The progress view after the changes
+	 * @param Differences The differences between them
+	 * @param bWasDifferent Whether there were any differences
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName="Get Progress View Differences", Category="SUQS")
+	static void GetProgressViewDifferencesBP(const FSuqsProgressView& Before, const FSuqsProgressView& After, FSuqsProgressViewDiff& Differences, bool& bWasDifferent);
+
+	/**
+	 * Helper function to locate quest state in a progress view snapshot.
+	 * @param ProgressView The progress view snapshot
+	 * @param QuestID The identifier of the quest
+	 * @param Quest Output quest state details, if found
+	 * @param bWasFound Whether the quest state was found
+	 */
+	UFUNCTION(BlueprintCallable, Category="SUQS")
+	static void GetQuestStateFromProgressView(const FSuqsProgressView& ProgressView, FName QuestID, FSuqsQuestStateView& Quest, bool& bWasFound);
+
+	/**
+	 * Helper function to locate task state in a progress view snapshot.
+	 * @param ProgressView The progress view snapshot
+	 * @param QuestID The identifier of the quest
+	 * @param TaskID The identifier of the task
+	 * @param Quest Output quest state details, if found
+	 * @param Task Output task state details, if found
+	 * @param bWasFound Whether the task state was found
+	 */
+	UFUNCTION(BlueprintCallable, Category="SUQS")
+	static void GetTaskStateFromProgressView(const FSuqsProgressView& ProgressView, FName QuestID, FName TaskID, FSuqsQuestStateView& Quest, FSuqsTaskStateView& Task, bool& bWasFound);
 
 };
