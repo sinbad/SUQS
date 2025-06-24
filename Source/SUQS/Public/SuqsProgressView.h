@@ -54,8 +54,8 @@ struct SUQS_API FSuqsTaskStateView
 	{
 		// Only compare things that can change at runtime, and not status
 		return 
-			CompletedNumber == Rhs.CompletedNumber &&
-			TimeRemaining == Rhs.TimeRemaining &&
+			CompletedNumber != Rhs.CompletedNumber ||
+			TimeRemaining != Rhs.TimeRemaining ||
 			bHidden != Rhs.bHidden;
 	}
 
@@ -110,9 +110,9 @@ struct SUQS_API FSuqsQuestStateView
 	{
 		// Only compare things that can change at runtime, and not status
 		return 
-			Description.CompareTo(Rhs.Description) == 0 &&
-			CurrentObjectiveIdentifier == Rhs.CurrentObjectiveIdentifier &&
-			CurrentObjectiveDescription.CompareTo(Rhs.CurrentObjectiveDescription) == 0;
+			Description.CompareTo(Rhs.Description) != 0 ||
+			CurrentObjectiveIdentifier != Rhs.CurrentObjectiveIdentifier ||
+			CurrentObjectiveDescription.CompareTo(Rhs.CurrentObjectiveDescription) != 0;
 	}
 };
 
