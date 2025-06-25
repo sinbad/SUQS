@@ -31,13 +31,14 @@ void FSuqsQuestStateView::FromUObject(USuqsQuestState* State)
 	Title = State->GetTitle();
 
 	Description = State->GetDescription();
-	if (State->GetCurrentObjective())
+	if (auto Obj = State->GetCurrentObjective())
 	{
-		CurrentObjectiveIdentifier = State->GetCurrentObjective()->GetIdentifier();
-		CurrentObjectiveDescription = State->GetCurrentObjective()->GetDescription();
-		auto& Tasks = State->GetCurrentObjective()->GetTasks();
-		CurrentTasks.Reset(Tasks.Num());
-		for (USuqsTaskState* TaskState : Tasks)
+		CurrentObjectiveIdentifier = Obj->GetIdentifier();
+		CurrentObjectiveDescription = Obj->GetDescription();
+		TArray<USuqsTaskState*> RelevantTasks;
+		Obj->GetAllRelevantTasks(RelevantTasks);
+		CurrentTasks.Reset(RelevantTasks.Num());
+		for (USuqsTaskState* TaskState : RelevantTasks)
 		{
 			auto& Task = CurrentTasks.AddDefaulted_GetRef();
 			Task.FromUObject(TaskState);
