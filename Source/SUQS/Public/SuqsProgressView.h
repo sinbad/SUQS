@@ -163,6 +163,7 @@ struct SUQS_API FSuqsProgressViewDiffEntry
 	ESuqsProgressViewDiffCategory Category = ESuqsProgressViewDiffCategory::Quest;
 
 	/// What has changed in that category
+	UPROPERTY(BlueprintReadOnly)
 	ESuqsProgressViewDiffChangeType ChangeType = ESuqsProgressViewDiffChangeType::Added;
 
 	/// Identifier of the quest (always present). Use USuqsProgressViewHelpers to locate this in the progress view
