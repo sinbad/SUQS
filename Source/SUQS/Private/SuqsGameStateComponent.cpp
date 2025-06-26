@@ -57,7 +57,8 @@ void USuqsGameStateComponent::FireChangedEvent()
 		if (USuqsProgressViewHelpers::GetProgressViewDifferences(PreviousProgressView, ProgressView, ProgressDiff))
 		{
 			OnProgressChangedWithDiff.Broadcast(this, ProgressView, ProgressDiff);
-		}	
+		}
+		PreviousProgressView = ProgressView;
 	}
 }
 
