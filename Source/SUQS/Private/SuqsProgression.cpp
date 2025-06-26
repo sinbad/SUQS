@@ -49,15 +49,16 @@ void USuqsProgression::InitWithQuestDataTablesInPaths(const TArray<FString>& Pat
 	InitWithQuestDataTables(DataTables);
 }
 
-FSuqsQuest USuqsProgression::GetQuestDefinitionCopy(FName QuestID)
+bool USuqsProgression::GetQuestDefinitionCopy(FName QuestID, FSuqsQuest& OutQuest)
 {
 	auto QDef = QuestDefinitions.Find(QuestID);
 	if (QDef)
 	{
-		return *QDef;
+		OutQuest = *QDef;
+		return true;
 	}
 
-	return FSuqsQuest();
+	return false;
 }
 
 bool USuqsProgression::CreateQuestDefinition(const FSuqsQuest& NewQuest, bool bOverwriteIfExists)

@@ -58,19 +58,22 @@ bool FTestRuntimeQuestDefinitions::RunTest(const FString& Parameters)
 			USuqsProgression::MakeQuestDataTableFromJSON(SimpleMainQuestJson)
 		}
 	);
-	FSuqsQuest QuestCopy = Progression->GetQuestDefinitionCopy("Q_Main1");
-	QuestCopy.Identifier = "Q_Main1_Copy";
-	QuestCopy.Title = INVTEXT("A Copy");
-	QuestCopy.Objectives[0].Tasks[0].Title = INVTEXT("A modified task");
-	QuestCopy.Objectives[0].Tasks[2].TargetNumber = 10;
-	TestTrue("Quest copy should be created", Progression->CreateQuestDefinition(QuestCopy));
+	FSuqsQuest QuestCopy;
+	if (TestTrue("Copy should work", Progression->GetQuestDefinitionCopy("Q_Main1", QuestCopy)))
+	{
+		QuestCopy.Identifier = "Q_Main1_Copy";
+		QuestCopy.Title = INVTEXT("A Copy");
+		QuestCopy.Objectives[0].Tasks[0].Title = INVTEXT("A modified task");
+		QuestCopy.Objectives[0].Tasks[2].TargetNumber = 10;
+		TestTrue("Quest copy should be created", Progression->CreateQuestDefinition(QuestCopy));
 
-	TestTrue("Should be able to accept quest copy", Progression->AcceptQuest("Q_Main1_Copy"));
-	TArray<USuqsQuestState*> AcceptedQuests;
-	Progression->GetAcceptedQuests(AcceptedQuests);
-	TestEqual("Should be 1 quest active", AcceptedQuests.Num(), 1);
-	TestEqual("Quest title should be modified", AcceptedQuests[0]->GetTitle().ToString(), "A Copy");
-	TestEqual("Task title should be modified", AcceptedQuests[0]->GetCurrentObjective()->GetTasks()[0]->GetTitle().ToString(), "A modified task");
-	TestEqual("Task target number should be modified", AcceptedQuests[0]->GetCurrentObjective()->GetTasks()[2]->GetTargetNumber(), 10);
+		TestTrue("Should be able to accept quest copy", Progression->AcceptQuest("Q_Main1_Copy"));
+		TArray<USuqsQuestState*> AcceptedQuests;
+		Progression->GetAcceptedQuests(AcceptedQuests);
+		TestEqual("Should be 1 quest active", AcceptedQuests.Num(), 1);
+		TestEqual("Quest title should be modified", AcceptedQuests[0]->GetTitle().ToString(), "A Copy");
+		TestEqual("Task title should be modified", AcceptedQuests[0]->GetCurrentObjective()->GetTasks()[0]->GetTitle().ToString(), "A modified task");
+		TestEqual("Task target number should be modified", AcceptedQuests[0]->GetCurrentObjective()->GetTasks()[2]->GetTargetNumber(), 10);
+	}
 	return true;
 }

@@ -226,10 +226,15 @@ public:
 	UFUNCTION(BlueprintCallable)
     void InitWithQuestDataTablesInPaths(const TArray<FString>& Paths);
 
-	/// Get a copy of a Quest Definition. This is mostly so that you can modify it and register it
-	/// as a new runtime quest
+	/**
+	 * Get a copy of a Quest Definition. This is mostly so that you can modify it and register it
+	 * as a new runtime quest
+	 * @param QuestID The identifier of the quest
+	 * @param OutQuest Output quest copy
+	 * @return Whether the quest was found
+	 */
 	UFUNCTION(BlueprintCallable)
-	FSuqsQuest GetQuestDefinitionCopy(FName QuestID);
+	bool GetQuestDefinitionCopy(FName QuestID, FSuqsQuest& OutQuest);
 
 	
 	/**
