@@ -175,6 +175,11 @@
                         "ResolveGate": {
                           "description": "Optional Gate name; after completion / failure of this objective, knock-on effects won't occur until the Gate of this name is opened on the Progression instance (activating next task, completing/failing quest)",
                           "type": "string"
+                        },
+                        "bAlwaysVisible": {
+                          "description": "If true, overrides the usual behaviour of automatically hiding tasks when they're resolved and if they're mandatory and sequential.",
+                          "type": "boolean",
+                          "default": true
                         }
                       },
                       "required": [

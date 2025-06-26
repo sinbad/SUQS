@@ -63,6 +63,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Task")
 	FName ResolveGate;
 
+	/// If true, overrides the usual behaviour of automatically hiding tasks when they're resolved
+	/// and if they're mandatory and sequential. Set this to true if you always want this task to
+	/// keep being displayed while the parent objective is active. 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Task")
+	bool bAlwaysVisible = false;
+
 };
 
 /// A sub-objective of a quest. These objectives are always sequential, but branching can be supported by association with quest branches

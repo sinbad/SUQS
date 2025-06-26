@@ -261,7 +261,8 @@ void USuqsTaskState::NotifyGateOpened(const FName& GateName)
 
 bool USuqsTaskState::IsHiddenOnCompleteOrFail() const
 {
-	return IsMandatory() && (ParentObjective.IsValid() && ParentObjective->AreTasksSequential());
+	return !TaskDefinition->bAlwaysVisible && IsMandatory() &&
+		(ParentObjective.IsValid() && ParentObjective->AreTasksSequential());
 }
 
 bool USuqsTaskState::IsRelevant() const
