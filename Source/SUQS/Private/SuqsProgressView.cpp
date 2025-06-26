@@ -13,7 +13,7 @@ void FSuqsTaskStateView::FromUObject(USuqsTaskState* State)
 	Title = State->GetTitle();
 	bMandatory = State->IsMandatory();
 	TargetNumber = State->GetTargetNumber();
-	CompletedNumber = 0;
+	CompletedNumber = State->GetNumber();
 	TimeRemaining = State->GetTimeRemaining();
 	Status = State->GetStatus();
 	bHidden = State->GetHidden();
