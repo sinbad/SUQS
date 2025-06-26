@@ -17,6 +17,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Task")
 	FName Identifier;
 
+	/// Optional list of labels to associate with the task. Could be used for categorisation etc 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Task")
+	TArray<FName> Labels;
+	
 	/// The player-visible text of the task
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Task")
 	FText Title;

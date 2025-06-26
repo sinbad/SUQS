@@ -131,6 +131,13 @@
                           "description": "Identifier for the task. Required. Must be unique within the Quest (not just the objective)",
                           "type": "string"
                         },
+                        "Labels": {
+                          "description": "Optional list of labels to associate with the task. Could be used for categorisation etc",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
                         "Title": {
                           "description": "Player-visible title for the task.",
                           "type": "string"
