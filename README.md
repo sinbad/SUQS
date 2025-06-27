@@ -138,6 +138,7 @@ See [Quest Progression](docs/Progression.md) for more details.
 
 * [Quest Definitions](docs/Quests.md)
 * [Quest Progression](docs/Progression.md)
+* [Multiplayer Guide](docs/Multiplayer.md)
 
 ## License
 
