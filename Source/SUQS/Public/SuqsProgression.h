@@ -457,6 +457,7 @@ public:
 	 * @param TaskIdentifier The identifier of the task within the quest
 	 * @param Number The number of completed items to set the task to
 	 */
+	UFUNCTION(BlueprintCallable)
 	void SetTaskNumberCompleted(FName QuestID, FName TaskIdentifier, int Number);
 
 	/**
