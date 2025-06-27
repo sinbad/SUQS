@@ -456,6 +456,26 @@ int USuqsProgression::ProgressTask(FName QuestID, FName TaskIdentifier, int Delt
 	}
 }
 
+void USuqsProgression::SetTaskNumberCompleted(FName QuestID, FName TaskIdentifier, int Number)
+{
+	if (QuestID.IsNone())
+	{
+		int MaxLeft = 0;
+		for (auto Pair : ActiveQuests)
+		{
+			Pair.Value->SetTaskNumberCompleted(TaskIdentifier, Number);
+		}
+	}
+	else
+	{
+		auto T = FindTaskStatus(QuestID, TaskIdentifier);
+		if (T)
+		{
+			return T->SetNumber(Number);
+		}
+	}
+}
+
 void USuqsProgression::ResolveTask(FName QuestID, FName TaskIdentifier)
 {
 	if (QuestID.IsNone())

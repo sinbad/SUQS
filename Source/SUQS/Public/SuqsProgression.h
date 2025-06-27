@@ -452,6 +452,14 @@ public:
 	int ProgressTask(FName QuestID, FName TaskIdentifier, int Delta);
 
 	/**
+	 * Directly set the current completed number on a specific task. An alternative to the delta version ProgressTask. 
+	 * @param QuestID The ID of the quest. If None, will scan all active quests and set any task with TaskIdentifier
+	 * @param TaskIdentifier The identifier of the task within the quest
+	 * @param Number The number of completed items to set the task to
+	 */
+	void SetTaskNumberCompleted(FName QuestID, FName TaskIdentifier, int Number);
+
+	/**
 	 * Resolve the outcome of a completed/failed task; activate the next task, or complete/fail the quest if it's the last.
 	 * You do not normally need to call this, tasks resolve automatically on completion/failure by default. However if
 	 * the task definition sets "ResolveAutomatically" to false then you have to call this to resolve it.

@@ -143,6 +143,14 @@ int USuqsQuestState::ProgressTask(FName TaskID, int Delta)
 	return 0;
 }
 
+void USuqsQuestState::SetTaskNumberCompleted(FName TaskID, int Number)
+{
+	if (auto T = GetTask(TaskID))
+	{
+		return T->SetNumber(Number);
+	}
+}
+
 FText USuqsQuestState::GetTitle() const
 {
 	if (bTitleNeedsFormatting)

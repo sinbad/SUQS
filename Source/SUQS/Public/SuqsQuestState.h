@@ -249,6 +249,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int ProgressTask(FName TaskID, int Delta);
 
+	/**
+	 * Directly set the current completed number on a specific task. An alternative to the delta version ProgressTask. 
+	 * @param TaskID The identifier of the task within the quest
+	 * @param Number The number of completed items to set the task to
+	 */
+	void SetTaskNumberCompleted(FName TaskID, int Number);
+
 	/// Get the current objective on this quest. Will return null if quest is complete.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USuqsObjectiveState* GetCurrentObjective() const;
