@@ -15,6 +15,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnAnyWaypointIsCurrentChanged, 
  * This isn't exposed publicly, we just use it internally to register & manage waypoints, which
  * are instances of USuqsWaypointComponent.
  * Public exposure of these details is on USuqsProgression, which will listen to the events this class raises.
+ * In multiplayer, only the server runs this class. Waypoint components / actors are replicated but their
+ * association with quests is not.
  */
 UCLASS()
 class USuqsWaypointSubsystem : public UGameInstanceSubsystem

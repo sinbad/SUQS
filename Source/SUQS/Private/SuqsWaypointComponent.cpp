@@ -3,12 +3,15 @@
 #include "Suqs.h"
 #include "SuqsWaypointSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 
 USuqsWaypointComponent::USuqsWaypointComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	bIsCurrent = false;
+
+	SetIsReplicatedByDefault(true);
 }
 
 
@@ -20,21 +23,44 @@ void USuqsWaypointComponent::BeginPlay()
 	// needed for movement events
 	bWantsOnUpdateTransform = bRaiseMoveEvents;
 
-	// If quest / task missing, ignore
-	if (!QuestID.IsNone() && !TaskID.IsNone() && IsValid(GetWorld()))
+	Register();
+	
+}
+
+void USuqsWaypointComponent::Register()
+{
+	// Only link with quest on the server & if set up
+	if (GetOwnerRole() == ROLE_Authority && !bIsRegistered)
 	{
-		const auto GI = UGameplayStatics::GetGameInstance(this);
-		if (IsValid(GI))
+		// If quest / task missing, ignore
+		if (!QuestID.IsNone() && !TaskID.IsNone() && IsValid(GetWorld()))
 		{
-			auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
-			Suqs->RegisterWaypoint(this);
+			const auto GI = UGameplayStatics::GetGameInstance(this);
+			if (IsValid(GI))
+			{
+				auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
+				Suqs->RegisterWaypoint(this);
+				bIsRegistered = true;
+			}
 		}
 	}
-	else
+}
+
+void USuqsWaypointComponent::Unregister()
+{
+	if (GetOwnerRole() == ROLE_Authority && bIsRegistered)
 	{
-		UE_LOG(LogSUQS, Warning, TEXT("Waypoint component %s ignored because it is not initialised"), *GetReadableName());
+		if (IsValid(GetWorld()))
+		{
+			const auto GI = UGameplayStatics::GetGameInstance(this);
+			if (IsValid(GI))
+			{
+				auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
+				Suqs->UnregisterWaypoint(this);
+				bIsRegistered = false;
+			}
+		}
 	}
-	
 }
 
 void USuqsWaypointComponent::OnUpdateTransform(EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport)
@@ -54,17 +80,11 @@ void USuqsWaypointComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	if (IsValid(GetWorld()))
-	{
-		const auto GI = UGameplayStatics::GetGameInstance(this);
-		if (IsValid(GI))
-		{
-			auto Suqs = GI->GetSubsystem<USuqsWaypointSubsystem>();
-			Suqs->UnregisterWaypoint(this);
-		}
-	}
+	Unregister();
 	
 }
+
+
 
 void USuqsWaypointComponent::SetIsCurrent(bool bNewIsCurrent)
 {
@@ -83,4 +103,46 @@ void USuqsWaypointComponent::SetEnabled(bool bNewEnabled)
 		bEnabled = bNewEnabled;
 		OnWaypointEnabledChanged.Broadcast(this);
 	}
+}
+
+void USuqsWaypointComponent::Initialise(FName InQuestID, FName InTaskID, uint8 InSequenceIndex)
+{
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		if (!InQuestID.IsNone() && !InTaskID.IsNone())
+		{
+			if (bIsRegistered)
+			{
+				Unregister();
+			}
+			QuestID = InQuestID;
+			TaskID = InTaskID;
+			SequenceIndex = InSequenceIndex;
+			Register();
+		}
+	}
+	else
+	{
+		UE_LOG(LogSUQS, Warning, TEXT("Called Waypoint component Initialise() from non-Server, ignoring"));
+	}
+}
+
+void USuqsWaypointComponent::OnRep_Enabled()
+{
+	// Multiplayer notify
+	OnWaypointEnabledChanged.Broadcast(this);
+}
+
+void USuqsWaypointComponent::OnRep_IsCurrent()
+{
+	// Multiplayer notify
+	OnWaypointIsCurrentChanged.Broadcast(this);
+}
+
+void USuqsWaypointComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(USuqsWaypointComponent, bEnabled, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USuqsWaypointComponent, bIsCurrent, COND_None, REPNOTIFY_Always);
 }

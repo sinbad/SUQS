@@ -25,6 +25,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuqsOnWaypointIsCurrentChanged, USu
  * Waypoints can be enabled/disabled, and move at runtime.
  *
  * See the USuqsProgression class for details on how to query for waypoints and to get events about waypoint changes.
+ * In multiplayer, waypoint components are only linked to the quest on the server. Only movement is
+ * replicated.
 */
 UCLASS(ClassGroup=(SUQS), meta=(BlueprintSpawnableComponent))
 class SUQS_API USuqsWaypointComponent : public USceneComponent
@@ -33,31 +35,44 @@ class SUQS_API USuqsWaypointComponent : public USceneComponent
 
 protected:
 	/// The ID of the quest this waypoint belongs to (required)
+	/// If you leave this blank in defaults, use the Initialise() function later
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetQuestID, Category="Waypoint")
 	FName QuestID;
 
 	/// The ID of the task within the quest that this waypoint belongs to (required)
+	/// If you leave this blank in defaults, use the Initialise() function later
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetTaskID, Category="Waypoint")
 	FName TaskID;
 	
 	/// If > 1 waypoint is registered for a task, the sequence index can imply an order (e.g. along a path)
 	/// You may wish to SetEnabled(false) on waypoints that are no longer relevant
+	/// If you leave this blank in defaults, use the Initialise() function later
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetSequenceIndex, Category="Waypoint")
 	uint8 SequenceIndex = 0;
 	
 	/// Whether this waypoint is currently enabled
-	UPROPERTY(EditAnywhere, BlueprintSetter=SetEnabled, SaveGame, BlueprintGetter=IsEnabled, Category="Waypoint")
+	UPROPERTY(EditAnywhere, BlueprintSetter=SetEnabled, SaveGame, ReplicatedUsing=OnRep_Enabled, BlueprintGetter=IsEnabled, Category="Waypoint")
 	bool bEnabled = true;
 
 	/// Whether this waypoint should raise move events when current
 	/// Default false since you don't need this if you attach this waypoint component and visual to the same actor
-	UPROPERTY(EditAnywhere, BlueprintGetter=IsEnabled, Category="Waypoint")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Waypoint")
 	bool bRaiseMoveEvents = false;
 
 	/**
 	 * Whether this waypoint is "current" ie associated with a currently relevant task
 	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_IsCurrent, Category="Waypoint")
 	bool bIsCurrent = false;
+
+	bool bIsRegistered = false; // server only
+
+	UFUNCTION()
+	void OnRep_Enabled();
+
+	UFUNCTION()
+	void OnRep_IsCurrent();
+
 public:
 	// Sets default values for this component's properties
 	USuqsWaypointComponent();
@@ -84,6 +99,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SetEnabled(bool bNewEnabled);
 
+	
+	/**
+	 * Late initialise this component with quest details.
+	 * Note: only relevant on the server in multiplayer.
+	 * @param InQuestID The ID of the quest this waypoint belongs to (required) 
+	 * @param InTaskID The ID of the task this waypoint belongs to (required)
+	 * @param InSequenceIndex If > 1 waypoint is registered for a task, the sequence index can imply an order (e.g. along a path)
+	 */
+	UFUNCTION(BlueprintCallable)
+	virtual void Initialise(FName InQuestID, FName InTaskID, uint8 InSequenceIndex = 0);
+
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	/// Internal use only
@@ -93,6 +119,9 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	virtual void Register();
+	virtual void Unregister();
 
 	virtual void OnUpdateTransform(EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport) override;
 };

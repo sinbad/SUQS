@@ -8,7 +8,9 @@ class UWidgetComponent;
 class USuqsWaypointComponent;
 
 /**
- * Base class for waypoint actors which have a waypoint component, you can subclass this to add custom widgets or other functionality
+ * Base class for waypoint actors which have a waypoint component, you can subclass this to add custom widgets or other functionality.
+ * In multiplayer, waypoint components are only linked to the quest on the server. Only movement is
+ * replicated.
  */
 UCLASS(Abstract, Blueprintable, ClassGroup=(SUQS))
 class SUQS_API ASuqsWaypointActorBase : public AActor
