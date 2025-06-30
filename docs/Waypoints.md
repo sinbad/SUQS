@@ -68,6 +68,12 @@ you have multiple waypoints for a single count-based task, like "Collect 10 nuts
 Once a nut has been collected, the task isn't complete, but this specific waypoint
 should be disabled.
 
+## Multiplayer support
+
+Waypoints are replicated; only the server-end component is actually linked to the quest, 
+and it updates whether it's current based on quest state changes. On the client end,
+you can only rely on updates to `IsCurrent` and `IsEnabled` (and their associated events),
+but that is enough to display waypoints for all players.
 
 ## More Info
 
