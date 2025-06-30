@@ -861,6 +861,13 @@ void USuqsProgression::RaiseTaskUpdated(USuqsTaskState* Task)
 	{
 		OnTaskUpdated.Broadcast(Task);
 		OnProgressionEvent.Broadcast(FSuqsProgressionEventDetails(ESuqsProgressionEventType::TaskUpdated, Task));
+		
+		// A task that hasn't changed visibility but has changed status may need its waypoints enabling/disabling
+		auto Waypoints = Task->GetWaypoints(false);
+		for (auto W : Waypoints)
+		{
+			W->SetIsCurrent(Task->IsIncomplete());
+		}
 	}
 }
 

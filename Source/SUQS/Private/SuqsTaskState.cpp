@@ -92,6 +92,7 @@ void USuqsTaskState::ChangeStatus(ESuqsTaskStatus NewStatus, bool bIgnoreResolve
 			Progression->RaiseTaskFailed(this);
 			break;
 		default:
+			Progression->RaiseTaskUpdated(this);
 			break;
 		}
 
