@@ -128,8 +128,8 @@ bool USuqsWaypointSubsystem::GetWaypoints(const FName& QuestID,
 
 void USuqsWaypointSubsystem::SetProgression(USuqsProgression* Prog)
 {
-	if (IsValid(Prog))
-		Prog->OnProgressionLoaded.RemoveDynamic(this, &USuqsWaypointSubsystem::OnProgressionLoaded);
+	if (Progression.IsValid())
+		Progression->OnProgressionLoaded.RemoveDynamic(this, &USuqsWaypointSubsystem::OnProgressionLoaded);
 	
 	Progression = Prog;
 	
