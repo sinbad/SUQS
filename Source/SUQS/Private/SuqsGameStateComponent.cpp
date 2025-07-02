@@ -24,7 +24,7 @@ void USuqsGameStateComponent::InitServerProgress()
 	if (!ServerProgression && GetOwner()->HasAuthority())
 	{
 		ServerProgression = NewObject<USuqsProgression>(this, "ServerProgression");
-		ProgressView.FromUObject(ServerProgression);
+		ProgressView.FromUObject(ServerProgression, bIncludeCompletedObjectives);
 		ServerProgression->OnProgressionEvent.AddDynamic(this, &USuqsGameStateComponent::OnProgressionEvent);
 		bServerPendingChanges = false;
 
@@ -41,7 +41,7 @@ void USuqsGameStateComponent::TickComponent(float DeltaTime,
 
 	if (GetOwner()->HasAuthority() && bServerPendingChanges)
 	{
-		ProgressView.FromUObject(GetServerProgression());
+		ProgressView.FromUObject(GetServerProgression(), bIncludeCompletedObjectives);
 		FireChangedEvent();
 		bServerPendingChanges = false;
 	}

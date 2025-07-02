@@ -105,7 +105,7 @@ struct SUQS_API FSuqsQuestStateView
 	TArray<FSuqsTaskStateView> CurrentTasks;
 
 	FSuqsQuestStateView();
-	void FromUObject(USuqsQuestState* State);
+	void FromUObject(USuqsQuestState* State, bool bIncludeCompletedObjectives);
 	
 	bool IsModified(const FSuqsQuestStateView& Rhs) const
 	{
@@ -130,7 +130,7 @@ struct SUQS_API FSuqsProgressView
 
 
 	FSuqsProgressView();
-	void FromUObject(USuqsProgression* State);
+	void FromUObject(USuqsProgression* State, bool bIncludeCompletedObjectives);
 
 };
 

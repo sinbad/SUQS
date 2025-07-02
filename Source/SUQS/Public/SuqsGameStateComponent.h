@@ -32,6 +32,13 @@ protected:
 	UPROPERTY(ReplicatedUsing=OnRep_Progress)
 	FSuqsProgressView ProgressView;
 
+	/// Whether to include completed/failed objectives in the progress view, rather than just the
+	/// current objective. This will only include tasks which are not hidden, so use the "Always Visible"
+	/// option on tasks as well to ensure they remain visible individually. This means more data but
+	/// can be useful if you want to show completed tasks in previous objectives as well.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIncludeCompletedObjectives = false;
+
 	/// The previous progress snapshot, used to generate diffs
 	FSuqsProgressView PreviousProgressView;
 	FSuqsProgressViewDiff ProgressDiff;
@@ -59,6 +66,20 @@ public:
 	/// You cannot call this from multiplayer clients!
 	UFUNCTION(BlueprintCallable)
 	USuqsProgression* GetServerProgression();
+
+	bool GetIncludeCompletedObjectives() const
+	{
+		return bIncludeCompletedObjectives;
+	}
+
+	/// Whether to include completed/failed objectives in the progress view, rather than just the
+	/// current objective. This will only include tasks which are not hidden, so use the "Always Visible"
+	/// option on tasks as well to ensure they remain visible individually. This means more data but
+	/// can be useful if you want to show completed tasks in previous objectives as well.
+	void SetIncludeCompletedObjectives(const bool bInclude)
+	{
+		bIncludeCompletedObjectives = bInclude;
+	}
 
 	/// Retrieve a view on the current progress state. This can be called on both servers and clients.
 	UFUNCTION(BlueprintPure)

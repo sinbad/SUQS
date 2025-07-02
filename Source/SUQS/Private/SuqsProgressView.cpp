@@ -24,31 +24,51 @@ FSuqsQuestStateView::FSuqsQuestStateView()
 {
 }
 
-void FSuqsQuestStateView::FromUObject(USuqsQuestState* State)
+void FSuqsQuestStateView::FromUObject(USuqsQuestState* State, bool bIncludeCompletedObjectives)
 {
 	Identifier = State->GetIdentifier();
 	Labels = State->GetLabels();
 	Title = State->GetTitle();
 
 	Description = State->GetDescription();
-	if (auto Obj = State->GetCurrentObjective())
+
+	auto CurrObj = State->GetCurrentObjective();
+
+	if (CurrObj)
 	{
-		CurrentObjectiveIdentifier = Obj->GetIdentifier();
-		CurrentObjectiveDescription = Obj->GetDescription();
-		TArray<USuqsTaskState*> RelevantTasks;
-		Obj->GetAllRelevantTasks(RelevantTasks);
-		CurrentTasks.Reset(RelevantTasks.Num());
-		for (USuqsTaskState* TaskState : RelevantTasks)
-		{
-			auto& Task = CurrentTasks.AddDefaulted_GetRef();
-			Task.FromUObject(TaskState);
-		}
+		CurrentObjectiveIdentifier = CurrObj->GetIdentifier();
+		CurrentObjectiveDescription = CurrObj->GetDescription();
 	}
 	else
 	{
 		CurrentObjectiveIdentifier = NAME_None;
 		CurrentObjectiveDescription = FText::GetEmpty();
-		CurrentTasks.Reset(0);
+	}
+
+
+	TArray<USuqsObjectiveState*> ObjectivesOfInterest;
+	if (bIncludeCompletedObjectives)
+	{
+		State->GetActiveObjectives(ObjectivesOfInterest);
+	}
+	else
+	{
+		ObjectivesOfInterest.Add(CurrObj);
+	}
+	
+	CurrentTasks.Reset();
+	TArray<USuqsTaskState*> RelevantTasks;
+	for (auto& Obj : ObjectivesOfInterest)
+	{
+		if (Obj == CurrObj || (bIncludeCompletedObjectives && !Obj->IsIncomplete()))
+		{
+			Obj->GetAllRelevantTasks(RelevantTasks);
+			for (USuqsTaskState* TaskState : RelevantTasks)
+			{
+				auto& Task = CurrentTasks.AddDefaulted_GetRef();
+				Task.FromUObject(TaskState);
+			}
+		}
 	}
 
 }
@@ -57,7 +77,7 @@ FSuqsProgressView::FSuqsProgressView()
 {
 }
 
-void FSuqsProgressView::FromUObject(USuqsProgression* State)
+void FSuqsProgressView::FromUObject(USuqsProgression* State, bool bIncludeCompletedObjectives)
 {
 	TArray<USuqsQuestState*> QuestStates;
 	State->GetAcceptedQuests(QuestStates);
@@ -68,7 +88,7 @@ void FSuqsProgressView::FromUObject(USuqsProgression* State)
 		if (QuestState->IsPlayerVisible())
 		{
 			auto& Quest = ActiveQuests.AddDefaulted_GetRef();
-			Quest.FromUObject(QuestState);
+			Quest.FromUObject(QuestState, bIncludeCompletedObjectives);
 		}
 	}
 	// If not player visible, ignore quest
