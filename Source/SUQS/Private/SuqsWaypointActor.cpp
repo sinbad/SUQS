@@ -8,7 +8,7 @@ ASuqsWaypointActorBase::ASuqsWaypointActorBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	SetReplicates(true);
+	bReplicates = true;
 	SetReplicatingMovement(true);
 
 	const auto Root = CreateDefaultSubobject<USceneComponent>("Root");
