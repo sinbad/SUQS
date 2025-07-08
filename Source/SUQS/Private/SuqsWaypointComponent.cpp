@@ -91,9 +91,14 @@ void USuqsWaypointComponent::SetIsCurrent(bool bNewIsCurrent)
 	if (bIsCurrent != bNewIsCurrent)
 	{
 		bIsCurrent = bNewIsCurrent;
-		OnWaypointIsCurrentChanged.Broadcast(this);
+		OnIsCurrentChanged();
 		
 	}
+}
+
+void USuqsWaypointComponent::OnIsCurrentChanged()
+{
+	OnWaypointIsCurrentChanged.Broadcast(this);
 }
 
 void USuqsWaypointComponent::SetEnabled(bool bNewEnabled)
@@ -101,8 +106,13 @@ void USuqsWaypointComponent::SetEnabled(bool bNewEnabled)
 	if (bEnabled != bNewEnabled)
 	{
 		bEnabled = bNewEnabled;
-		OnWaypointEnabledChanged.Broadcast(this);
+		OnIsEnabledChanged();
 	}
+}
+
+void USuqsWaypointComponent::OnIsEnabledChanged()
+{
+	OnWaypointEnabledChanged.Broadcast(this);
 }
 
 void USuqsWaypointComponent::Initialise(FName InQuestID, FName InTaskID, uint8 InSequenceIndex)
@@ -130,13 +140,13 @@ void USuqsWaypointComponent::Initialise(FName InQuestID, FName InTaskID, uint8 I
 void USuqsWaypointComponent::OnRep_Enabled()
 {
 	// Multiplayer notify
-	OnWaypointEnabledChanged.Broadcast(this);
+	OnIsEnabledChanged();
 }
 
 void USuqsWaypointComponent::OnRep_IsCurrent()
 {
 	// Multiplayer notify
-	OnWaypointIsCurrentChanged.Broadcast(this);
+	OnIsCurrentChanged();
 }
 
 void USuqsWaypointComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

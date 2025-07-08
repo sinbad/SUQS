@@ -124,4 +124,7 @@ protected:
 	virtual void Unregister();
 
 	virtual void OnUpdateTransform(EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport) override;
+
+	virtual void OnIsCurrentChanged();
+	virtual void OnIsEnabledChanged();
 };
