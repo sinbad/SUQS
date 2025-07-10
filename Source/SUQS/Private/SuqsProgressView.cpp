@@ -29,6 +29,7 @@ void FSuqsQuestStateView::FromUObject(USuqsQuestState* State, bool bIncludeCompl
 	Identifier = State->GetIdentifier();
 	Labels = State->GetLabels();
 	Title = State->GetTitle();
+	Status = State->GetStatus();
 
 	Description = State->GetDescription();
 
