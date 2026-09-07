@@ -4,18 +4,17 @@ We covered [how to define quests](Quests.md), now let's look at how you actually
 progress through quests during gameplay.
 
 The core object you need to do this is `USuqsProgression`. This is just a `UObject`,
-so you can store it anywhere you like (in a `UPROPERTY`). Personally, I like to
-store mine in my `UGameInstance` subclass, because that always exists across levels.
+so you can store it anywhere you like (in a `UPROPERTY`). For simplicity we provide
+`USuqsGameStateComponent` which you can add to your `AGameState`, because that always
+exists across levels (but you can do it however you want).
 
 You should initialise it, if possible, passing an "Outer" parameter of something
-that has a world context. In this example, it's done from a `UGameInstance` subclass:
+that has a world context. In this example, it's done from a `AGameState` subclass constructor:
 
 ```c++
-QuestProgression = NewObject<USuqsProgression>(this);
+SuqsComponent = CreateDefaultSubobject<USuqsGameStateComponent>(TEXT("SUQS"));
 ```
 
-While you *can* construct without the outer context, if you do so you'll have no
-access to world waypoints.
 
 ## Initialising the Quest Library
 
