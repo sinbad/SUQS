@@ -187,8 +187,8 @@ bool USuqsTaskState::Complete(bool bIgnoreResolveBarriers)
 					return false;
 				}
 			}
-		}		
-		Number = TaskDefinition->TargetNumber;
+		}
+		Number = FMath::Max(Number, TaskDefinition->TargetNumber);
 		ChangeStatus(ESuqsTaskStatus::Completed, bIgnoreResolveBarriers);
 	}
 	// Already completed
@@ -212,17 +212,29 @@ int USuqsTaskState::Progress(int Delta)
 void USuqsTaskState::SetNumber(int N)
 {
 	const int PrevNumber = Number;
-	// Clamp
-	Number = std::min(std::max(0, N), TaskDefinition->TargetNumber);
-
+	
+	Number = FMath::Max(0, N);
+	
+	if (TaskDefinition->ClampToTargetNumber)
+	{
+		Number = FMath::Min(Number, TaskDefinition->TargetNumber);
+	}
+	
 	if (PrevNumber != Number)
 	{
 		Progression->RaiseTaskUpdated(this);
 
-		if (Number == TaskDefinition->TargetNumber)
-			Complete();
+		if (Number >= TaskDefinition->TargetNumber)
+		{
+			if (PrevNumber < TaskDefinition->TargetNumber && Number >= TaskDefinition->TargetNumber)
+			{
+				Complete();
+			}
+		}
 		else
+		{
 			ChangeStatus(Number > 0 ? ESuqsTaskStatus::InProgress : ESuqsTaskStatus::NotStarted);
+		}
 		
 	}
 	
@@ -230,8 +242,7 @@ void USuqsTaskState::SetNumber(int N)
 
 int USuqsTaskState::GetNumberOutstanding() const
 {
-	// Number should be limited already so don't waste time clamping
-	return GetTargetNumber() - Number;
+	return FMath::Max(0, GetTargetNumber() - Number);
 }
 
 void USuqsTaskState::Reset()

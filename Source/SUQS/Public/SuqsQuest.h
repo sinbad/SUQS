@@ -34,6 +34,10 @@ public:
 	/// The number of times this task needs to be completed to be checked off
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Task")
 	int TargetNumber = 1;
+	
+	/// Whether the completed number should be clamped to the target number, or allowed to exceed it
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Task")
+	bool ClampToTargetNumber = true;
 
 	/// An optional time limit for the task. Once a task is started, it will be auto-closed if this time limit expires.
 	/// By default tasks fail on time limit expiry, but if you set TimeLimitCompleteOnExpiry=true then the task completes on timeout
