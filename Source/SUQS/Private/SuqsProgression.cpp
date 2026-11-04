@@ -759,7 +759,7 @@ bool USuqsProgression::IsGateOpen(FName GateName)
 	return OpenGates.Contains(GateName);
 }
 
-const TSet<FName>& USuqsProgression::GetOpenGates()
+const TSet<FName>& USuqsProgression::GetOpenGates() const 
 {
 	return OpenGates;
 }
