@@ -759,6 +759,11 @@ bool USuqsProgression::IsGateOpen(FName GateName)
 	return OpenGates.Contains(GateName);
 }
 
+const TSet<FName>& USuqsProgression::GetOpenGates() const 
+{
+	return OpenGates;
+}
+
 bool USuqsProgression::QuestDependenciesMet(const FName& QuestID)
 {
 	if (auto QuestDef = QuestDefinitions.Find(QuestID))

@@ -560,6 +560,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsGateOpen(FName GateName);
 	
+	/// Returns all open gates
+	UFUNCTION(BlueprintCallable)
+	const TSet<FName>& GetOpenGates() const;
+	
 	/// Return whether the dependencies for a given quest have been met
 	/// You don't usually need to call this yourself, if auto-accept is enabled on your quests. But if you
 	/// want to determine it manually you can.
